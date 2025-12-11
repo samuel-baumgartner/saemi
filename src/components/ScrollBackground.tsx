@@ -6,6 +6,7 @@ const TOTAL_IMAGES = 100;
 // Adjust this number to control how fast images progress: higher = faster (more images per pixel scrolled)
 const SCROLL_MULTIPLIER = 0.039;
 
+
 function getImagePath(index: number): string {
   const paddedIndex = String(index + 1).padStart(4, "0");
   return `/data/${paddedIndex}.png`;
