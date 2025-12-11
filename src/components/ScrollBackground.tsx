@@ -16,7 +16,7 @@ export default function ScrollBackground() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const imagesRef = useRef<Map<number, HTMLImageElement>>(new Map());
   const loadedImagesRef = useRef<Set<number>>(new Set());
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | undefined>(undefined);
   const lastIndexRef = useRef(0);
 
   // Preload images with proper loading tracking

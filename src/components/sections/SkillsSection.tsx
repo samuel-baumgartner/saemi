@@ -26,7 +26,7 @@ const SkillIcon = ({ skillId, color }: { skillId: string; color: string }) => {
   const iconSize = 40;
   const iconColor = iconColors[skillId] || iconColors.programming;
   
-  const icons: Record<string, JSX.Element> = {
+  const icons: Record<string, React.ReactElement> = {
     embedded: (
       <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" style={{ color: iconColor }}>
         <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/>
