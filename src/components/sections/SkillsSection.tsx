@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Skill } from '@/data/skills';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 
 interface SkillsSectionProps {
   skills: Skill[];
@@ -19,6 +20,20 @@ const iconColors: Record<string, string> = {
   devops: "#0891b2", // cyan-600
   documentation: "#4f46e5", // indigo-600
   fabrication: "#0d9488", // teal-600
+};
+
+// Spotlight color mapping based on icon colors
+const spotlightColors: Record<string, string> = {
+  embedded: "rgba(22, 163, 74, 0.25)", // green
+  programming: "rgba(37, 99, 235, 0.25)", // blue
+  "ml-ai": "rgba(147, 51, 234, 0.25)", // purple
+  scientific: "rgba(234, 88, 12, 0.25)", // orange
+  "3d-modeling": "rgba(219, 39, 119, 0.25)", // pink
+  control: "rgba(220, 38, 38, 0.25)", // red
+  systems: "rgba(202, 138, 4, 0.25)", // yellow
+  devops: "rgba(8, 145, 178, 0.25)", // cyan
+  documentation: "rgba(79, 70, 229, 0.25)", // indigo
+  fabrication: "rgba(13, 148, 136, 0.25)", // teal
 };
 
 // Icon components for each skill category
@@ -118,53 +133,47 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
             const isExpanded = expandedCard === skill.id;
             
             return (
-              <div
+              <SpotlightCard
                 key={skill.id}
                 onClick={() => handleCardClick(skill.id)}
-                className={`
-                  bg-white rounded-lg p-4 shadow-lg 
-                  hover:shadow-xl transition-all duration-300 
-                  flex flex-col items-center text-center cursor-pointer
-                  transform hover:scale-105 hover:-translate-y-1
-                  border-2 border-transparent hover:border-gray-200
-                  relative group
-                  ${isExpanded ? 'shadow-xl scale-105 border-gray-300' : ''}
-                `}
+                className="p-4 h-full flex flex-col items-center text-center cursor-pointer group"
+                spotlightColor={spotlightColors[skill.id] || "rgba(255, 255, 255, 0.15)"}
               >
-                <div className="mb-3 flex items-center justify-center relative">
+                <div className="mb-3 flex items-center justify-center">
                   <div className={`transition-transform duration-300 ${isExpanded ? 'scale-110' : 'group-hover:scale-110'}`}>
                     <SkillIcon skillId={skill.id} color={skill.iconColor} />
                   </div>
-                  {!isExpanded && (
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-gray-400">
-                        <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                  )}
                 </div>
                 
-                <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base leading-tight group-hover:text-gray-700 transition-colors">
+                <h3 className="font-bold text-white mb-2 text-sm md:text-base leading-tight group-hover:text-neutral-200 transition-colors">
                   {skill.category}
                 </h3>
                 
                 <div className="w-full mb-3">
-                  <p className="text-gray-600 text-xs md:text-sm font-medium">
+                  <p className="text-neutral-400 text-xs md:text-sm font-medium">
                     {skill.tools}
                   </p>
                 </div>
                 
                 <div
                   className={`
-                    overflow-hidden transition-all duration-500 ease-in-out
+                    overflow-hidden transition-all duration-500 ease-in-out flex-1
                     ${isExpanded ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}
                   `}
                 >
-                  <p className="text-gray-500 text-xs leading-relaxed text-left">
+                  <p className="text-neutral-400 text-xs leading-relaxed text-left">
                     {skill.description}
                   </p>
                 </div>
-              </div>
+                
+                {!isExpanded && (
+                  <div className="mt-auto pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center w-full">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-neutral-400">
+                      <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )}
+              </SpotlightCard>
             );
           })}
         </div>

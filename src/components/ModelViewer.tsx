@@ -56,11 +56,12 @@ export default function ModelViewer({ modelPath, className }: ModelViewerProps) 
           <pointLight position={[-10, -10, -5]} intensity={0.5} />
           <Model modelPath={modelPath} />
           <OrbitControls
-            enableZoom={true}
+            enableZoom={false}
             enablePan={false}
             enableRotate={true}
             minDistance={2}
             maxDistance={15}
+            makeDefault
           />
           <Environment preset="city" />
         </Suspense>
