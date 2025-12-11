@@ -21,11 +21,11 @@ export default function ScrollHint() {
   if (!isVisible) return null;
 
   return (
-    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce transition-opacity duration-300">
-      <div className="flex flex-col items-center gap-2 text-white text-sm">
+    <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce transition-opacity duration-300">
+      <div className="flex flex-col items-center gap-1 sm:gap-2 text-white text-xs sm:text-sm">
         <span>Scroll</span>
         <svg
-          className="w-6 h-6"
+          className="w-5 h-5 sm:w-6 sm:h-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

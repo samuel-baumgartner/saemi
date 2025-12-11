@@ -124,11 +124,11 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
   };
 
   return (
-    <section id="skills" className="relative min-h-[40vh] flex items-center justify-center px-4 py-6 z-10">
+    <section id="skills" className="relative min-h-[40vh] flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 z-10">
       <div className="max-w-7xl w-full">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-12 text-center">Skills</h2>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 sm:mb-12 text-center">Skills</h2>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {skills.map((skill) => {
             const isExpanded = expandedCard === skill.id;
             
@@ -136,21 +136,21 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
               <SpotlightCard
                 key={skill.id}
                 onClick={() => handleCardClick(skill.id)}
-                className="p-4 h-full flex flex-col items-center text-center cursor-pointer group"
+                className="p-3 sm:p-4 h-full flex flex-col items-center text-center cursor-pointer group"
                 spotlightColor={spotlightColors[skill.id] || "rgba(255, 255, 255, 0.15)"}
               >
-                <div className="mb-3 flex items-center justify-center">
+                <div className="mb-2 sm:mb-3 flex items-center justify-center">
                   <div className={`transition-transform duration-300 ${isExpanded ? 'scale-110' : 'group-hover:scale-110'}`}>
                     <SkillIcon skillId={skill.id} color={skill.iconColor} />
                   </div>
                 </div>
                 
-                <h3 className="font-bold text-white mb-2 text-sm md:text-base leading-tight group-hover:text-neutral-200 transition-colors">
+                <h3 className="font-bold text-white mb-1 sm:mb-2 text-xs sm:text-sm md:text-base leading-tight group-hover:text-neutral-200 transition-colors">
                   {skill.category}
                 </h3>
                 
-                <div className="w-full mb-3">
-                  <p className="text-neutral-400 text-xs md:text-sm font-medium">
+                <div className="w-full mb-2 sm:mb-3">
+                  <p className="text-neutral-400 text-xs sm:text-sm font-medium">
                     {skill.tools}
                   </p>
                 </div>

@@ -50,19 +50,19 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
     }
   };
   return (
-    <div className="flex min-h-[80vh] items-center justify-center relative">
+    <div className="flex min-h-[70vh] sm:min-h-[80vh] items-center justify-center relative pb-20 sm:pb-0">
       <Link
         href="/"
-        className="absolute top-4 left-4 text-white text-lg font-medium hover:underline z-10"
+        className="absolute top-4 left-4 text-white text-base sm:text-lg font-medium hover:underline z-10 px-2"
       >
         {personalInfo.name}
       </Link>
-      <div className="text-center text-white space-y-8 max-w-2xl px-4 z-10">
-        <div className="space-y-4">
-          <h1 className="text-6xl md:text-7xl font-bold tracking-tight">
+      <div className="text-center text-white space-y-6 sm:space-y-8 max-w-2xl px-4 sm:px-6 z-10">
+        <div className="space-y-3 sm:space-y-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
             {personalInfo.name}
           </h1>
-          <p className="text-xl md:text-2xl text-white font-light">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-light px-2">
             {personalInfo.title},{' '}
             <a
               href={personalInfo.universityUrl}
@@ -74,26 +74,26 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
             </a>
           </p>
         </div>
-        <p className="text-lg text-white pt-4">
+        <p className="text-base sm:text-lg text-white pt-2 sm:pt-4">
           I am a <Typewriter />
         </p>
-        <p className="text-lg text-white">{personalInfo.interests}</p>
-        <div className="flex gap-4 justify-center pt-6">
+        <p className="text-sm sm:text-base md:text-lg text-white px-2">{personalInfo.interests}</p>
+        <div className="flex gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 flex-wrap">
           <Link
             href="#cv"
-            className="text-sm text-white hover:text-gray-200 transition-colors"
+            className="text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2"
           >
             CV
           </Link>
           <Link
             href="#projects"
-            className="text-sm text-white hover:text-gray-200 transition-colors"
+            className="text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2"
           >
             Projects
           </Link>
           <Link
             href="#contact"
-            className="text-sm text-white hover:text-gray-200 transition-colors"
+            className="text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2"
           >
             Contact
           </Link>
@@ -103,10 +103,10 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
       {showProjectHint && showBubble && (
         <button
           onClick={handleBackgroundClick}
-          className="absolute z-10 group hover:opacity-100 transition-opacity duration-300"
+          className="absolute z-10 group hover:opacity-100 transition-opacity duration-300 hidden md:block"
           style={{
-            top: '450px', // Change this value (in px, rem, %, etc.)
-            right: '250px', // Change this value (in px, rem, %, etc.)
+            top: '450px',
+            right: '250px',
             animation: 'fadeInSlideUp 0.5s ease-out forwards',
           }}
         >
@@ -120,12 +120,14 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
             }}
           >
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-            <span className="relative text-white/90 text-xs md:text-sm font-medium group-hover:text-white transition-colors">
-              Background: 
-            </span>
-            <span className="relative text-white text-xs md:text-sm font-semibold group-hover:underline">
-              Remote Controlled Ball Project
-            </span>
+            <div className="relative flex flex-col items-start">
+              <span className="relative text-white/90 text-xs md:text-sm font-medium group-hover:text-white transition-colors">
+                background:
+              </span>
+              <span className="relative text-white text-xs md:text-sm font-semibold group-hover:underline">
+                Remote controlled ball
+              </span>
+            </div>
             <svg 
               className="relative w-3.5 h-3.5 text-white/90 group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300" 
               fill="none" 

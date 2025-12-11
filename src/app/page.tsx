@@ -76,31 +76,26 @@ export default function Home() {
     // Find the remote-ball project
     const remoteBallProject = projects.find(p => p.id === 'remote-ball');
     if (remoteBallProject) {
-      // Scroll to projects section
-      const projectsSection = document.querySelector('#projects');
-      if (projectsSection) {
-        projectsSection.scrollIntoView({ behavior: 'smooth' });
+      // Find the project card element directly
+      const projectCard = document.querySelector(`[data-project-id="${remoteBallProject.id}"]`) as HTMLElement;
+      if (projectCard) {
+        // Scroll card into view with a slight offset from top
+        const cardRect = projectCard.getBoundingClientRect();
+        const scrollY = window.scrollY + cardRect.top - (window.innerHeight * 0.3);
+        window.scrollTo({ top: Math.max(0, scrollY), behavior: 'smooth' });
         
-        // After scrolling, highlight the project
+        // Add highlight animation with a ring effect after scroll
         setTimeout(() => {
-          // Find the project card element
-          const projectCard = document.querySelector(`[data-project-id="${remoteBallProject.id}"]`) as HTMLElement;
-          if (projectCard) {
-            // Scroll card into view
-            projectCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Add highlight animation with a ring effect
-            projectCard.style.transition = 'all 0.5s ease-in-out';
-            projectCard.style.boxShadow = '0 0 0 4px rgba(34, 197, 94, 0.5), 0 0 20px rgba(34, 197, 94, 0.3)';
-            projectCard.style.transform = 'scale(1.05)';
-            
-            // Remove highlight after animation (but don't open modal)
-            setTimeout(() => {
-              projectCard.style.boxShadow = '';
-              projectCard.style.transform = '';
-            }, 1500);
-          }
-        }, 600);
+          projectCard.style.transition = 'all 0.5s ease-in-out';
+          projectCard.style.boxShadow = '0 0 0 4px rgba(34, 197, 94, 0.5), 0 0 20px rgba(34, 197, 94, 0.3)';
+          projectCard.style.transform = 'scale(1.05)';
+          
+          // Remove highlight after animation (but don't open modal)
+          setTimeout(() => {
+            projectCard.style.boxShadow = '';
+            projectCard.style.transform = '';
+          }, 1500);
+        }, 300);
       }
     }
   };
