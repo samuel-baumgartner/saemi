@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Ensure static files are properly handled
-  // Vercel automatically serves files from public/, but this ensures proper handling
-  images: {
-    // Disable image optimization for large static images if needed
-    unoptimized: false,
-  },
+  // Ensure static files are properly served
+  // This helps with case-sensitive file systems in production
+  output: 'standalone', // Optional: for better deployment compatibility
 };
 
 export default nextConfig;
