@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { useGLTF } from "@react-three/drei";
 import ScrollBackground from "@/components/ScrollBackground";
 import EducationModal from "@/components/EducationModal";
 import HeroSection from "@/components/sections/HeroSection";
@@ -15,6 +16,26 @@ import { educationItems } from "@/data/education";
 import { projects } from "@/data/projects";
 import { skills } from "@/data/skills";
 import { Project, EducationItem } from "@/types";
+
+// Preload the 3D model in the background
+function ModelPreloader() {
+  useEffect(() => {
+    // Wait a bit after page load, then preload the model in the background
+    const timer = setTimeout(() => {
+      try {
+        // Preload the GLB model
+        useGLTF.preload('/Kugel_rerender6.glb');
+      } catch (error) {
+        // Silently fail if preload doesn't work
+        console.debug('Model preload initiated');
+      }
+    }, 2000); // Start preloading 2 seconds after page load
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return null;
+}
 
 export default function Home() {
   const { modalState, openModal, closeModal } = useModal();
@@ -51,15 +72,49 @@ export default function Home() {
     );
   };
 
+  const handleOpenRemoteBallProject = () => {
+    // Find the remote-ball project
+    const remoteBallProject = projects.find(p => p.id === 'remote-ball');
+    if (remoteBallProject) {
+      // Scroll to projects section
+      const projectsSection = document.querySelector('#projects');
+      if (projectsSection) {
+        projectsSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // After scrolling, highlight the project
+        setTimeout(() => {
+          // Find the project card element
+          const projectCard = document.querySelector(`[data-project-id="${remoteBallProject.id}"]`) as HTMLElement;
+          if (projectCard) {
+            // Scroll card into view
+            projectCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Add highlight animation with a ring effect
+            projectCard.style.transition = 'all 0.5s ease-in-out';
+            projectCard.style.boxShadow = '0 0 0 4px rgba(34, 197, 94, 0.5), 0 0 20px rgba(34, 197, 94, 0.3)';
+            projectCard.style.transform = 'scale(1.05)';
+            
+            // Remove highlight after animation (but don't open modal)
+            setTimeout(() => {
+              projectCard.style.boxShadow = '';
+              projectCard.style.transform = '';
+            }, 1500);
+          }
+        }, 600);
+      }
+    }
+  };
+
   const handleOpenEducation = (item: EducationItem) => {
     openModal(item.title, item.description);
   };
 
   return (
     <>
+      <ModelPreloader />
       <ScrollBackground />
       <main className="relative min-h-screen">
-        <HeroSection personalInfo={personalInfo} />
+        <HeroSection personalInfo={personalInfo} onOpenRemoteBallProject={handleOpenRemoteBallProject} />
         <AboutSection personalInfo={personalInfo} />
         <EducationSection
           educationItems={educationItems}

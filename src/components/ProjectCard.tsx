@@ -40,7 +40,12 @@ export default function ProjectCard({ project, onOpen }: ProjectCardProps) {
       : 'bg-green-100 text-green-800';
 
   return (
-    <button onClick={() => onOpen(project)} className={bgClass} style={bgStyle}>
+    <button 
+      onClick={() => onOpen(project)} 
+      className={`${bgClass} transition-all duration-500`}
+      style={bgStyle}
+      data-project-id={project.id}
+    >
       {project.backgroundImage && (
         <div className="absolute inset-0 bg-black/40 hover:bg-black/50 transition-colors"></div>
       )}

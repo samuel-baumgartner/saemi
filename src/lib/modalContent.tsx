@@ -178,10 +178,10 @@ export const createProjectHeader = (
   description: string
 ): React.ReactNode => (
   <div className="pb-8 pt-4 pr-4">
-    <h4 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-8 leading-tight">
+    <h4 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
       {title}
     </h4>
-    <div className="flex flex-wrap gap-4 text-sm mb-8">
+    <div className="flex flex-wrap gap-4 text-sm mb-6">
       {tags.map((tag, index) => (
         <span
           key={index}
@@ -191,7 +191,7 @@ export const createProjectHeader = (
         </span>
       ))}
     </div>
-    <p className="text-lg md:text-xl text-gray-800 leading-relaxed font-medium">{description}</p>
+    <p className="text-lg md:text-xl text-gray-800 leading-relaxed font-medium mt-2">{description}</p>
   </div>
 );
 

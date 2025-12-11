@@ -14,30 +14,75 @@ function getImagePath(index: number): string {
 
 export default function ScrollBackground() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFirstImageLoaded, setIsFirstImageLoaded] = useState(false);
   const imagesRef = useRef<Map<number, HTMLImageElement>>(new Map());
   const loadedImagesRef = useRef<Set<number>>(new Set());
   const rafRef = useRef<number | undefined>(undefined);
   const lastIndexRef = useRef(0);
 
-  // Preload images with proper loading tracking
+  // Prioritize loading the first image immediately
   useEffect(() => {
+    const loadFirstImage = () => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImagesRef.current.add(0);
+        imagesRef.current.set(0, img);
+        setIsFirstImageLoaded(true);
+      };
+      img.onerror = () => {
+        loadedImagesRef.current.add(0);
+        setIsFirstImageLoaded(true);
+      };
+      img.src = getImagePath(0);
+      imagesRef.current.set(0, img);
+    };
+
+    loadFirstImage();
+  }, []);
+
+  // Preload remaining images after first image is loaded
+  useEffect(() => {
+    if (!isFirstImageLoaded) return;
+
     const preloadImages = () => {
-      for (let i = 0; i < TOTAL_IMAGES; i++) {
+      // Preload first few images immediately
+      for (let i = 1; i <= 10; i++) {
         const img = new Image();
         img.onload = () => {
           loadedImagesRef.current.add(i);
         };
         img.onerror = () => {
-          // Still mark as "loaded" to avoid blocking
           loadedImagesRef.current.add(i);
         };
         img.src = getImagePath(i);
         imagesRef.current.set(i, img);
       }
+
+      // Preload remaining images in batches to avoid blocking
+      let batchStart = 11;
+      const preloadBatch = () => {
+        const batchEnd = Math.min(batchStart + 10, TOTAL_IMAGES);
+        for (let i = batchStart; i < batchEnd; i++) {
+          const img = new Image();
+          img.onload = () => {
+            loadedImagesRef.current.add(i);
+          };
+          img.onerror = () => {
+            loadedImagesRef.current.add(i);
+          };
+          img.src = getImagePath(i);
+          imagesRef.current.set(i, img);
+        }
+        batchStart = batchEnd;
+        if (batchStart < TOTAL_IMAGES) {
+          setTimeout(preloadBatch, 50);
+        }
+      };
+      setTimeout(preloadBatch, 100);
     };
 
     preloadImages();
-  }, []);
+  }, [isFirstImageLoaded]);
 
   // Preload adjacent images when scrolling
   useEffect(() => {
@@ -93,10 +138,17 @@ export default function ScrollBackground() {
     };
   }, []);
 
+  // Don't render background until first image is loaded
+  if (!isFirstImageLoaded) {
+    return (
+      <div className="fixed inset-0 -z-10 bg-black" />
+    );
+  }
+
   return (
     <>
       <div
-        className="fixed inset-0 -z-10 transition-opacity duration-500"
+        className="fixed inset-0 -z-10 transition-opacity duration-300"
         style={{
           backgroundImage: `url(${getImagePath(currentImageIndex)})`,
           backgroundSize: "cover",
@@ -106,6 +158,7 @@ export default function ScrollBackground() {
           backfaceVisibility: "hidden",
           transform: "translateZ(0)",
           willChange: "background-image",
+          opacity: isFirstImageLoaded ? 1 : 0,
         }}
       />
       <div className="fixed inset-0 -z-10 bg-black/40" />

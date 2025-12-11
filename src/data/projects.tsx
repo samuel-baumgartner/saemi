@@ -625,7 +625,10 @@ export const projects: Project[] = [
       { label: 'Self-Hosting' },
     ],
     metadata: {},
-    carouselItems: [],
+    backgroundImage: '/overleaf/image.png',
+    carouselItems: [
+      { type: 'image', src: '/overleaf/image.png' },
+    ],
     headerContent: createProjectHeader(
       'Self-Hosted Overleaf with Automated TrueNAS Backups',
       [
