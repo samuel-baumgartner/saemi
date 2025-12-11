@@ -36,6 +36,7 @@ export const createFeatureList = (features: FeatureItem[]): React.ReactNode => {
       'bg-pink-500': 'from-pink-50 via-rose-50/30 to-pink-50',
       'bg-indigo-500': 'from-indigo-50 via-blue-50/30 to-indigo-50',
       'bg-cyan-500': 'from-cyan-50 via-sky-50/30 to-cyan-50',
+      'bg-emerald-500': 'from-emerald-50 via-green-50/30 to-emerald-50',
       'bg-red-500': 'from-red-50 via-rose-50/30 to-red-50',
     };
     return gradientMap[color] || 'from-blue-50 via-indigo-50/30 to-blue-50';
@@ -50,23 +51,25 @@ export const createFeatureList = (features: FeatureItem[]): React.ReactNode => {
       'bg-pink-500': 'border-pink-200/60',
       'bg-indigo-500': 'border-indigo-200/60',
       'bg-cyan-500': 'border-cyan-200/60',
+      'bg-emerald-500': 'border-emerald-200/60',
       'bg-red-500': 'border-red-200/60',
     };
     return borderMap[color] || 'border-blue-200/60';
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+    <div className="grid md:grid-cols-2 gap-4 md:gap-6">
       {features.map((feature, index) => {
         const gradient = getFeatureGradient(feature.color);
+        const borderColor = getBorderColor(feature.color);
         return (
           <div 
             key={index} 
-            className={`group bg-gray-200 rounded-2xl p-4 md:p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border border-gray-200/60 shadow-sm text-center`}
+            className={`group bg-gradient-to-br ${gradient} rounded-xl p-4 md:p-5 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border ${borderColor} shadow-md text-center backdrop-blur-sm`}
           >
             <div className="flex flex-col items-center">
-              <strong className="text-gray-900 font-bold text-lg md:text-xl block mb-3">{feature.title}:</strong>
-              <span className="text-gray-700 text-sm md:text-base leading-relaxed block">{feature.description}</span>
+              <strong className="text-gray-900 font-bold text-lg md:text-xl block mb-2">{feature.title}</strong>
+              <span className="text-gray-600 text-sm md:text-base leading-relaxed block">{feature.description}</span>
             </div>
           </div>
         );

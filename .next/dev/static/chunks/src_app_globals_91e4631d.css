@@ -1163,10 +1163,6 @@ body {
   font-weight: 600;
 }
 
-.lowercase {
-  text-transform: lowercase;
-}
-
 .leading-relaxed {
   line-height: 1.625;
 }

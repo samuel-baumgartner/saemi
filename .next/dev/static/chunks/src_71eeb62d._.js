@@ -6,7 +6,6 @@ __turbopack_context__.s([
     "default",
     ()=>ScrollBackground
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/.pnpm/next@16.0.8_@babel+core@7.28.5_react-dom@19.2.1_react@19.2.1__react@19.2.1/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/next@16.0.8_@babel+core@7.28.5_react-dom@19.2.1_react@19.2.1__react@19.2.1/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/next@16.0.8_@babel+core@7.28.5_react-dom@19.2.1_react@19.2.1__react@19.2.1/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 ;
@@ -26,7 +25,6 @@ const SCROLL_MULTIPLIER_MOBILE = 0.025; // Mobile scroll speed
 const PRELOAD_RANGE = ("TURBOPACK compile-time value", "object") !== 'undefined' && window.innerWidth < 768 ? 10 : 5;
 function getImagePath(index) {
     const paddedIndex = String(index + 1).padStart(4, "0");
-    // Ensure lowercase path for case-sensitive servers (Linux production)
     return `/data/${paddedIndex}.png`;
 }
 function ScrollBackground() {
@@ -113,15 +111,7 @@ function ScrollBackground() {
                         }
                     })["ScrollBackground.useEffect.loadFirstImage"];
                     img.onerror = ({
-                        "ScrollBackground.useEffect.loadFirstImage": (error)=>{
-                            const imagePath = getImagePath(0);
-                            console.error(`Failed to load image: ${imagePath}`, {
-                                error,
-                                path: imagePath,
-                                environment: ("TURBOPACK compile-time value", "development"),
-                                // Log if we're on Vercel
-                                isVercel: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.VERCEL === '1'
-                            });
+                        "ScrollBackground.useEffect.loadFirstImage": ()=>{
                             loadedImagesRef.current.add(0);
                             decodedImagesRef.current.add(0);
                             setIsFirstImageLoaded(true);
@@ -546,7 +536,7 @@ function ScrollBackground() {
             className: "fixed inset-0 -z-10 bg-black"
         }, void 0, false, {
             fileName: "[project]/src/components/ScrollBackground.tsx",
-            lineNumber: 480,
+            lineNumber: 471,
             columnNumber: 7
         }, this);
     }
@@ -558,7 +548,7 @@ function ScrollBackground() {
                 className: "fixed inset-0 -z-10 bg-black"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 490,
+                lineNumber: 481,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -579,7 +569,7 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 493,
+                lineNumber: 484,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -602,14 +592,14 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 511,
+                lineNumber: 502,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "fixed inset-0 -z-10 bg-black/40"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 530,
+                lineNumber: 521,
                 columnNumber: 7
             }, this)
         ]
@@ -1527,6 +1517,16 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
             }
         }
     };
+    const handleCvDownload = (e)=>{
+        e.preventDefault();
+        // Create a temporary anchor element to trigger download
+        const link = document.createElement('a');
+        link.href = '/CV/Samuel_Baumgartner.pdf';
+        link.download = 'Samuel_Baumgartner_CV.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "flex min-h-[70vh] sm:min-h-[80vh] items-center justify-center relative pb-20 sm:pb-0",
         children: [
@@ -1536,7 +1536,7 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                 children: personalInfo.name
             }, void 0, false, {
                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                lineNumber: 54,
+                lineNumber: 65,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1550,7 +1550,7 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                                 children: personalInfo.name
                             }, void 0, false, {
                                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                lineNumber: 62,
+                                lineNumber: 73,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1567,19 +1567,19 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                                         children: personalInfo.university
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                        lineNumber: 67,
+                                        lineNumber: 78,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                lineNumber: 65,
+                                lineNumber: 76,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/sections/HeroSection.tsx",
-                        lineNumber: 61,
+                        lineNumber: 72,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1588,13 +1588,13 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                             "I am a ",
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Typewriter$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                lineNumber: 78,
+                                lineNumber: 89,
                                 columnNumber: 18
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/sections/HeroSection.tsx",
-                        lineNumber: 77,
+                        lineNumber: 88,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1602,19 +1602,19 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                         children: personalInfo.interests
                     }, void 0, false, {
                         fileName: "[project]/src/components/sections/HeroSection.tsx",
-                        lineNumber: 80,
+                        lineNumber: 91,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "flex gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 flex-wrap",
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                href: "#cv",
-                                className: "text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2",
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                onClick: handleCvDownload,
+                                className: "text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2 cursor-pointer",
                                 children: "CV"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                lineNumber: 82,
+                                lineNumber: 93,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1623,7 +1623,7 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                                 children: "Projects"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                lineNumber: 88,
+                                lineNumber: 99,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1632,24 +1632,24 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                                 children: "Contact"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                lineNumber: 94,
+                                lineNumber: 105,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/sections/HeroSection.tsx",
-                        lineNumber: 81,
+                        lineNumber: 92,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                lineNumber: 60,
+                lineNumber: 71,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ScrollHint$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                lineNumber: 102,
+                lineNumber: 113,
                 columnNumber: 7
             }, this),
             showProjectHint && showBubble && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1674,7 +1674,7 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                             className: "absolute inset-0 rounded-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none"
                         }, void 0, false, {
                             fileName: "[project]/src/components/sections/HeroSection.tsx",
-                            lineNumber: 122,
+                            lineNumber: 133,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1685,7 +1685,7 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                                     children: "background:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                    lineNumber: 124,
+                                    lineNumber: 135,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1693,13 +1693,13 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                                     children: "Remote controlled ball"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                    lineNumber: 127,
+                                    lineNumber: 138,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/sections/HeroSection.tsx",
-                            lineNumber: 123,
+                            lineNumber: 134,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
@@ -1714,29 +1714,29 @@ function HeroSection({ personalInfo, onOpenRemoteBallProject }) {
                                 d: "M9 5l7 7-7 7"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                                lineNumber: 137,
+                                lineNumber: 148,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/sections/HeroSection.tsx",
-                            lineNumber: 131,
+                            lineNumber: 142,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/sections/HeroSection.tsx",
-                    lineNumber: 113,
+                    lineNumber: 124,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/sections/HeroSection.tsx",
-                lineNumber: 104,
+                lineNumber: 115,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/sections/HeroSection.tsx",
-        lineNumber: 53,
+        lineNumber: 64,
         columnNumber: 5
     }, this);
 }
@@ -3271,6 +3271,7 @@ const createFeatureList = (features)=>{
             'bg-pink-500': 'from-pink-50 via-rose-50/30 to-pink-50',
             'bg-indigo-500': 'from-indigo-50 via-blue-50/30 to-indigo-50',
             'bg-cyan-500': 'from-cyan-50 via-sky-50/30 to-cyan-50',
+            'bg-emerald-500': 'from-emerald-50 via-green-50/30 to-emerald-50',
             'bg-red-500': 'from-red-50 via-rose-50/30 to-red-50'
         };
         return gradientMap[color] || 'from-blue-50 via-indigo-50/30 to-blue-50';
@@ -3284,53 +3285,52 @@ const createFeatureList = (features)=>{
             'bg-pink-500': 'border-pink-200/60',
             'bg-indigo-500': 'border-indigo-200/60',
             'bg-cyan-500': 'border-cyan-200/60',
+            'bg-emerald-500': 'border-emerald-200/60',
             'bg-red-500': 'border-red-200/60'
         };
         return borderMap[color] || 'border-blue-200/60';
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "grid md:grid-cols-2 gap-6 md:gap-8",
+        className: "grid md:grid-cols-2 gap-4 md:gap-6",
         children: features.map((feature, index)=>{
             const gradient = getFeatureGradient(feature.color);
+            const borderColor = getBorderColor(feature.color);
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: `group bg-gray-200 rounded-2xl p-4 md:p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border border-gray-200/60 shadow-sm text-center`,
+                className: `group bg-gradient-to-br ${gradient} rounded-xl p-4 md:p-5 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border ${borderColor} shadow-md text-center backdrop-blur-sm`,
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex flex-col items-center",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                            className: "text-gray-900 font-bold text-lg md:text-xl block mb-3",
-                            children: [
-                                feature.title,
-                                ":"
-                            ]
-                        }, void 0, true, {
+                            className: "text-gray-900 font-bold text-lg md:text-xl block mb-2",
+                            children: feature.title
+                        }, void 0, false, {
                             fileName: "[project]/src/lib/modalContent.tsx",
-                            lineNumber: 68,
+                            lineNumber: 71,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                            className: "text-gray-700 text-sm md:text-base leading-relaxed block",
+                            className: "text-gray-600 text-sm md:text-base leading-relaxed block",
                             children: feature.description
                         }, void 0, false, {
                             fileName: "[project]/src/lib/modalContent.tsx",
-                            lineNumber: 69,
+                            lineNumber: 72,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/lib/modalContent.tsx",
-                    lineNumber: 67,
+                    lineNumber: 70,
                     columnNumber: 13
                 }, ("TURBOPACK compile-time value", void 0))
             }, index, false, {
                 fileName: "[project]/src/lib/modalContent.tsx",
-                lineNumber: 63,
+                lineNumber: 66,
                 columnNumber: 11
             }, ("TURBOPACK compile-time value", void 0));
         })
     }, void 0, false, {
         fileName: "[project]/src/lib/modalContent.tsx",
-        lineNumber: 59,
+        lineNumber: 61,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -3415,7 +3415,7 @@ const createTechStack = (techItems)=>{
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/lib/modalContent.tsx",
-                            lineNumber: 149,
+                            lineNumber: 152,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3423,24 +3423,24 @@ const createTechStack = (techItems)=>{
                             children: item.technology
                         }, void 0, false, {
                             fileName: "[project]/src/lib/modalContent.tsx",
-                            lineNumber: 150,
+                            lineNumber: 153,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/lib/modalContent.tsx",
-                    lineNumber: 148,
+                    lineNumber: 151,
                     columnNumber: 13
                 }, ("TURBOPACK compile-time value", void 0))
             }, index, false, {
                 fileName: "[project]/src/lib/modalContent.tsx",
-                lineNumber: 141,
+                lineNumber: 144,
                 columnNumber: 11
             }, ("TURBOPACK compile-time value", void 0));
         })
     }, void 0, false, {
         fileName: "[project]/src/lib/modalContent.tsx",
-        lineNumber: 137,
+        lineNumber: 140,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -3453,13 +3453,13 @@ const createHighlightedSection = (title, content, gradient = 'from-blue-500 to-c
                 children: content
             }, void 0, false, {
                 fileName: "[project]/src/lib/modalContent.tsx",
-                lineNumber: 168,
+                lineNumber: 171,
                 columnNumber: 5
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/src/lib/modalContent.tsx",
-        lineNumber: 166,
+        lineNumber: 169,
         columnNumber: 3
     }, ("TURBOPACK compile-time value", void 0));
 const createProjectHeader = (title, tags, description)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3470,7 +3470,7 @@ const createProjectHeader = (title, tags, description)=>/*#__PURE__*/ (0, __TURB
                 children: title
             }, void 0, false, {
                 fileName: "[project]/src/lib/modalContent.tsx",
-                lineNumber: 180,
+                lineNumber: 183,
                 columnNumber: 5
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3480,12 +3480,12 @@ const createProjectHeader = (title, tags, description)=>/*#__PURE__*/ (0, __TURB
                         children: tag.label
                     }, index, false, {
                         fileName: "[project]/src/lib/modalContent.tsx",
-                        lineNumber: 185,
+                        lineNumber: 188,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0)))
             }, void 0, false, {
                 fileName: "[project]/src/lib/modalContent.tsx",
-                lineNumber: 183,
+                lineNumber: 186,
                 columnNumber: 5
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3493,13 +3493,13 @@ const createProjectHeader = (title, tags, description)=>/*#__PURE__*/ (0, __TURB
                 children: description
             }, void 0, false, {
                 fileName: "[project]/src/lib/modalContent.tsx",
-                lineNumber: 193,
+                lineNumber: 196,
                 columnNumber: 5
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/src/lib/modalContent.tsx",
-        lineNumber: 179,
+        lineNumber: 182,
         columnNumber: 3
     }, ("TURBOPACK compile-time value", void 0));
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
@@ -3992,9 +3992,9 @@ const projects = [
     },
     {
         id: 'zurich-hack',
-        title: 'Zürich AI Hack 2025 – "Guidely: AI Desktop Guidance Assistant"',
-        shortTitle: 'Zürich AI Hack',
-        description: 'Guidely is a desktop application built for Zürich AI Hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.',
+        title: 'Swiss AI hack 2025 – "Guidely: AI Desktop Guidance Assistant"',
+        shortTitle: 'Swiss AI hack',
+        description: 'Guidely is a desktop application built for Swiss AI hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.',
         type: 'hackathon',
         tags: [
             {
@@ -4041,7 +4041,7 @@ const projects = [
                 src: 'https://www.youtube.com/watch?v=tGFbolKX4Ts'
             }
         ],
-        headerContent: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$modalContent$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createProjectHeader"])('Zürich AI Hack 2025 – "Guidely: AI Desktop Guidance Assistant"', [
+        headerContent: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$modalContent$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createProjectHeader"])('Swiss AI Hackathon 2025 - "Guidely: AI Desktop Guidance Assistant"', [
             {
                 label: 'Hackathon',
                 color: 'bg-blue-100 text-blue-800'
@@ -4055,7 +4055,7 @@ const projects = [
             {
                 label: 'Team of 3'
             }
-        ], 'Guidely is a desktop application built for Zürich AI Hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.'),
+        ], 'Guidely is a desktop application built for Swiss AI hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.'),
         content: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "space-y-8",
             children: [
@@ -4063,7 +4063,7 @@ const projects = [
                     className: "mt-20",
                     children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$modalContent$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createHighlightedSection"])('Overview', /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                         className: "text-gray-700 leading-relaxed text-base",
-                        children: "Guidely is a desktop application built for Zürich AI Hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials. A user describes what they want to accomplish, and Guidely produces a guided workflow directly on top of the user's screen, highlighting exactly where to click and what to do next. The goal is to make unfamiliar software and multi-step actions accessible without searching manuals or videos."
+                        children: "Guidely is a desktop application built for Swiss AI hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials. A user describes what they want to accomplish, and Guidely produces a guided workflow directly on top of the user's screen, highlighting exactly where to click and what to do next. The goal is to make unfamiliar software and multi-step actions accessible without searching manuals or videos."
                     }, void 0, false, {
                         fileName: "[project]/src/data/projects.tsx",
                         lineNumber: 250,
@@ -4398,14 +4398,14 @@ const projects = [
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "space-y-6 mt-16",
+                    className: "space-y-8 mt-16",
                     children: [
                         (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$modalContent$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createSectionHeader"])('Key Features', 'from-purple-500 to-pink-500'),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-xl p-6 border border-gray-200/60 shadow-md",
+                            className: "bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-2xl p-6 md:p-8 border border-gray-200/60 shadow-lg backdrop-blur-sm",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "text-gray-700 mb-4 font-semibold",
+                                    className: "text-gray-800 mb-6 font-semibold text-lg md:text-xl",
                                     children: "Multi-layer environmental dashboard for Zurich, including:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/data/projects.tsx",
@@ -4450,81 +4450,116 @@ const projects = [
                                     }
                                 ]),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mt-5 space-y-2.5 text-gray-700",
+                                    className: "mt-8 pt-6 border-t border-blue-200/60",
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "flex items-start gap-2.5",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-blue-500 mt-1.5 font-bold",
-                                                    children: "•"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 387,
-                                                    columnNumber: 17
-                                                }, ("TURBOPACK compile-time value", void 0)),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-sm leading-relaxed",
-                                                    children: "Automated ingestion and alignment of satellite + city datasets into a unified grid"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 388,
-                                                    columnNumber: 17
-                                                }, ("TURBOPACK compile-time value", void 0))
-                                            ]
-                                        }, void 0, true, {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h5", {
+                                            className: "text-xl md:text-2xl font-bold text-gray-900 mb-4",
+                                            children: "Core Capabilities"
+                                        }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
                                             lineNumber: 386,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "flex items-start gap-2.5",
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "grid md:grid-cols-1 gap-4",
                                             children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-blue-500 mt-1.5 font-bold",
-                                                    children: "•"
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-start gap-3",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/data/projects.tsx",
+                                                                lineNumber: 390,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-gray-700 leading-relaxed text-base md:text-lg",
+                                                                children: "Automated ingestion and alignment of satellite + city datasets into a unified grid"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/data/projects.tsx",
+                                                                lineNumber: 391,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/data/projects.tsx",
+                                                        lineNumber: 389,
+                                                        columnNumber: 19
+                                                    }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 391,
+                                                    lineNumber: 388,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-sm leading-relaxed",
-                                                    children: "Unsupervised anomaly detection to identify unusual environmental patterns"
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-start gap-3",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/data/projects.tsx",
+                                                                lineNumber: 396,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-gray-700 leading-relaxed text-base md:text-lg",
+                                                                children: "Unsupervised anomaly detection to identify unusual environmental patterns"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/data/projects.tsx",
+                                                                lineNumber: 397,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/data/projects.tsx",
+                                                        lineNumber: 395,
+                                                        columnNumber: 19
+                                                    }, ("TURBOPACK compile-time value", void 0))
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 392,
+                                                    lineNumber: 394,
+                                                    columnNumber: 17
+                                                }, ("TURBOPACK compile-time value", void 0)),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-start gap-3",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/data/projects.tsx",
+                                                                lineNumber: 402,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0)),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-gray-700 leading-relaxed text-base md:text-lg",
+                                                                children: "Interactive web map to explore anomalies and underlying layers spatially"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/data/projects.tsx",
+                                                                lineNumber: 403,
+                                                                columnNumber: 21
+                                                            }, ("TURBOPACK compile-time value", void 0))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/data/projects.tsx",
+                                                        lineNumber: 401,
+                                                        columnNumber: 19
+                                                    }, ("TURBOPACK compile-time value", void 0))
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/data/projects.tsx",
+                                                    lineNumber: 400,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 390,
-                                            columnNumber: 15
-                                        }, ("TURBOPACK compile-time value", void 0)),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "flex items-start gap-2.5",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-blue-500 mt-1.5 font-bold",
-                                                    children: "•"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 395,
-                                                    columnNumber: 17
-                                                }, ("TURBOPACK compile-time value", void 0)),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-sm leading-relaxed",
-                                                    children: "Interactive web map to explore anomalies and underlying layers spatially"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 396,
-                                                    columnNumber: 17
-                                                }, ("TURBOPACK compile-time value", void 0))
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 394,
+                                            lineNumber: 387,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
@@ -4550,7 +4585,7 @@ const projects = [
                     children: "I built the Python API, ran the entire analysis pipeline in Jupyter Notebook, and implemented the transportation data layer that computes and visualizes 10-minute travel reachability across the city."
                 }, void 0, false, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 403,
+                    lineNumber: 412,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4562,7 +4597,7 @@ const projects = [
                             children: "I retrieved public transport data from an external API and used it to compute the area that can be reached within 10 minutes from any given point. Based on this reachable region, I then calculated a transport-accessibility score for every location on the map, reflecting how well each area is served by public transport."
                         }, void 0, false, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 409,
+                            lineNumber: 418,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -4571,13 +4606,13 @@ const projects = [
                             className: "w-full rounded-xl shadow-lg border border-gray-200"
                         }, void 0, false, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 412,
+                            lineNumber: 421,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 407,
+                    lineNumber: 416,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4594,18 +4629,18 @@ const projects = [
                                 title: "UrbanLens Project Video"
                             }, void 0, false, {
                                 fileName: "[project]/src/data/projects.tsx",
-                                lineNumber: 421,
+                                lineNumber: 430,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 420,
+                            lineNumber: 429,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 418,
+                    lineNumber: 427,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4623,7 +4658,7 @@ const projects = [
                                             children: "•"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 434,
+                                            lineNumber: 443,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4634,20 +4669,20 @@ const projects = [
                                                     children: "Heterogeneous data formats:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 435,
+                                                    lineNumber: 444,
                                                     columnNumber: 63
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 " merged sources with different projections, resolutions, and grids into a single aligned dataset"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 435,
+                                            lineNumber: 444,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 433,
+                                    lineNumber: 442,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -4658,7 +4693,7 @@ const projects = [
                                             children: "•"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 438,
+                                            lineNumber: 447,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4669,20 +4704,20 @@ const projects = [
                                                     children: "No labeled ground truth:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 439,
+                                                    lineNumber: 448,
                                                     columnNumber: 63
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 " designed a robust unsupervised pipeline to surface meaningful urban anomalies"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 439,
+                                            lineNumber: 448,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 437,
+                                    lineNumber: 446,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -4693,7 +4728,7 @@ const projects = [
                                             children: "•"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 442,
+                                            lineNumber: 451,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4704,32 +4739,32 @@ const projects = [
                                                     children: "Real-time visualization:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 443,
+                                                    lineNumber: 452,
                                                     columnNumber: 63
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 " ensured the frontend could render multiple heavy geospatial layers smoothly"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 443,
+                                            lineNumber: 452,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 441,
+                                    lineNumber: 450,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 432,
+                            lineNumber: 441,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 430,
+                    lineNumber: 439,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4766,7 +4801,7 @@ const projects = [
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 447,
+                    lineNumber: 456,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4785,31 +4820,31 @@ const projects = [
                                         children: "🌐"
                                     }, void 0, false, {
                                         fileName: "[project]/src/data/projects.tsx",
-                                        lineNumber: 466,
+                                        lineNumber: 475,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "https://www.urbanlens.app/"
                                     }, void 0, false, {
                                         fileName: "[project]/src/data/projects.tsx",
-                                        lineNumber: 467,
+                                        lineNumber: 476,
                                         columnNumber: 15
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/data/projects.tsx",
-                                lineNumber: 460,
+                                lineNumber: 469,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 459,
+                            lineNumber: 468,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 457,
+                    lineNumber: 466,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             ]
@@ -4891,7 +4926,7 @@ const projects = [
                                 children: "Progress Pact is a comprehensive web application designed to cultivate happiness and wellness among employees while fostering connections across different departments, languages, and geographical locations. Built for the Belimo Challenge at StartHack 2024 (St. Gallen), our platform aims to dismantle barriers and envision a world where universal health and well-being are attainable for all. We advanced to the finalist stage and narrowly missed winning the challenge."
                             }, void 0, false, {
                                 fileName: "[project]/src/data/projects.tsx",
-                                lineNumber: 514,
+                                lineNumber: 523,
                                 columnNumber: 11
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4899,18 +4934,18 @@ const projects = [
                                 children: "Our mission is to create a holistic solution that integrates AI-powered coaching, gamified goal tracking, multilingual communication, and social engagement into a single, cohesive platform that transforms workplace culture and employee well-being."
                             }, void 0, false, {
                                 fileName: "[project]/src/data/projects.tsx",
-                                lineNumber: 517,
+                                lineNumber: 526,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/data/projects.tsx",
-                        lineNumber: 513,
+                        lineNumber: 522,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0)), 'from-blue-500 to-purple-500', 'bg-blue-50', 'border-blue-200')
                 }, void 0, false, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 510,
+                    lineNumber: 519,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4922,7 +4957,7 @@ const projects = [
                             children: "Progress Pact promotes holistic well-being through four pillars:"
                         }, void 0, false, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 528,
+                            lineNumber: 537,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$modalContent$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createFeatureList"])([
@@ -4950,7 +4985,7 @@ const projects = [
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 526,
+                    lineNumber: 535,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4969,7 +5004,7 @@ const projects = [
                                             className: "w-full rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 hover:ring-blue-200/50 transition-all duration-300"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 542,
+                                            lineNumber: 551,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4979,7 +5014,7 @@ const projects = [
                                                     children: "AI Coach"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 548,
+                                                    lineNumber: 557,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4987,19 +5022,19 @@ const projects = [
                                                     children: "Powered by artificial intelligence, our coaching feature provides personalized training regimens and guidance tailored to individual goals. The AI coach adapts to each user's unique needs, offering real-time support and motivation to help employees achieve their wellness objectives."
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 549,
+                                                    lineNumber: 558,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 547,
+                                            lineNumber: 556,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 541,
+                                    lineNumber: 550,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5011,7 +5046,7 @@ const projects = [
                                             className: "w-full rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 hover:ring-blue-200/50 transition-all duration-300"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 555,
+                                            lineNumber: 564,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5021,7 +5056,7 @@ const projects = [
                                                     children: "Goals"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 561,
+                                                    lineNumber: 570,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5029,19 +5064,19 @@ const projects = [
                                                     children: "Users can establish objectives across various facets of life, accompanied by incentives to foster goal attainment. The system provides comprehensive tracking and gamified rewards that motivate continuous progress and achievement."
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 562,
+                                                    lineNumber: 571,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 560,
+                                            lineNumber: 569,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 554,
+                                    lineNumber: 563,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5052,7 +5087,7 @@ const projects = [
                                             children: "Multilingual Chat"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 568,
+                                            lineNumber: 577,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5060,13 +5095,13 @@ const projects = [
                                             children: "With automatic translation capabilities, our chat feature enables seamless interaction among employees, irrespective of their preferred language, breaking down communication barriers in diverse, global workplaces."
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 569,
+                                            lineNumber: 578,
                                             columnNumber: 11
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 567,
+                                    lineNumber: 576,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5078,7 +5113,7 @@ const projects = [
                                             className: "w-full rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 hover:ring-blue-200/50 transition-all duration-300"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 574,
+                                            lineNumber: 583,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5088,7 +5123,7 @@ const projects = [
                                                     children: "Events"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 580,
+                                                    lineNumber: 589,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5096,19 +5131,19 @@ const projects = [
                                                     children: "Discover and engage in events aligned with personal interests, facilitating connections with like-minded individuals and offering rewards for participation, either from the company or through the avatar. This feature promotes social interaction and helps build a stronger, more connected workplace community."
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/data/projects.tsx",
-                                                    lineNumber: 581,
+                                                    lineNumber: 590,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 579,
+                                            lineNumber: 588,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 573,
+                                    lineNumber: 582,
                                     columnNumber: 9
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5119,7 +5154,7 @@ const projects = [
                                             children: "Feedback with an Avatar"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 587,
+                                            lineNumber: 596,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5127,25 +5162,25 @@ const projects = [
                                             children: "Employing an animated avatar, our platform delivers instantaneous responses in the form of delayed rewards and consequences, aiding users in anticipating their emotional states based on their actions. This innovative approach to behavioral feedback enhances user engagement and promotes self-awareness."
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 588,
+                                            lineNumber: 597,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 586,
+                                    lineNumber: 595,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 540,
+                            lineNumber: 549,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 538,
+                    lineNumber: 547,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5192,7 +5227,7 @@ const projects = [
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 594,
+                    lineNumber: 603,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5204,19 +5239,19 @@ const projects = [
                             children: "In 36 hours, we delivered a fully functional prototype featuring real-time chat, goal tracking, event creation, AI coaching, and a 3D animated avatar—combining AI, gamification, and workplace psychology into one cohesive platform."
                         }, void 0, false, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 608,
+                            lineNumber: 617,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 606,
+                    lineNumber: 615,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/src/data/projects.tsx",
-            lineNumber: 509,
+            lineNumber: 518,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     },
@@ -5276,14 +5311,14 @@ const projects = [
                             children: "ETH servers for internal ETH use"
                         }, void 0, false, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 647,
+                            lineNumber: 656,
                             columnNumber: 86
                         }, ("TURBOPACK compile-time value", void 0)),
                         ". I wrote comprehensive documentation and automated setup scripts (install.sh and update.sh) to enable easy deployment and maintenance. The system runs fully containerised behind nginx with TLS, with all project data and databases backed up to a dedicated TrueNAS SMB share. The entire infrastructure is production-ready and currently serving ETH users."
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 646,
+                    lineNumber: 655,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0)), 'from-blue-500 to-purple-500', 'bg-blue-50', 'border-blue-200'),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5320,7 +5355,7 @@ const projects = [
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 653,
+                    lineNumber: 662,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5339,7 +5374,7 @@ const projects = [
                                             children: "ETH infrastructure"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 667,
+                                            lineNumber: 676,
                                             columnNumber: 34
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         " (Proxmox-hosted Ubuntu VM) with AVX-capable virtual CPU for MongoDB. I developed the installation script (install.sh) that automates Docker Compose v2 setup, prepares the /overleaf directory, and configures the docker-compose file with Mongo replicaSet and Redis settings. Overleaf listens on 127.0.0.1:4242 behind nginx with TLS termination, serving ",
@@ -5348,14 +5383,14 @@ const projects = [
                                             children: "internal ETH users"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 667,
+                                            lineNumber: 676,
                                             columnNumber: 447
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         "."
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 666,
+                                    lineNumber: 675,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5363,7 +5398,7 @@ const projects = [
                                     children: "A systemd unit manages the Docker stack lifecycle. The sharelatex container includes a full TeX Live distribution, with packages updated via tlmgr as needed."
                                 }, void 0, false, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 669,
+                                    lineNumber: 678,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5374,7 +5409,7 @@ const projects = [
                                             children: "Storage and Backup Architecture"
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 673,
+                                            lineNumber: 682,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5382,7 +5417,7 @@ const projects = [
                                             children: "A TrueNAS pool and dataset are configured as an SMB share, mounted at /backup on the Ubuntu VM. A nightly systemd timer triggers a backup script that runs mongodump and rsyncs Overleaf data, MongoDB, and Redis volumes into date-stamped folders on the TrueNAS share."
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 674,
+                                            lineNumber: 683,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5390,25 +5425,25 @@ const projects = [
                                             children: "The update.sh script pulls newer Docker images, restarts the stack, and optionally updates TeX Live packages, all without reinstalling or reconfiguring the system."
                                         }, void 0, false, {
                                             fileName: "[project]/src/data/projects.tsx",
-                                            lineNumber: 677,
+                                            lineNumber: 686,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/data/projects.tsx",
-                                    lineNumber: 672,
+                                    lineNumber: 681,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/data/projects.tsx",
-                            lineNumber: 665,
+                            lineNumber: 674,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 663,
+                    lineNumber: 672,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$modalContent$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createHighlightedSection"])('TrueNAS Configuration', /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5416,7 +5451,7 @@ const projects = [
                     children: "I configured the TrueNAS system from scratch, setting up the storage pool, datasets, and SMB share with proper access controls. This provides reliable, scalable storage for the backup system."
                 }, void 0, false, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 685,
+                    lineNumber: 694,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0))),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5453,13 +5488,13 @@ const projects = [
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/data/projects.tsx",
-                    lineNumber: 689,
+                    lineNumber: 698,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/src/data/projects.tsx",
-            lineNumber: 643,
+            lineNumber: 652,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }

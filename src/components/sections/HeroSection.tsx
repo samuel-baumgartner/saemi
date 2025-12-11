@@ -49,6 +49,17 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
       }
     }
   };
+
+  const handleCvDownload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Create a temporary anchor element to trigger download
+    const link = document.createElement('a');
+    link.href = '/CV/Samuel_Baumgartner.pdf';
+    link.download = 'Samuel_Baumgartner_CV.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <div className="flex min-h-[70vh] sm:min-h-[80vh] items-center justify-center relative pb-20 sm:pb-0">
       <Link
@@ -79,12 +90,12 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
         </p>
         <p className="text-sm sm:text-base md:text-lg text-white px-2">{personalInfo.interests}</p>
         <div className="flex gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 flex-wrap">
-          <Link
-            href="#cv"
-            className="text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2"
+          <button
+            onClick={handleCvDownload}
+            className="text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2 cursor-pointer"
           >
             CV
-          </Link>
+          </button>
           <Link
             href="#projects"
             className="text-xs sm:text-sm text-white hover:text-gray-200 transition-colors px-2"

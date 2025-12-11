@@ -207,9 +207,9 @@ export const projects: Project[] = [
   },
   {
     id: 'zurich-hack',
-    title: 'Zürich AI Hack 2025 – "Guidely: AI Desktop Guidance Assistant"',
-    shortTitle: 'Zürich AI Hack',
-    description: 'Guidely is a desktop application built for Zürich AI Hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.',
+    title: 'Swiss AI hack 2025 – "Guidely: AI Desktop Guidance Assistant"',
+    shortTitle: 'Swiss AI hack',
+    description: 'Guidely is a desktop application built for Swiss AI hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.',
     type: 'hackathon',
     tags: [
       { label: 'Hackathon', color: 'bg-blue-100 text-blue-800' },
@@ -233,14 +233,14 @@ export const projects: Project[] = [
       { type: 'video', src: 'https://www.youtube.com/watch?v=tGFbolKX4Ts' },
     ],
     headerContent: createProjectHeader(
-      'Zürich AI Hack 2025 – "Guidely: AI Desktop Guidance Assistant"',
+      'Swiss AI Hackathon 2025 - "Guidely: AI Desktop Guidance Assistant"',
       [
         { label: 'Hackathon', color: 'bg-blue-100 text-blue-800' },
         { label: 'Zürich' },
         { label: 'November 2025' },
         { label: 'Team of 3' },
       ],
-      'Guidely is a desktop application built for Zürich AI Hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.'
+      'Guidely is a desktop application built for Swiss AI hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.'
     ),
     content: (
       <div className="space-y-8">
@@ -248,7 +248,7 @@ export const projects: Project[] = [
           {createHighlightedSection(
             'Overview',
             <p className="text-gray-700 leading-relaxed text-base">
-              Guidely is a desktop application built for Zürich AI Hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials. A user describes what they want to accomplish, and Guidely produces a guided workflow directly on top of the user's screen, highlighting exactly where to click and what to do next. The goal is to make unfamiliar software and multi-step actions accessible without searching manuals or videos.
+              Guidely is a desktop application built for Swiss AI hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials. A user describes what they want to accomplish, and Guidely produces a guided workflow directly on top of the user's screen, highlighting exactly where to click and what to do next. The goal is to make unfamiliar software and multi-step actions accessible without searching manuals or videos.
             </p>,
           'from-blue-500 to-purple-500',
           'bg-blue-50',
@@ -369,10 +369,10 @@ export const projects: Project[] = [
           'border-blue-200'
           )}
         </div>
-        <div className="space-y-6 mt-16">
+        <div className="space-y-8 mt-16">
           {createSectionHeader('Key Features', 'from-purple-500 to-pink-500')}
-          <div className="bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-xl p-6 border border-gray-200/60 shadow-md">
-            <p className="text-gray-700 mb-4 font-semibold">Multi-layer environmental dashboard for Zurich, including:</p>
+          <div className="bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-2xl p-6 md:p-8 border border-gray-200/60 shadow-lg backdrop-blur-sm">
+            <p className="text-gray-800 mb-6 font-semibold text-lg md:text-xl">Multi-layer environmental dashboard for Zurich, including:</p>
             {createFeatureList([
               { title: 'Surface Temperature', description: '(NASA/ESA Earthdata)', color: 'bg-blue-500' },
               { title: 'Soil Sealing / Imperviousness', description: '(Earthdata)', color: 'bg-green-500' },
@@ -382,19 +382,28 @@ export const projects: Project[] = [
               { title: 'Tree Cover / Vegetation', description: '(NASA data)', color: 'bg-emerald-500' },
               { title: 'Transportation Reachability Layer', description: '(travel range within 10 minutes)', color: 'bg-cyan-500' },
             ])}
-            <div className="mt-5 space-y-2.5 text-gray-700">
-              <p className="flex items-start gap-2.5">
-                <span className="text-blue-500 mt-1.5 font-bold">•</span>
-                <span className="text-sm leading-relaxed">Automated ingestion and alignment of satellite + city datasets into a unified grid</span>
-              </p>
-              <p className="flex items-start gap-2.5">
-                <span className="text-blue-500 mt-1.5 font-bold">•</span>
-                <span className="text-sm leading-relaxed">Unsupervised anomaly detection to identify unusual environmental patterns</span>
-              </p>
-              <p className="flex items-start gap-2.5">
-                <span className="text-blue-500 mt-1.5 font-bold">•</span>
-                <span className="text-sm leading-relaxed">Interactive web map to explore anomalies and underlying layers spatially</span>
-              </p>
+            <div className="mt-8 pt-6 border-t border-blue-200/60">
+              <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Core Capabilities</h5>
+              <div className="grid md:grid-cols-1 gap-4">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
+                    <p className="text-gray-700 leading-relaxed text-base md:text-lg">Automated ingestion and alignment of satellite + city datasets into a unified grid</p>
+                  </div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
+                    <p className="text-gray-700 leading-relaxed text-base md:text-lg">Unsupervised anomaly detection to identify unusual environmental patterns</p>
+                  </div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
+                    <p className="text-gray-700 leading-relaxed text-base md:text-lg">Interactive web map to explore anomalies and underlying layers spatially</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
