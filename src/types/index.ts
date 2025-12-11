@@ -7,7 +7,7 @@ export interface CarouselItem {
 
 export interface ProjectTag {
   label: string;
-  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
+  color?: string;
 }
 
 export interface ProjectMetadata {
