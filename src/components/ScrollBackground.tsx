@@ -19,6 +19,7 @@ const PRELOAD_RANGE = typeof window !== 'undefined' && window.innerWidth < 768 ?
 
 function getImagePath(index: number): string {
   const paddedIndex = String(index + 1).padStart(4, "0");
+  // Ensure lowercase path for case-sensitive servers (Linux production)
   return `/data/${paddedIndex}.png`;
 }
 
@@ -103,7 +104,15 @@ export default function ScrollBackground() {
           setNextImageIndex(0);
         }
       };
-      img.onerror = () => {
+      img.onerror = (error) => {
+        const imagePath = getImagePath(0);
+        console.error(`Failed to load image: ${imagePath}`, {
+          error,
+          path: imagePath,
+          environment: process.env.NODE_ENV,
+          // Log if we're on Vercel
+          isVercel: process.env.VERCEL === '1',
+        });
         loadedImagesRef.current.add(0);
         decodedImagesRef.current.add(0);
         setIsFirstImageLoaded(true);

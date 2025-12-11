@@ -30,6 +30,7 @@ const SCROLL_MULTIPLIER_MOBILE = 0.025; // Mobile scroll speed
 const PRELOAD_RANGE = ("TURBOPACK compile-time value", "undefined") !== 'undefined' && window.innerWidth < 768 ? "TURBOPACK unreachable" : 5;
 function getImagePath(index) {
     const paddedIndex = String(index + 1).padStart(4, "0");
+    // Ensure lowercase path for case-sensitive servers (Linux production)
     return `/data/${paddedIndex}.png`;
 }
 function ScrollBackground() {
@@ -100,7 +101,15 @@ function ScrollBackground() {
                     setNextImageIndex(0);
                 }
             };
-            img.onerror = ()=>{
+            img.onerror = (error)=>{
+                const imagePath = getImagePath(0);
+                console.error(`Failed to load image: ${imagePath}`, {
+                    error,
+                    path: imagePath,
+                    environment: ("TURBOPACK compile-time value", "development"),
+                    // Log if we're on Vercel
+                    isVercel: process.env.VERCEL === '1'
+                });
                 loadedImagesRef.current.add(0);
                 decodedImagesRef.current.add(0);
                 setIsFirstImageLoaded(true);
@@ -454,7 +463,7 @@ function ScrollBackground() {
             className: "fixed inset-0 -z-10 bg-black"
         }, void 0, false, {
             fileName: "[project]/src/components/ScrollBackground.tsx",
-            lineNumber: 471,
+            lineNumber: 480,
             columnNumber: 7
         }, this);
     }
@@ -466,7 +475,7 @@ function ScrollBackground() {
                 className: "fixed inset-0 -z-10 bg-black"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 481,
+                lineNumber: 490,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -487,7 +496,7 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 484,
+                lineNumber: 493,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -510,14 +519,14 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 502,
+                lineNumber: 511,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "fixed inset-0 -z-10 bg-black/40"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 521,
+                lineNumber: 530,
                 columnNumber: 7
             }, this)
         ]
@@ -802,17 +811,17 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                         d: "M6 18L18 6M6 6l12 12"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                        lineNumber: 128,
+                                        lineNumber: 129,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/EducationModal.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 123,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                lineNumber: 117,
+                                lineNumber: 118,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -820,13 +829,13 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                 children: headerContent
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                lineNumber: 136,
+                                lineNumber: 137,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/EducationModal.tsx",
-                        lineNumber: 116,
+                        lineNumber: 117,
                         columnNumber: 13
                     }, this),
                     items.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -850,7 +859,7 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                 className: "max-h-[400px] sm:max-h-[600px] md:max-h-[800px] max-w-full w-auto h-auto object-contain rounded-xl shadow-2xl"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                                lineNumber: 156,
+                                                lineNumber: 157,
                                                 columnNumber: 25
                                             }, this) : item.type === 'video' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "w-full max-w-4xl aspect-video rounded-xl shadow-2xl overflow-hidden",
@@ -862,12 +871,12 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                     title: `${title} - Video ${index + 1}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/EducationModal.tsx",
-                                                    lineNumber: 163,
+                                                    lineNumber: 164,
                                                     columnNumber: 27
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                                lineNumber: 162,
+                                                lineNumber: 163,
                                                 columnNumber: 25
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "w-full max-w-6xl md:max-w-7xl lg:max-w-[90vw] flex flex-col items-center gap-3 sm:gap-4 py-2",
@@ -879,12 +888,12 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                             children: title || "3D Model"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/EducationModal.tsx",
-                                                            lineNumber: 174,
+                                                            lineNumber: 175,
                                                             columnNumber: 29
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 174,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -894,12 +903,12 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                             className: "w-full h-full"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/EducationModal.tsx",
-                                                            lineNumber: 179,
+                                                            lineNumber: 180,
                                                             columnNumber: 29
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                                        lineNumber: 178,
+                                                        lineNumber: 179,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -921,56 +930,56 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                                             d: "M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/EducationModal.tsx",
-                                                                            lineNumber: 185,
+                                                                            lineNumber: 186,
                                                                             columnNumber: 35
                                                                         }, this)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                                                        lineNumber: 184,
+                                                                        lineNumber: 185,
                                                                         columnNumber: 33
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         children: "Drag to rotate"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                                                        lineNumber: 187,
+                                                                        lineNumber: 188,
                                                                         columnNumber: 33
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                                                lineNumber: 183,
+                                                                lineNumber: 184,
                                                                 columnNumber: 31
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/EducationModal.tsx",
-                                                            lineNumber: 182,
+                                                            lineNumber: 183,
                                                             columnNumber: 29
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                                        lineNumber: 181,
+                                                        lineNumber: 182,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                                lineNumber: 172,
+                                                lineNumber: 173,
                                                 columnNumber: 25
                                             }, this)
                                         }, index, false, {
                                             fileName: "[project]/src/components/EducationModal.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 152,
                                             columnNumber: 21
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/EducationModal.tsx",
-                                    lineNumber: 144,
+                                    lineNumber: 145,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                lineNumber: 143,
+                                lineNumber: 144,
                                 columnNumber: 15
                             }, this),
                             items.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -994,17 +1003,17 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                 d: "M15 19l-7-7 7-7"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                                lineNumber: 213,
+                                                lineNumber: 214,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/EducationModal.tsx",
-                                            lineNumber: 207,
+                                            lineNumber: 208,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                        lineNumber: 199,
+                                        lineNumber: 200,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1026,17 +1035,17 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                 d: "M9 5l7 7-7 7"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                                lineNumber: 235,
+                                                lineNumber: 236,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/EducationModal.tsx",
-                                            lineNumber: 229,
+                                            lineNumber: 230,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                        lineNumber: 221,
+                                        lineNumber: 222,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1050,12 +1059,12 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                                 "aria-label": `Go to image ${index + 1}`
                                             }, index, false, {
                                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                                lineNumber: 245,
+                                                lineNumber: 246,
                                                 columnNumber: 23
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                        lineNumber: 243,
+                                        lineNumber: 244,
                                         columnNumber: 19
                                     }, this)
                                 ]
@@ -1063,7 +1072,7 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/EducationModal.tsx",
-                        lineNumber: 142,
+                        lineNumber: 143,
                         columnNumber: 13
                     }, this),
                     (content || title || description) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1085,17 +1094,17 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                         d: "M6 18L18 6M6 6l12 12"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EducationModal.tsx",
-                                        lineNumber: 280,
+                                        lineNumber: 281,
                                         columnNumber: 21
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/EducationModal.tsx",
-                                    lineNumber: 274,
+                                    lineNumber: 275,
                                     columnNumber: 19
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                lineNumber: 269,
+                                lineNumber: 270,
                                 columnNumber: 17
                             }, this),
                             title && !content && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1105,12 +1114,12 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                     children: title
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/EducationModal.tsx",
-                                    lineNumber: 291,
+                                    lineNumber: 292,
                                     columnNumber: 19
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                lineNumber: 290,
+                                lineNumber: 291,
                                 columnNumber: 17
                             }, this),
                             content ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1118,36 +1127,36 @@ function EducationModal({ isOpen, onClose, title, description, images, carouselI
                                 children: content
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                lineNumber: 295,
+                                lineNumber: 296,
                                 columnNumber: 17
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 className: "text-sm sm:text-base text-gray-700 leading-relaxed pr-2 sm:pr-4",
                                 children: description
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EducationModal.tsx",
-                                lineNumber: 297,
+                                lineNumber: 298,
                                 columnNumber: 17
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/EducationModal.tsx",
-                        lineNumber: 267,
+                        lineNumber: 268,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/EducationModal.tsx",
-                lineNumber: 113,
+                lineNumber: 114,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/EducationModal.tsx",
-            lineNumber: 108,
+            lineNumber: 109,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/EducationModal.tsx",
-        lineNumber: 103,
+        lineNumber: 104,
         columnNumber: 5
     }, this);
 }
