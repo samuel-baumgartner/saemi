@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 
-const TOTAL_IMAGES = 120;
+const TOTAL_IMAGES = 100;
+// Adjust this number to control how fast images progress: higher = faster (more images per pixel scrolled)
+const SCROLL_MULTIPLIER = 0.039;
 
 function getImagePath(index: number): string {
   const paddedIndex = String(index + 1).padStart(4, "0");
@@ -12,14 +14,22 @@ function getImagePath(index: number): string {
 export default function ScrollBackground() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const imagesRef = useRef<Map<number, HTMLImageElement>>(new Map());
+  const loadedImagesRef = useRef<Set<number>>(new Set());
   const rafRef = useRef<number>();
   const lastIndexRef = useRef(0);
 
-  // Preload images
+  // Preload images with proper loading tracking
   useEffect(() => {
     const preloadImages = () => {
       for (let i = 0; i < TOTAL_IMAGES; i++) {
         const img = new Image();
+        img.onload = () => {
+          loadedImagesRef.current.add(i);
+        };
+        img.onerror = () => {
+          // Still mark as "loaded" to avoid blocking
+          loadedImagesRef.current.add(i);
+        };
         img.src = getImagePath(i);
         imagesRef.current.set(i, img);
       }
@@ -28,6 +38,25 @@ export default function ScrollBackground() {
     preloadImages();
   }, []);
 
+  // Preload adjacent images when scrolling
+  useEffect(() => {
+    const preloadAdjacent = (index: number) => {
+      const preloadRange = 5;
+      for (let i = Math.max(0, index - preloadRange); i <= Math.min(TOTAL_IMAGES - 1, index + preloadRange); i++) {
+        if (!loadedImagesRef.current.has(i)) {
+          const img = imagesRef.current.get(i);
+          if (img && !img.complete) {
+            img.src = getImagePath(i);
+          }
+        }
+      }
+    };
+
+    if (currentImageIndex !== undefined) {
+      preloadAdjacent(currentImageIndex);
+    }
+  }, [currentImageIndex]);
+
   useEffect(() => {
     const handleScroll = () => {
       if (rafRef.current) {
@@ -35,22 +64,19 @@ export default function ScrollBackground() {
       }
 
       rafRef.current = requestAnimationFrame(() => {
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrollTop = window.scrollY;
-        const scrollProgress = Math.min(Math.max(scrollTop / scrollHeight, 0), 1);
-        const imageIndex = Math.floor(scrollProgress * (TOTAL_IMAGES - 1));
+        // Simple calculation: scrollTop * multiplier determines image index
+        const imageIndex = Math.min(Math.floor(scrollTop * SCROLL_MULTIPLIER), TOTAL_IMAGES - 1);
         
         if (imageIndex !== lastIndexRef.current) {
-          // Only update if image is loaded or we'll wait for it
           const img = imagesRef.current.get(imageIndex);
-          if (img && (img.complete || img.naturalWidth > 0)) {
-            setCurrentImageIndex(imageIndex);
-            lastIndexRef.current = imageIndex;
-          } else {
-            // If not loaded yet, set it anyway but it might flicker once
+          
+          // Only update if image is confirmed loaded to prevent flickering
+          if (img && (img.complete || loadedImagesRef.current.has(imageIndex))) {
             setCurrentImageIndex(imageIndex);
             lastIndexRef.current = imageIndex;
           }
+          // If not loaded, don't switch yet - will switch once loaded via onload handler
         }
       });
     };
@@ -69,13 +95,16 @@ export default function ScrollBackground() {
   return (
     <>
       <div
-        className="fixed inset-0 -z-10"
+        className="fixed inset-0 -z-10 transition-opacity duration-500"
         style={{
           backgroundImage: `url(${getImagePath(currentImageIndex)})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           imageRendering: "auto",
+          backfaceVisibility: "hidden",
+          transform: "translateZ(0)",
+          willChange: "background-image",
         }}
       />
       <div className="fixed inset-0 -z-10 bg-black/40" />

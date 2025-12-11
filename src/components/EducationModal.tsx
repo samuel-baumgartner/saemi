@@ -36,15 +36,22 @@ export default function EducationModal({
 
   useEffect(() => {
     if (isOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
       // Reset to first item when modal opens
       setCurrentImageIndex(0);
-    } else {
-      document.body.style.overflow = "unset";
+      
+      return () => {
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        document.body.style.overflow = "";
+        window.scrollTo(0, scrollY);
+      };
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -96,18 +103,20 @@ export default function EducationModal({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4"
       onClick={onClose}
+      style={{ overflow: 'hidden', overflowX: 'hidden' }}
     >
       <div
-        className="bg-gradient-to-br from-white to-gray-50 rounded-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-200/50 flex flex-col"
+        className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200/60 flex flex-col"
         onClick={(e) => e.stopPropagation()}
+        style={{ overflowX: 'hidden' }}
       >
-        <div className="overflow-y-auto flex-1">
+        <div className="overflow-y-auto bg-white" style={{ maxHeight: '90vh', overflowX: 'hidden' }}>
           {/* Header Content */}
           {headerContent && (
-            <div className="p-10 pb-6 relative">
+            <div className="p-10 pb-6 pl-16 md:pl-20 relative bg-white border-b border-gray-200/60">
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 w-10 h-10 flex items-center justify-center transition-all z-20"
+                className="absolute top-6 right-6 text-gray-500 hover:text-gray-700 hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 rounded-full p-2 w-10 h-10 flex items-center justify-center transition-all z-20 shadow-md hover:shadow-lg border border-gray-200/50 hover:border-red-200/50"
                 aria-label="Close"
               >
                 <svg
@@ -130,7 +139,7 @@ export default function EducationModal({
           
           {/* Image/Video Carousel */}
           {items.length > 0 && (
-            <div className="relative w-full overflow-hidden bg-gradient-to-br from-white to-gray-50">
+            <div className="relative w-full overflow-hidden bg-gradient-to-br from-blue-50/40 via-white to-purple-50/30 border-y border-blue-100/30">
               <div className="relative w-full flex items-center" style={{ minHeight: '600px', maxHeight: '800px' }}>
                 <div
                   className="flex transition-transform duration-500 ease-in-out w-full h-full"
@@ -161,8 +170,30 @@ export default function EducationModal({
                           />
                         </div>
                       ) : (
-                        <div className="w-full max-w-4xl aspect-square rounded-xl shadow-2xl overflow-hidden bg-gray-100">
-                          <ModelViewer modelPath={item.src} className="w-full h-full" />
+                        <div className="w-full max-w-4xl flex flex-col items-center gap-6">
+                          <div className="text-center space-y-3 w-full">
+                            <h5 className="text-3xl md:text-4xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-2">
+                              {title || "3D Model"}
+                            </h5>
+                            <p className="text-sm text-gray-500 font-medium">
+                              <span className="inline-flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                Drag to rotate
+                              </span>
+                              <span className="mx-2">•</span>
+                              <span className="inline-flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Scroll to zoom
+                              </span>
+                            </p>
+                          </div>
+                          <div className="w-full aspect-square rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 border border-gray-200/60 ring-4 ring-gray-100/50">
+                            <ModelViewer modelPath={item.src} className="w-full h-full" />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -239,11 +270,11 @@ export default function EducationModal({
 
           {/* Rest of Content */}
           {(content || title || description) && (
-            <div className="p-10 pt-6 relative">
+            <div className="px-16 md:px-20 py-8 relative bg-white">
               {!headerContent && (
                 <button
                   onClick={onClose}
-                  className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 w-10 h-10 flex items-center justify-center transition-all z-20"
+                  className="absolute top-6 right-6 text-gray-500 hover:text-gray-700 hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 rounded-full p-2 w-10 h-10 flex items-center justify-center transition-all z-20 shadow-md hover:shadow-lg border border-gray-200/50 hover:border-red-200/50"
                   aria-label="Close"
                 >
                   <svg
@@ -263,11 +294,11 @@ export default function EducationModal({
               )}
               {title && !content && (
                 <div className="mb-6 pr-12">
-                  <h3 className="text-3xl font-bold text-gray-900">{title}</h3>
+                  <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">{title}</h3>
                 </div>
               )}
               {content ? (
-                <div className="text-gray-700 leading-relaxed pr-4">{content}</div>
+                <div className="text-gray-700 leading-relaxed pr-4 [&>*]:space-y-6">{content}</div>
               ) : (
                 <p className="text-gray-700 leading-relaxed pr-4">{description}</p>
               )}
