@@ -25,23 +25,23 @@ export default function EducationSection({
   onOpenModal,
 }: EducationSectionProps) {
   return (
-    <section id="education" className="relative min-h-[40vh] flex items-center justify-center px-4 py-6 z-10">
+    <section id="education" className="relative min-h-[40vh] flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 z-10">
       <div className="max-w-6xl w-full">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-12 text-center">Education</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 sm:mb-12 text-center">Education</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {educationItems.map((item) => (
             <SpotlightCard
               key={item.id}
               onClick={() => onOpenModal(item)}
-              className="p-6 h-full flex flex-col gap-4 cursor-pointer"
+              className="p-4 sm:p-6 h-full flex flex-col gap-3 sm:gap-4 cursor-pointer"
               spotlightColor={spotlightColorMap[item.id] || "rgba(255, 255, 255, 0.15)"}
             >
               <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-neutral-800 border border-neutral-700">
                 {iconMap[item.id] || <GraduationCap className="text-white h-5 w-5" />}
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white mb-1">{item.title}</h3>
-                <p className="text-sm text-neutral-400">{item.subtitle}</p>
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-1">{item.title}</h3>
+                <p className="text-xs sm:text-sm text-neutral-400">{item.subtitle}</p>
                 {item.id === 'eth' && (
                   <p className="text-xs text-purple-300 font-medium mt-2">
                     ⭐ Top 5% of cohort (Average: 5.7)

@@ -19,11 +19,11 @@ export default function ProjectCard({ project, onOpen }: ProjectCardProps) {
   // Improved styling with gradients and better visual appeal
   const bgClass = project.type === 'hackathon' 
     ? project.backgroundImage
-      ? 'h-full min-h-[200px] rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left relative overflow-hidden bg-cover bg-center flex flex-col border border-gray-200/60 shadow-xl'
-      : 'h-full min-h-[200px] bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left relative overflow-hidden flex flex-col border border-gray-200/60 shadow-lg'
+      ? 'h-full min-h-[180px] sm:min-h-[200px] rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left relative overflow-hidden bg-cover bg-center flex flex-col border border-gray-200/60 shadow-xl'
+      : 'h-full min-h-[180px] sm:min-h-[200px] bg-gradient-to-br from-white to-gray-50 rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left relative overflow-hidden flex flex-col border border-gray-200/60 shadow-lg'
     : project.backgroundImage
-      ? 'h-full min-h-[200px] rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left w-full relative overflow-hidden bg-cover bg-center flex flex-col border border-gray-200/60 shadow-xl'
-      : 'h-full min-h-[200px] bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left w-full relative flex flex-col border border-gray-200/60 shadow-xl';
+      ? 'h-full min-h-[180px] sm:min-h-[200px] rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left w-full relative overflow-hidden bg-cover bg-center flex flex-col border border-gray-200/60 shadow-xl'
+      : 'h-full min-h-[180px] sm:min-h-[200px] bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer text-left w-full relative flex flex-col border border-gray-200/60 shadow-xl';
 
   // Determine tag label and color
   const ethProjectTag = project.tags?.find(tag => tag.label === 'ETH Project');
@@ -49,20 +49,20 @@ export default function ProjectCard({ project, onOpen }: ProjectCardProps) {
       {project.backgroundImage && (
         <div className="absolute inset-0 bg-black/40 hover:bg-black/50 transition-colors"></div>
       )}
-      <span className={`absolute top-4 right-4 text-xs ${tagColor} px-3 py-1.5 rounded-full font-semibold z-10 shadow-md backdrop-blur-sm`}>
+      <span className={`absolute top-3 right-3 sm:top-4 sm:right-4 text-xs ${tagColor} px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-semibold z-10 shadow-md backdrop-blur-sm`}>
         {tagLabel}
       </span>
       <div className={`relative z-10 flex-1 flex flex-col justify-center ${project.backgroundImage ? '' : ''}`}>
-        <h3 className={`text-2xl md:text-3xl font-bold mb-3 pr-20 ${project.backgroundImage ? 'text-white drop-shadow-lg' : project.type === 'hackathon' ? 'text-gray-900' : 'text-white'}`}>
+        <h3 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 pr-16 sm:pr-20 ${project.backgroundImage ? 'text-white drop-shadow-lg' : project.type === 'hackathon' ? 'text-gray-900' : 'text-white'}`}>
           {project.shortTitle}
         </h3>
         {project.metadata.place && (
-          <p className={`${project.backgroundImage ? 'text-white/90 drop-shadow-md' : project.type === 'hackathon' ? 'text-gray-700' : 'text-gray-300'} mb-2 text-sm md:text-base`}>
+          <p className={`${project.backgroundImage ? 'text-white/90 drop-shadow-md' : project.type === 'hackathon' ? 'text-gray-700' : 'text-gray-300'} mb-1 sm:mb-2 text-xs sm:text-sm md:text-base`}>
             {project.metadata.place}
           </p>
         )}
         {project.metadata.earnings && (
-          <p className={`${project.backgroundImage ? 'text-white font-semibold drop-shadow-md' : project.type === 'hackathon' ? 'text-gray-800 font-semibold' : 'text-gray-200'} text-sm md:text-base mt-1`}>
+          <p className={`${project.backgroundImage ? 'text-white font-semibold drop-shadow-md' : project.type === 'hackathon' ? 'text-gray-800 font-semibold' : 'text-gray-200'} text-xs sm:text-sm md:text-base mt-1`}>
             💰 {project.metadata.earnings}
           </p>
         )}

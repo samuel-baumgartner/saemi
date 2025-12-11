@@ -47,12 +47,12 @@ export const projects: Project[] = [
           {createHighlightedSection(
             'Overview',
             <div>
-              <p className="text-gray-700 leading-relaxed text-base">
+          <p className="text-gray-700 leading-relaxed text-base">
                 I built a remote-controlled spherical robot that can be controlled from a smartphone. The ball hosts its own web interface that I can connect to wirelessly, allowing me to control movement and direction in real-time.
               </p>
               <p className="text-gray-700 leading-relaxed text-base mt-4">
                 The 3D model shows the internal mechanism, which is designed to fit inside an outer spherical shell. A copper rod connects the inner frame firmly to the outer ball shell, ensuring the mechanism can transfer motion to the ball.
-              </p>
+          </p>
             </div>,
           'from-blue-500 to-purple-500',
           'bg-blue-50',
@@ -71,12 +71,12 @@ export const projects: Project[] = [
         {createHighlightedSection(
           'Mechanical Design',
           <div>
-            <p className="text-gray-700 leading-relaxed text-base">
+          <p className="text-gray-700 leading-relaxed text-base">
               The 3D model displays the internal mechanism that sits inside the outer ball shell. The copper rod is firmly connected to the outer shell, creating a rigid connection between the inner frame and the ball.
             </p>
             <p className="text-gray-700 leading-relaxed text-base mt-4">
               For forward movement, the entire inner assembly rotates around its central axis. This rotation is transferred through the copper rod to the outer shell, causing the ball to roll forward. For sideways movement, a second motor shifts an internal mass to one side, tilting the ball and creating differential motion that results in left or right movement.
-            </p>
+          </p>
           </div>
         )}
         <div className="space-y-4">
@@ -361,8 +361,8 @@ export const projects: Project[] = [
         <div className="mt-20">
           {createHighlightedSection(
             'Overview',
-            <p className="text-gray-700 leading-relaxed text-base">
-              UrbanLens is a web platform built during the NASA Space Apps Challenge in Lucerne. We tackled the theme Data Pathways to Healthy Cities and Human Settlements by creating an interactive map of Zurich that overlays diverse environmental datasets. We consolidated heterogeneous sources into a single pipeline, analyzed them in Python, and used unsupervised machine learning to detect urban anomalies. The results are visualized as layered, explorable insights for city-scale health and sustainability.
+          <p className="text-gray-700 leading-relaxed text-base">
+            UrbanLens is a web platform built during the NASA Space Apps Challenge in Lucerne. We tackled the theme Data Pathways to Healthy Cities and Human Settlements by creating an interactive map of Zurich that overlays diverse environmental datasets. We consolidated heterogeneous sources into a single pipeline, analyzed them in Python, and used unsupervised machine learning to detect urban anomalies. The results are visualized as layered, explorable insights for city-scale health and sustainability.
             </p>,
           'from-blue-500 to-purple-500',
           'bg-blue-50',
@@ -511,12 +511,12 @@ export const projects: Project[] = [
           {createHighlightedSection(
             'Overview',
             <div>
-              <p className="text-gray-700 leading-relaxed text-base">
+          <p className="text-gray-700 leading-relaxed text-base">
                 Progress Pact is a comprehensive web application designed to cultivate happiness and wellness among employees while fostering connections across different departments, languages, and geographical locations. Built for the Belimo Challenge at StartHack 2024 (St. Gallen), our platform aims to dismantle barriers and envision a world where universal health and well-being are attainable for all. We advanced to the finalist stage and narrowly missed winning the challenge.
               </p>
               <p className="text-gray-700 leading-relaxed text-base mt-4">
                 Our mission is to create a holistic solution that integrates AI-powered coaching, gamified goal tracking, multilingual communication, and social engagement into a single, cohesive platform that transforms workplace culture and employee well-being.
-              </p>
+          </p>
             </div>,
             'from-blue-500 to-purple-500',
             'bg-blue-50',
@@ -561,16 +561,16 @@ export const projects: Project[] = [
                 <h5 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Goals</h5>
                 <p className="text-gray-700 leading-relaxed">
                   Users can establish objectives across various facets of life, accompanied by incentives to foster goal attainment. The system provides comprehensive tracking and gamified rewards that motivate continuous progress and achievement.
-                </p>
+          </p>
               </div>
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-cyan-50/50 rounded-2xl p-6 md:p-7 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
               <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Multilingual Chat</h5>
-              <p className="text-gray-700 leading-relaxed text-base">
+          <p className="text-gray-700 leading-relaxed text-base">
                 With automatic translation capabilities, our chat feature enables seamless interaction among employees, irrespective of their preferred language, breaking down communication barriers in diverse, global workplaces.
-              </p>
-            </div>
-            <div className="space-y-3">
+          </p>
+        </div>
+        <div className="space-y-3">
               <img
                 src="/Start Hack/3.png"
                 alt="Events System Feature"
@@ -676,7 +676,7 @@ export const projects: Project[] = [
               </p>
               <p className="text-gray-700 leading-relaxed">
                 The update.sh script pulls newer Docker images, restarts the stack, and optionally updates TeX Live packages, all without reinstalling or reconfiguring the system.
-              </p>
+          </p>
             </div>
           </div>
         </div>

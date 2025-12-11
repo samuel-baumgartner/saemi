@@ -5,25 +5,25 @@ import { SpotlightCard } from '@/components/ui/spotlight-card';
 
 export default function ContactSection() {
   return (
-    <section id="contact" className="relative min-h-[40vh] flex items-center justify-center px-4 py-6 z-10">
+    <section id="contact" className="relative min-h-[40vh] flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 z-10">
       <div className="max-w-4xl w-full mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-12 text-center">Contact</h2>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 sm:mb-12 text-center">Contact</h2>
         
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-8 md:gap-12">
           {/* LinkedIn */}
           <a
             href="https://www.linkedin.com/in/samuel-baumgartner-441a1a24b/"
             target="_blank"
             rel="noopener noreferrer"
-            className="block min-w-[200px] w-full md:w-auto"
+            className="block w-full max-w-[280px] sm:max-w-[300px] md:min-w-[200px] md:w-auto"
           >
             <SpotlightCard
-              className="flex flex-col items-center justify-center gap-4 p-6 group cursor-pointer"
+              className="flex flex-col items-center justify-center gap-3 sm:gap-4 p-5 sm:p-6 group cursor-pointer"
               spotlightColor="rgba(0, 119, 181, 0.25)"
             >
               <div className="flex items-center justify-center">
                 <svg
-                  className="w-12 h-12 text-[#0077b5] group-hover:scale-110 transition-transform duration-300 mx-auto"
+                  className="w-10 h-10 sm:w-12 sm:h-12 text-[#0077b5] group-hover:scale-110 transition-transform duration-300 mx-auto"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
@@ -32,8 +32,8 @@ export default function ContactSection() {
                 </svg>
               </div>
               <div className="flex flex-col items-center">
-                <span className="text-white font-semibold text-lg">LinkedIn</span>
-                <span className="text-neutral-400 text-sm">Connect with me</span>
+                <span className="text-white font-semibold text-base sm:text-lg">LinkedIn</span>
+                <span className="text-neutral-400 text-xs sm:text-sm">Connect with me</span>
               </div>
             </SpotlightCard>
           </a>
@@ -41,15 +41,15 @@ export default function ContactSection() {
           {/* Email */}
           <a
             href="mailto:sbaumgartn@ethz.ch"
-            className="block min-w-[200px] w-full md:w-auto"
+            className="block w-full max-w-[280px] sm:max-w-[300px] md:min-w-[200px] md:w-auto"
           >
             <SpotlightCard
-              className="flex flex-col items-center justify-center gap-4 p-6 group cursor-pointer"
+              className="flex flex-col items-center justify-center gap-3 sm:gap-4 p-5 sm:p-6 group cursor-pointer"
               spotlightColor="rgba(0, 119, 181, 0.25)"
             >
               <div className="flex items-center justify-center">
                 <svg
-                  className="w-12 h-12 text-[#0077b5] group-hover:scale-110 transition-transform duration-300 mx-auto"
+                  className="w-10 h-10 sm:w-12 sm:h-12 text-[#0077b5] group-hover:scale-110 transition-transform duration-300 mx-auto"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -64,8 +64,8 @@ export default function ContactSection() {
                 </svg>
               </div>
               <div className="flex flex-col items-center">
-                <span className="text-white font-semibold text-lg">Email</span>
-                <span className="text-neutral-400 text-sm">Send me a message</span>
+                <span className="text-white font-semibold text-base sm:text-lg">Email</span>
+                <span className="text-neutral-400 text-xs sm:text-sm">Send me a message</span>
               </div>
             </SpotlightCard>
           </a>
