@@ -33,9 +33,15 @@ export default function EducationSection({
             <SpotlightCard
               key={item.id}
               onClick={() => onOpenModal(item)}
-              className="p-4 sm:p-6 h-full flex flex-col gap-3 sm:gap-4 cursor-pointer"
+              className="p-4 sm:p-6 h-full flex flex-col gap-3 sm:gap-4 cursor-pointer active:scale-95 transition-transform md:transition-none border-2 md:border border-neutral-700 md:border-neutral-800 hover:border-neutral-600 md:hover:border-neutral-700 relative group"
               spotlightColor={spotlightColorMap[item.id] || "rgba(255, 255, 255, 0.15)"}
             >
+              {/* Mobile tap indicator */}
+              <div className="absolute top-2 right-2 md:hidden opacity-60 group-active:opacity-100 transition-opacity">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
+                  <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
               <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-neutral-800 border border-neutral-700">
                 {iconMap[item.id] || <GraduationCap className="text-white h-5 w-5" />}
               </div>
@@ -48,6 +54,10 @@ export default function EducationSection({
                   </p>
                 )}
               </div>
+              {/* Mobile tap hint text */}
+              <p className="text-xs text-neutral-500 mt-auto pt-2 md:hidden">
+                Tap to view details
+              </p>
             </SpotlightCard>
           ))}
         </div>
