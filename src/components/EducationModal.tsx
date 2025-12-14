@@ -106,34 +106,36 @@ export default function EducationModal({
       style={{ overflow: 'hidden', overflowX: 'hidden' }}
     >
       <div
-        className="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200/60 flex flex-col"
+        className="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200/60 flex flex-col relative"
         onClick={(e) => e.stopPropagation()}
         style={{ overflowX: 'hidden' }}
       >
+        {/* Close button - fixed on mobile viewport, absolute on desktop */}
+        <button
+          onClick={onClose}
+          className="fixed sm:absolute top-8 sm:top-6 right-6 sm:right-6 text-gray-500 hover:text-gray-700 hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 rounded-full p-1.5 sm:p-2 w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center transition-all shadow-lg sm:shadow-md hover:shadow-xl sm:hover:shadow-lg border border-gray-200/50 hover:border-red-200/50 bg-white/95 sm:bg-white backdrop-blur-sm sm:backdrop-blur-none z-[60] sm:z-20"
+          aria-label="Close"
+        >
+          <svg
+            className="w-5 h-5 sm:w-5 sm:h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
         <div className="overflow-y-auto bg-white" style={{ maxHeight: '95vh', overflowX: 'hidden' }}>
+
           {/* Header Content */}
           {headerContent && (
             <div className="p-4 sm:p-6 md:p-10 pb-4 sm:pb-6 pl-4 sm:pl-8 md:pl-16 lg:pl-20 relative bg-white border-b border-gray-200/60">
-              <button
-                onClick={onClose}
-                className="absolute top-3 right-3 sm:top-6 sm:right-6 text-gray-500 hover:text-gray-700 hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 rounded-full p-1.5 sm:p-2 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition-all z-20 shadow-md hover:shadow-lg border border-gray-200/50 hover:border-red-200/50"
-                aria-label="Close"
-              >
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-              <div className="pr-8 sm:pr-12">{headerContent}</div>
+              <div className="pr-12 sm:pr-12">{headerContent}</div>
             </div>
           )}
           
@@ -265,27 +267,6 @@ export default function EducationModal({
           {/* Rest of Content */}
           {(content || title || description) && (
             <div className="px-4 sm:px-8 md:px-16 lg:px-20 py-6 sm:py-8 relative bg-white">
-              {!headerContent && (
-                <button
-                  onClick={onClose}
-                  className="absolute top-3 right-3 sm:top-6 sm:right-6 text-gray-500 hover:text-gray-700 hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 rounded-full p-1.5 sm:p-2 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition-all z-20 shadow-md hover:shadow-lg border border-gray-200/50 hover:border-red-200/50"
-                  aria-label="Close"
-                >
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              )}
               {title && !content && (
                 <div className="mb-4 sm:mb-6 pr-8 sm:pr-12">
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">{title}</h3>

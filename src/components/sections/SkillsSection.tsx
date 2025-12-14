@@ -136,9 +136,16 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
               <SpotlightCard
                 key={skill.id}
                 onClick={() => handleCardClick(skill.id)}
-                className="p-3 sm:p-4 h-full flex flex-col items-center text-center cursor-pointer group"
+                className="p-3 sm:p-4 h-full flex flex-col items-center text-center cursor-pointer group active:scale-95 transition-transform md:transition-none border-2 md:border border-neutral-700 md:border-neutral-800 hover:border-neutral-600 md:hover:border-neutral-700 relative"
                 spotlightColor={spotlightColors[skill.id] || "rgba(255, 255, 255, 0.15)"}
               >
+                {/* Mobile tap indicator */}
+                <div className={`absolute top-2 right-2 md:hidden transition-opacity ${isExpanded ? 'opacity-100 rotate-180' : 'opacity-60 group-active:opacity-100'}`}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white">
+                    <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                
                 <div className="mb-2 sm:mb-3 flex items-center justify-center">
                   <div className={`transition-transform duration-300 ${isExpanded ? 'scale-110' : 'group-hover:scale-110'}`}>
                     <SkillIcon skillId={skill.id} color={skill.iconColor} />
@@ -167,11 +174,17 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
                 </div>
                 
                 {!isExpanded && (
-                  <div className="mt-auto pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center w-full">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-neutral-400">
-                      <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
+                  <>
+                    <div className="mt-auto pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex justify-center w-full">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-neutral-400">
+                        <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    {/* Mobile tap hint text */}
+                    <p className="text-xs text-neutral-500 mt-auto pt-2 md:hidden">
+                      Tap to expand
+                    </p>
+                  </>
                 )}
               </SpotlightCard>
             );

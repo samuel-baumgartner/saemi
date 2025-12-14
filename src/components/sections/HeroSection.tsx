@@ -61,7 +61,7 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
     document.body.removeChild(link);
   };
   return (
-    <div className="flex min-h-[70vh] sm:min-h-[80vh] items-center justify-center relative pb-20 sm:pb-0">
+    <div className="flex min-h-screen items-center justify-center relative pb-20 sm:pb-0">
       <Link
         href="/"
         className="absolute top-4 left-4 text-white text-base sm:text-lg font-medium hover:underline z-10 px-2"
