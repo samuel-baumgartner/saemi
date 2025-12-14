@@ -561,6 +561,10 @@ body {
   height: 100%;
 }
 
+.h-12 {
+  height: 3rem;
+}
+
 .max-h-0 {
   max-height: 0;
 }
@@ -635,6 +639,10 @@ body {
 
 .w-fit {
   width: fit-content;
+}
+
+.w-12 {
+  width: 3rem;
 }
 
 .min-w-\[1ch\] {
@@ -1018,6 +1026,12 @@ body {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-white\/0 {
+  --tw-gradient-from: #fff0 var(--tw-gradient-from-position);
+  --tw-gradient-to: #fff0 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .via-blue-800 {
   --tw-gradient-to: #1e40af00 var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), #1e40af var(--tw-gradient-via-position), var(--tw-gradient-to);
@@ -1046,6 +1060,11 @@ body {
 .via-purple-600\/20 {
   --tw-gradient-to: #9333ea00 var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), #9333ea33 var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+.via-white\/0 {
+  --tw-gradient-to: #fff0 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #fff0 var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
 .to-gray-100 {
@@ -1080,6 +1099,14 @@ body {
   --tw-gradient-to: #6366f14d var(--tw-gradient-to-position);
 }
 
+.to-gray-50\/80 {
+  --tw-gradient-to: #f9fafbcc var(--tw-gradient-to-position);
+}
+
+.to-white\/0 {
+  --tw-gradient-to: #fff0 var(--tw-gradient-to-position);
+}
+
 .bg-cover {
   background-size: cover;
 }
@@ -1091,6 +1118,10 @@ body {
 
 .bg-center {
   background-position: center;
+}
+
+.stroke-\[2\.5\] {
+  stroke-width: 2.5px;
 }
 
 .object-contain {
@@ -1370,6 +1401,11 @@ body {
   color: rgb(115 115 115 / var(--tw-text-opacity, 1));
 }
 
+.text-gray-600 {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity, 1));
+}
+
 .opacity-0 {
   opacity: 0;
 }
@@ -1430,6 +1466,11 @@ body {
 
 .blur {
   --tw-blur: blur(8px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.blur-sm {
+  --tw-blur: blur(4px);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
@@ -1545,6 +1586,10 @@ body {
   border-color: rgb(82 82 82 / var(--tw-border-opacity, 1));
 }
 
+.hover\:border-red-300\/60:hover {
+  border-color: #fca5a599;
+}
+
 .hover\:bg-black\/50:hover {
   background-color: #00000080;
 }
@@ -1579,12 +1624,21 @@ body {
   --tw-gradient-stops: var(--tw-gradient-from), #374151 var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
+.hover\:via-pink-50:hover {
+  --tw-gradient-to: #fdf2f800 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #fdf2f8 var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
 .hover\:to-gray-800:hover {
   --tw-gradient-to: #1f2937 var(--tw-gradient-to-position);
 }
 
 .hover\:to-pink-50:hover {
   --tw-gradient-to: #fdf2f8 var(--tw-gradient-to-position);
+}
+
+.hover\:to-rose-50:hover {
+  --tw-gradient-to: #fff1f2 var(--tw-gradient-to-position);
 }
 
 .hover\:text-gray-200:hover {
@@ -1646,6 +1700,21 @@ body {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.group:hover .group-hover\:from-red-100\/30 {
+  --tw-gradient-from: #fee2e24d var(--tw-gradient-from-position);
+  --tw-gradient-to: #fee2e200 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.group:hover .group-hover\:via-pink-100\/30 {
+  --tw-gradient-to: #fce7f300 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #fce7f34d var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+.group:hover .group-hover\:to-rose-100\/30 {
+  --tw-gradient-to: #ffe4e64d var(--tw-gradient-to-position);
+}
+
 .group:hover .group-hover\:text-neutral-200 {
   --tw-text-opacity: 1;
   color: rgb(229 229 229 / var(--tw-text-opacity, 1));
@@ -1654,6 +1723,11 @@ body {
 .group:hover .group-hover\:text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.group:hover .group-hover\:text-red-600 {
+  --tw-text-opacity: 1;
+  color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
 
 .group:hover .group-hover\:underline {
@@ -1760,6 +1834,10 @@ body {
     height: 1.5rem;
   }
 
+  .sm\:h-11 {
+    height: 2.75rem;
+  }
+
   .sm\:max-h-\[600px\] {
     max-height: 600px;
   }
@@ -1798,6 +1876,10 @@ body {
 
   .sm\:w-8 {
     width: 2rem;
+  }
+
+  .sm\:w-11 {
+    width: 2.75rem;
   }
 
   .sm\:max-w-\[300px\] {
