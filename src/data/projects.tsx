@@ -157,26 +157,58 @@ export const projects: Project[] = [
             <p className="text-gray-700 leading-relaxed text-base">
               I implemented three path planning algorithms for this project: RRT (Rapidly-exploring Random Tree), RRT*, and RRT* Smart. The visualization shows the planned path with grey regions around the trajectory representing the thickness of the ball, accounting for the physical constraints and safety margins required for successful navigation.
             </p>
-            <div className="bg-gradient-to-br from-blue-50/60 via-indigo-50/40 to-purple-50/30 rounded-xl p-6 border border-gray-200/60 shadow-md space-y-4">
-              <h5 className="text-xl font-semibold text-gray-900 mb-3">Implemented Algorithms</h5>
-              <div className="space-y-4 text-gray-700">
-                <div>
-                  <h6 className="font-bold text-gray-900 mb-2">Rapidly-Exploring Random Tree (RRT)</h6>
-                  <p className="text-sm leading-relaxed">
-                    I implemented the classic RRT algorithm for motion planning in cluttered environments. RRT incrementally grows a tree of collision-free states by sampling random points in the configuration space and connecting them to the nearest node if the straight-line path is obstacle-free. Because it aggressively explores large, unknown regions, it is very good at quickly finding a feasible path from start to goal – but that first path is usually quite suboptimal and jagged.
-                  </p>
+            <div className="space-y-6">
+              <h5 className="text-2xl md:text-3xl font-bold text-gray-900">
+                Implemented Algorithms
+              </h5>
+              <div className="space-y-6">
+                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 md:p-7 border border-indigo-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex items-start gap-6 md:gap-8 pl-4 md:pl-6">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 border-2 border-blue-300 flex items-center justify-center shadow-sm mt-1">
+                      <span className="text-blue-900 font-bold text-sm leading-none">1</span>
+                    </div>
+                    <div className="flex-1">
+                      <h6 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        Rapidly-Exploring Random Tree (RRT)
+                        <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-semibold">Classic</span>
+                      </h6>
+                      <p className="text-sm leading-relaxed text-gray-700">
+                        I implemented the classic RRT algorithm for motion planning in cluttered environments. RRT incrementally grows a tree of collision-free states by sampling random points in the configuration space and connecting them to the nearest node if the straight-line path is obstacle-free. Because it aggressively explores large, unknown regions, it is very good at quickly finding a feasible path from start to goal – but that first path is usually quite suboptimal and jagged.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h6 className="font-bold text-gray-900 mb-2">RRT*: Asymptotically Optimal RRT</h6>
-                  <p className="text-sm leading-relaxed">
-                    To improve path quality, I implemented RRT*, which extends RRT with a cost-aware rewiring step. As the tree grows, each new node not only connects to the nearest state, but also chooses the parent that yields the lowest cost-to-come, and then "rewires" nearby nodes through this new state if it shortens their path. Over time, the tree converges to an asymptotically optimal solution: the path becomes shorter and smoother as more samples are added, at the cost of higher computation per iteration.
-                  </p>
+                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 md:p-7 border border-purple-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex items-start gap-6 md:gap-8 pl-4 md:pl-6">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-purple-100 border-2 border-purple-300 flex items-center justify-center shadow-sm mt-1">
+                      <span className="text-purple-900 font-bold text-sm leading-none">2</span>
+                    </div>
+                    <div className="flex-1">
+                      <h6 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        RRT*: Asymptotically Optimal RRT
+                        <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold">Optimized</span>
+                      </h6>
+                      <p className="text-sm leading-relaxed text-gray-700">
+                        To improve path quality, I implemented RRT*, which extends RRT with a cost-aware rewiring step. As the tree grows, each new node not only connects to the nearest state, but also chooses the parent that yields the lowest cost-to-come, and then "rewires" nearby nodes through this new state if it shortens their path. Over time, the tree converges to an asymptotically optimal solution: the path becomes shorter and smoother as more samples are added, at the cost of higher computation per iteration.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h6 className="font-bold text-gray-900 mb-2">RRT*-Smart: Biased, Beacon-Guided Optimization</h6>
-                  <p className="text-sm leading-relaxed">
-                    Finally, I implemented RRT*-Smart, which accelerates RRT*'s convergence by combining online path smoothing with intelligent sampling. Once a first path is found, the algorithm optimizes the path by removing redundant waypoints and straightening segments, extracts "beacon" nodes along this optimized path, and biases future samples to lie in a region around these beacons, while still mixing in uniform samples for global exploration. This focused sampling around a continually re-optimized path lets RRT*-Smart reach high-quality paths much faster than plain RRT*, especially in cluttered environments.
-                  </p>
+                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 md:p-7 border border-purple-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex items-start gap-6 md:gap-8 pl-4 md:pl-6">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-100 border-2 border-indigo-300 flex items-center justify-center shadow-sm mt-1">
+                      <span className="text-purple-900 font-bold text-sm leading-none">3</span>
+                    </div>
+                    <div className="flex-1">
+                      <h6 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        RRT*-Smart: Biased, Beacon-Guided Optimization
+                        <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">Advanced</span>
+                      </h6>
+                      <p className="text-sm leading-relaxed text-gray-700">
+                        Finally, I implemented RRT*-Smart, which accelerates RRT*'s convergence by combining online path smoothing with intelligent sampling. Once a first path is found, the algorithm optimizes the path by removing redundant waypoints and straightening segments, extracts "beacon" nodes along this optimized path, and biases future samples to lie in a region around these beacons, while still mixing in uniform samples for global exploration. This focused sampling around a continually re-optimized path lets RRT*-Smart reach high-quality paths much faster than plain RRT*, especially in cluttered environments.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -291,7 +323,7 @@ export const projects: Project[] = [
             />
           </div>
         </div>
-        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-6 md:p-8 border border-gray-200/60 shadow-lg shadow-orange-100/30 backdrop-blur-sm">
+        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-orange-100/30 backdrop-blur-sm">
           {createSectionHeader('Challenges Overcome', 'from-orange-500 to-red-500')}
           <ul className="space-y-3 pt-1">
             <li className="flex items-start gap-3">
@@ -371,7 +403,7 @@ export const projects: Project[] = [
         </div>
         <div className="space-y-8 mt-16">
           {createSectionHeader('Key Features', 'from-purple-500 to-pink-500')}
-          <div className="bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-2xl p-6 md:p-8 border border-gray-200/60 shadow-lg backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg backdrop-blur-sm">
             <p className="text-gray-800 mb-6 font-semibold text-lg md:text-xl">Multi-layer environmental dashboard for Zurich, including:</p>
             {createFeatureList([
               { title: 'Surface Temperature', description: '(NASA/ESA Earthdata)', color: 'bg-blue-500' },
@@ -385,19 +417,19 @@ export const projects: Project[] = [
             <div className="mt-8 pt-6 border-t border-blue-200/60">
               <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Core Capabilities</h5>
               <div className="grid md:grid-cols-1 gap-4">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
                     <p className="text-gray-700 leading-relaxed text-base md:text-lg">Automated ingestion and alignment of satellite + city datasets into a unified grid</p>
                   </div>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
                     <p className="text-gray-700 leading-relaxed text-base md:text-lg">Unsupervised anomaly detection to identify unusual environmental patterns</p>
                   </div>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
                     <p className="text-gray-700 leading-relaxed text-base md:text-lg">Interactive web map to explore anomalies and underlying layers spatially</p>
@@ -436,7 +468,7 @@ export const projects: Project[] = [
             />
           </div>
         </div>
-        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-6 md:p-8 border border-gray-200/60 shadow-lg shadow-orange-100/30 backdrop-blur-sm">
+        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-orange-100/30 backdrop-blur-sm">
           {createSectionHeader('Challenges Overcome', 'from-orange-500 to-red-500')}
           <ul className="space-y-3 pt-1">
             <li className="flex items-start gap-3">
@@ -463,7 +495,7 @@ export const projects: Project[] = [
             { category: 'Deployment', technology: 'Vercel', color: 'bg-orange-500' },
           ])}
         </div>
-        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-6 md:p-8 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
+        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
           {createSectionHeader('Live Demo', 'from-blue-500 to-purple-500')}
           <div className="space-y-2 pt-1">
             <a
@@ -573,7 +605,7 @@ export const projects: Project[] = [
           </p>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50/50 rounded-2xl p-6 md:p-7 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
               <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Multilingual Chat</h5>
           <p className="text-gray-700 leading-relaxed text-base">
                 With automatic translation capabilities, our chat feature enables seamless interaction among employees, irrespective of their preferred language, breaking down communication barriers in diverse, global workplaces.
@@ -592,7 +624,7 @@ export const projects: Project[] = [
                 </p>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50/50 rounded-2xl p-6 md:p-7 border border-gray-200/60 shadow-lg shadow-purple-100/30 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 shadow-lg shadow-purple-100/30 backdrop-blur-sm mt-8">
               <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Feedback with an Avatar</h5>
               <p className="text-gray-700 leading-relaxed text-base">
                 Employing an animated avatar, our platform delivers instantaneous responses in the form of delayed rewards and consequences, aiding users in anticipating their emotional states based on their actions. This innovative approach to behavioral feedback enhances user engagement and promotes self-awareness.
@@ -612,7 +644,7 @@ export const projects: Project[] = [
             { category: 'AI Coach', technology: 'ChatGPT with user-context integration', color: 'bg-cyan-500' },
           ])}
         </div>
-        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-6 md:p-8 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
+        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
           {createSectionHeader('Result', 'from-blue-500 to-purple-500')}
           <p className="text-gray-700 leading-relaxed text-base pt-1">
             In 36 hours, we delivered a fully functional prototype featuring real-time chat, goal tracking, event creation, AI coaching, and a 3D animated avatar—combining AI, gamification, and workplace psychology into one cohesive platform.
@@ -678,7 +710,7 @@ export const projects: Project[] = [
             <p className="text-gray-700 leading-relaxed text-base">
               A systemd unit manages the Docker stack lifecycle. The sharelatex container includes a full TeX Live distribution, with packages updated via tlmgr as needed.
             </p>
-            <div className="bg-gradient-to-br from-amber-50/60 via-orange-50/40 to-yellow-50/30 rounded-xl p-6 border border-gray-200/60 shadow-md">
+            <div className="bg-gradient-to-br from-amber-50/60 via-orange-50/40 to-yellow-50/30 rounded-xl p-7 md:p-8 border border-gray-200/60 shadow-md">
               <h5 className="text-xl font-semibold text-gray-900 mb-3">Storage and Backup Architecture</h5>
               <p className="text-gray-700 leading-relaxed mb-3">
                 A TrueNAS pool and dataset are configured as an SMB share, mounted at /backup on the Ubuntu VM. A nightly systemd timer triggers a backup script that runs mongodump and rsyncs Overleaf data, MongoDB, and Redis volumes into date-stamped folders on the TrueNAS share.
