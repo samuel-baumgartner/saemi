@@ -13,8 +13,10 @@ const SCROLL_MULTIPLIER_DESKTOP = 0.039;  // Desktop scroll speed
 const SCROLL_MULTIPLIER_MOBILE = 0.025;   // Mobile scroll speed
 // ============================================
 
-// Increase preload range for mobile to prevent flickering
-const PRELOAD_RANGE = typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 5;
+function getPreloadRange(isMobile: boolean) {
+  // Increase preload range for mobile to prevent flickering
+  return isMobile ? 10 : 5;
+}
 
 
 function getImagePath(index: number): string {
@@ -128,9 +130,22 @@ export default function ScrollBackground() {
         const img = new Image();
         img.onload = () => {
           loadedImagesRef.current.add(i);
+          // Decode early-preloaded frames too (helps avoid first-load flicker)
+          if ('decode' in img) {
+            img.decode()
+              .then(() => {
+                decodedImagesRef.current.add(i);
+              })
+              .catch(() => {
+                decodedImagesRef.current.add(i);
+              });
+          } else {
+            decodedImagesRef.current.add(i);
+          }
         };
         img.onerror = () => {
           loadedImagesRef.current.add(i);
+          decodedImagesRef.current.add(i);
         };
         img.src = getImagePath(i);
         imagesRef.current.set(i, img);
@@ -217,7 +232,8 @@ export default function ScrollBackground() {
   // Preload adjacent images when scrolling
   useEffect(() => {
     const preloadAdjacent = (index: number) => {
-      for (let i = Math.max(0, index - PRELOAD_RANGE); i <= Math.min(TOTAL_IMAGES - 1, index + PRELOAD_RANGE); i++) {
+      const preloadRange = getPreloadRange(isMobile);
+      for (let i = Math.max(0, index - preloadRange); i <= Math.min(TOTAL_IMAGES - 1, index + preloadRange); i++) {
         if (!loadedImagesRef.current.has(i)) {
           if (!imagesRef.current.has(i)) {
             const img = new Image();
@@ -288,7 +304,7 @@ export default function ScrollBackground() {
     if (currentImageIndex !== undefined) {
       preloadAdjacent(currentImageIndex);
     }
-  }, [currentImageIndex]);
+  }, [currentImageIndex, isMobile]);
 
   useEffect(() => {
     const handleScroll = () => {
