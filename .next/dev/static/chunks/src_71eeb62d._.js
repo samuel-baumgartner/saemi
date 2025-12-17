@@ -21,8 +21,10 @@ const TOTAL_IMAGES = 100;
 const SCROLL_MULTIPLIER_DESKTOP = 0.039; // Desktop scroll speed
 const SCROLL_MULTIPLIER_MOBILE = 0.025; // Mobile scroll speed
 // ============================================
-// Increase preload range for mobile to prevent flickering
-const PRELOAD_RANGE = ("TURBOPACK compile-time value", "object") !== 'undefined' && window.innerWidth < 768 ? 10 : 5;
+function getPreloadRange(isMobile) {
+    // Increase preload range for mobile to prevent flickering
+    return isMobile ? 10 : 5;
+}
 function getImagePath(index) {
     const paddedIndex = String(index + 1).padStart(4, "0");
     return `/data/${paddedIndex}.png`;
@@ -138,11 +140,26 @@ function ScrollBackground() {
                         img.onload = ({
                             "ScrollBackground.useEffect.preloadImages": ()=>{
                                 loadedImagesRef.current.add(i);
+                                // Decode early-preloaded frames too (helps avoid first-load flicker)
+                                if ('decode' in img) {
+                                    img.decode().then({
+                                        "ScrollBackground.useEffect.preloadImages": ()=>{
+                                            decodedImagesRef.current.add(i);
+                                        }
+                                    }["ScrollBackground.useEffect.preloadImages"]).catch({
+                                        "ScrollBackground.useEffect.preloadImages": ()=>{
+                                            decodedImagesRef.current.add(i);
+                                        }
+                                    }["ScrollBackground.useEffect.preloadImages"]);
+                                } else {
+                                    decodedImagesRef.current.add(i);
+                                }
                             }
                         })["ScrollBackground.useEffect.preloadImages"];
                         img.onerror = ({
                             "ScrollBackground.useEffect.preloadImages": ()=>{
                                 loadedImagesRef.current.add(i);
+                                decodedImagesRef.current.add(i);
                             }
                         })["ScrollBackground.useEffect.preloadImages"];
                         img.src = getImagePath(i);
@@ -245,7 +262,8 @@ function ScrollBackground() {
         "ScrollBackground.useEffect": ()=>{
             const preloadAdjacent = {
                 "ScrollBackground.useEffect.preloadAdjacent": (index)=>{
-                    for(let i = Math.max(0, index - PRELOAD_RANGE); i <= Math.min(TOTAL_IMAGES - 1, index + PRELOAD_RANGE); i++){
+                    const preloadRange = getPreloadRange(isMobile);
+                    for(let i = Math.max(0, index - preloadRange); i <= Math.min(TOTAL_IMAGES - 1, index + preloadRange); i++){
                         if (!loadedImagesRef.current.has(i)) {
                             if (!imagesRef.current.has(i)) {
                                 const img = new Image();
@@ -328,7 +346,8 @@ function ScrollBackground() {
             }
         }
     }["ScrollBackground.useEffect"], [
-        currentImageIndex
+        currentImageIndex,
+        isMobile
     ]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "ScrollBackground.useEffect": ()=>{
@@ -536,7 +555,7 @@ function ScrollBackground() {
             className: "fixed inset-0 -z-10 bg-black"
         }, void 0, false, {
             fileName: "[project]/src/components/ScrollBackground.tsx",
-            lineNumber: 471,
+            lineNumber: 487,
             columnNumber: 7
         }, this);
     }
@@ -548,7 +567,7 @@ function ScrollBackground() {
                 className: "fixed inset-0 -z-10 bg-black"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 481,
+                lineNumber: 497,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -569,7 +588,7 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 484,
+                lineNumber: 500,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -592,14 +611,14 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 502,
+                lineNumber: 518,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "fixed inset-0 -z-10 bg-black/40"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 521,
+                lineNumber: 537,
                 columnNumber: 7
             }, this)
         ]

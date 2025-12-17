@@ -26,8 +26,10 @@ const TOTAL_IMAGES = 100;
 const SCROLL_MULTIPLIER_DESKTOP = 0.039; // Desktop scroll speed
 const SCROLL_MULTIPLIER_MOBILE = 0.025; // Mobile scroll speed
 // ============================================
-// Increase preload range for mobile to prevent flickering
-const PRELOAD_RANGE = ("TURBOPACK compile-time value", "undefined") !== 'undefined' && window.innerWidth < 768 ? "TURBOPACK unreachable" : 5;
+function getPreloadRange(isMobile) {
+    // Increase preload range for mobile to prevent flickering
+    return isMobile ? 10 : 5;
+}
 function getImagePath(index) {
     const paddedIndex = String(index + 1).padStart(4, "0");
     return `/data/${paddedIndex}.png`;
@@ -121,9 +123,20 @@ function ScrollBackground() {
                 const img = new Image();
                 img.onload = ()=>{
                     loadedImagesRef.current.add(i);
+                    // Decode early-preloaded frames too (helps avoid first-load flicker)
+                    if ('decode' in img) {
+                        img.decode().then(()=>{
+                            decodedImagesRef.current.add(i);
+                        }).catch(()=>{
+                            decodedImagesRef.current.add(i);
+                        });
+                    } else {
+                        decodedImagesRef.current.add(i);
+                    }
                 };
                 img.onerror = ()=>{
                     loadedImagesRef.current.add(i);
+                    decodedImagesRef.current.add(i);
                 };
                 img.src = getImagePath(i);
                 imagesRef.current.set(i, img);
@@ -207,7 +220,8 @@ function ScrollBackground() {
     // Preload adjacent images when scrolling
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const preloadAdjacent = (index)=>{
-            for(let i = Math.max(0, index - PRELOAD_RANGE); i <= Math.min(TOTAL_IMAGES - 1, index + PRELOAD_RANGE); i++){
+            const preloadRange = getPreloadRange(isMobile);
+            for(let i = Math.max(0, index - preloadRange); i <= Math.min(TOTAL_IMAGES - 1, index + preloadRange); i++){
                 if (!loadedImagesRef.current.has(i)) {
                     if (!imagesRef.current.has(i)) {
                         const img = new Image();
@@ -276,7 +290,8 @@ function ScrollBackground() {
             preloadAdjacent(currentImageIndex);
         }
     }, [
-        currentImageIndex
+        currentImageIndex,
+        isMobile
     ]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const handleScroll = ()=>{
@@ -454,7 +469,7 @@ function ScrollBackground() {
             className: "fixed inset-0 -z-10 bg-black"
         }, void 0, false, {
             fileName: "[project]/src/components/ScrollBackground.tsx",
-            lineNumber: 471,
+            lineNumber: 487,
             columnNumber: 7
         }, this);
     }
@@ -466,7 +481,7 @@ function ScrollBackground() {
                 className: "fixed inset-0 -z-10 bg-black"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 481,
+                lineNumber: 497,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -487,7 +502,7 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 484,
+                lineNumber: 500,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -510,14 +525,14 @@ function ScrollBackground() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 502,
+                lineNumber: 518,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "fixed inset-0 -z-10 bg-black/40"
             }, void 0, false, {
                 fileName: "[project]/src/components/ScrollBackground.tsx",
-                lineNumber: 521,
+                lineNumber: 537,
                 columnNumber: 7
             }, this)
         ]
