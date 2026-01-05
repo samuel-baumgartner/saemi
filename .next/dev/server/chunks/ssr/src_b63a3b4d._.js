@@ -1553,14 +1553,14 @@ class GoogleFitService {
    * Get activity name from Google Fit activity type code
    */ getActivityName(activityType) {
         const activityMap = {
-            1: 'Aerobics',
+            1: 'Biking',
+            7: 'Walking',
             8: 'Running',
             9: 'Strength Training',
-            10: 'Walking',
-            1: 'Biking',
+            10: 'Aerobics',
             82: 'Swimming',
-            108: 'Yoga',
-            93: 'Hiking'
+            93: 'Hiking',
+            108: 'Yoga'
         };
         return activityMap[activityType] || 'Exercise';
     }
