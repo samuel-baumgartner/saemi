@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model TimeSession {
+  id          String   @id @default(cuid())
+  userId      String   // Google account email or ID
+  activity    String
+  description String?
+  startTime   DateTime
+  endTime     DateTime?
+  date        String   // YYYY-MM-DD for easy querying
+  source      String   @default("tracked") // 'manual', 'tracked', 'google-fit'
+  
+  // Health data (stored as JSON)
+  healthDataType String? // 'sleep', 'workout', 'activity'
+  healthDataDetails Json? // detailed metrics
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId, date]) // Index for fast queries by user and date
+  @@index([userId, startTime]) // Index for time-range queries
+}
