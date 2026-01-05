@@ -20,10 +20,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const userId = session.user.email
+
     // Delete old health sessions (Google Fit data)
     await prisma.timeSession.deleteMany({
       where: {
-        userId: session.user.email,
+        userId,
         source: 'google-fit',
       },
     })
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Create new health sessions
     const created = await prisma.timeSession.createMany({
       data: sessions.map((s: any) => ({
-        userId: session.user.email,
+        userId,
         activity: s.activity,
         description: s.description || null,
         startTime: new Date(s.startTime),
