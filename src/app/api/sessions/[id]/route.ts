@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import { prisma } from '@/lib/prisma'
+
+// PATCH /api/sessions/[id] - Update a session
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { activity, description, startTime, endTime, healthData } = body
+
+    // Verify the session belongs to the user
+    const existingSession = await prisma.timeSession.findFirst({
+      where: {
+        id: params.id,
+        userId: session.user.email,
+      },
+    })
+
+    if (!existingSession) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+    }
+
+    const updatedSession = await prisma.timeSession.update({
+      where: { id: params.id },
+      data: {
+        ...(activity && { activity }),
+        ...(description !== undefined && { description }),
+        ...(startTime && { startTime: new Date(startTime) }),
+        ...(endTime !== undefined && {
+          endTime: endTime ? new Date(endTime) : null,
+        }),
+        ...(healthData && {
+          healthDataType: healthData.type,
+          healthDataDetails: healthData.details,
+        }),
+      },
+    })
+
+    return NextResponse.json(updatedSession)
+  } catch (error) {
+    console.error('PATCH /api/sessions/[id] error:', error)
+    return NextResponse.json(
+      { error: 'Failed to update session' },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE /api/sessions/[id] - Delete a session
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Verify the session belongs to the user
+    const existingSession = await prisma.timeSession.findFirst({
+      where: {
+        id: params.id,
+        userId: session.user.email,
+      },
+    })
+
+    if (!existingSession) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+    }
+
+    await prisma.timeSession.delete({
+      where: { id: params.id },
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('DELETE /api/sessions/[id] error:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete session' },
+      { status: 500 }
+    )
+  }
+}
+
