@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 // PATCH /api/sessions/[id] - Update a session
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -13,13 +13,14 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
     const { activity, description, startTime, endTime, healthData } = body
 
     // Verify the session belongs to the user
     const existingSession = await prisma.timeSession.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.email,
       },
     })
@@ -29,7 +30,7 @@ export async function PATCH(
     }
 
     const updatedSession = await prisma.timeSession.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(activity && { activity }),
         ...(description !== undefined && { description }),
@@ -57,7 +58,7 @@ export async function PATCH(
 // DELETE /api/sessions/[id] - Delete a session
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -65,10 +66,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Verify the session belongs to the user
     const existingSession = await prisma.timeSession.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: session.user.email,
       },
     })
@@ -78,7 +81,7 @@ export async function DELETE(
     }
 
     await prisma.timeSession.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })
