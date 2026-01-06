@@ -150,7 +150,7 @@ export class GoogleFitService {
     description: string,
     startTime: Date,
     endTime: Date,
-    source: string,
+    source: 'manual' | 'tracked' | 'google-fit' | 'anki',
     healthData: any
   ): TimeSession[] {
     const sessions: TimeSession[] = []
