@@ -239,3 +239,5 @@ Just make sure Samsung Health is syncing to Google Fit on your phone, and you're
 
 
 
+
+
