@@ -1,20 +1,5 @@
 {
   "node": {
-    "004fd337559dcdadb7b169f404110af9282e5b7cb8": {
-      "workers": {
-        "app/personal/page": {
-          "moduleId": "[project]/.next-internal/server/app/personal/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/personal/page.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "$$RSC_SERVER_ACTION_0",
-          "filename": "src/app/personal/page.tsx"
-        }
-      },
-      "layer": {
-        "app/personal/page": "rsc"
-      },
-      "filename": "src/app/personal/page.tsx",
-      "exportedName": "$$RSC_SERVER_ACTION_0"
-    },
     "00fa914d2df7c8a0012141c6566e2664bbb0b5f3ca": {
       "workers": {
         "app/personal/dashboard/page": {
@@ -28,6 +13,21 @@
         "app/personal/dashboard/page": "rsc"
       },
       "filename": "src/app/personal/dashboard/page.tsx",
+      "exportedName": "$$RSC_SERVER_ACTION_0"
+    },
+    "004fd337559dcdadb7b169f404110af9282e5b7cb8": {
+      "workers": {
+        "app/personal/page": {
+          "moduleId": "[project]/.next-internal/server/app/personal/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/personal/page.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "$$RSC_SERVER_ACTION_0",
+          "filename": "src/app/personal/page.tsx"
+        }
+      },
+      "layer": {
+        "app/personal/page": "rsc"
+      },
+      "filename": "src/app/personal/page.tsx",
       "exportedName": "$$RSC_SERVER_ACTION_0"
     }
   },
