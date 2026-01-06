@@ -1,4 +1,5 @@
 import { SleepData, WorkoutData, TimeSession } from '@/types/task'
+import { getLocalDateString } from './dateUtils'
 
 // Google Fit API integration
 // Documentation: https://developers.google.com/fit
@@ -134,6 +135,58 @@ export class GoogleFitService {
   }
 
   /**
+   * Check if a session spans midnight (starts on one day, ends on another)
+   */
+  private static spansMidnight(startTime: Date, endTime: Date): boolean {
+    return getLocalDateString(startTime) !== getLocalDateString(endTime)
+  }
+
+  /**
+   * Split a session that spans midnight into multiple sessions (one per day)
+   */
+  private static splitSessionAcrossDays(
+    id: string,
+    activity: string,
+    description: string,
+    startTime: Date,
+    endTime: Date,
+    source: string,
+    healthData: any
+  ): TimeSession[] {
+    const sessions: TimeSession[] = []
+    const currentStart = new Date(startTime)
+    const finalEnd = new Date(endTime)
+
+    let dayIndex = 0
+    while (currentStart < finalEnd) {
+      // Get end of current day (23:59:59.999)
+      const endOfDay = new Date(currentStart)
+      endOfDay.setHours(23, 59, 59, 999)
+
+      // Determine the end time for this segment
+      const segmentEnd = finalEnd <= endOfDay ? finalEnd : endOfDay
+
+      sessions.push({
+        id: `${id}-day${dayIndex}`,
+        activity,
+        description,
+        startTime: new Date(currentStart),
+        endTime: new Date(segmentEnd),
+        date: getLocalDateString(currentStart),
+        source,
+        healthData,
+      })
+
+      // Move to start of next day
+      currentStart.setDate(currentStart.getDate() + 1)
+      currentStart.setHours(0, 0, 0, 0)
+      dayIndex++
+    }
+
+    return sessions
+  }
+
+  /**
    * Convert health data to timeline sessions
    */
   static convertToSessions(
@@ -144,36 +197,72 @@ export class GoogleFitService {
 
     // Convert sleep data
     sleepData.forEach((sleep) => {
-      sessions.push({
-        id: `sleep-${sleep.id}`,
-        activity: '💤 Sleep',
-        description: this.formatSleepDescription(sleep),
-        startTime: sleep.startTime,
-        endTime: sleep.endTime,
-        date: sleep.startTime.toISOString().split('T')[0],
-        source: 'google-fit',
-        healthData: {
-          type: 'sleep',
-          details: sleep,
-        },
-      })
+      // Check if sleep spans multiple days (crosses midnight)
+      if (this.spansMidnight(sleep.startTime, sleep.endTime)) {
+        // Split into multiple sessions (one per day)
+        const splitSessions = this.splitSessionAcrossDays(
+          `sleep-${sleep.id}`,
+          '💤 Sleep',
+          this.formatSleepDescription(sleep),
+          sleep.startTime,
+          sleep.endTime,
+          'google-fit',
+          {
+            type: 'sleep',
+            details: sleep,
+          }
+        )
+        sessions.push(...splitSessions)
+      } else {
+        // Single day session
+        sessions.push({
+          id: `sleep-${sleep.id}`,
+          activity: '💤 Sleep',
+          description: this.formatSleepDescription(sleep),
+          startTime: sleep.startTime,
+          endTime: sleep.endTime,
+          date: getLocalDateString(sleep.startTime),
+          source: 'google-fit',
+          healthData: {
+            type: 'sleep',
+            details: sleep,
+          },
+        })
+      }
     })
 
     // Convert workout data
     workoutData.forEach((workout) => {
-      sessions.push({
-        id: `workout-${workout.id}`,
-        activity: `${this.getWorkoutEmoji(workout.type)} ${workout.type}`,
-        description: this.formatWorkoutDescription(workout),
-        startTime: workout.startTime,
-        endTime: workout.endTime,
-        date: workout.startTime.toISOString().split('T')[0],
-        source: 'google-fit',
-        healthData: {
-          type: 'workout',
-          details: workout,
-        },
-      })
+      // Check if workout spans multiple days
+      if (this.spansMidnight(workout.startTime, workout.endTime)) {
+        const splitSessions = this.splitSessionAcrossDays(
+          `workout-${workout.id}`,
+          `${this.getWorkoutEmoji(workout.type)} ${workout.type}`,
+          this.formatWorkoutDescription(workout),
+          workout.startTime,
+          workout.endTime,
+          'google-fit',
+          {
+            type: 'workout',
+            details: workout,
+          }
+        )
+        sessions.push(...splitSessions)
+      } else {
+        sessions.push({
+          id: `workout-${workout.id}`,
+          activity: `${this.getWorkoutEmoji(workout.type)} ${workout.type}`,
+          description: this.formatWorkoutDescription(workout),
+          startTime: workout.startTime,
+          endTime: workout.endTime,
+          date: getLocalDateString(workout.startTime),
+          source: 'google-fit',
+          healthData: {
+            type: 'workout',
+            details: workout,
+          },
+        })
+      }
     })
 
     return sessions

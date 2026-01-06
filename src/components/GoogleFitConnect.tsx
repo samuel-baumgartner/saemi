@@ -2,31 +2,31 @@
 
 import { useState, useEffect } from 'react'
 import { Activity, RefreshCw, Unplug, CheckCircle2, AlertCircle } from 'lucide-react'
-import { GoogleFitService, getGoogleFitToken, storeGoogleFitToken, removeGoogleFitToken } from '@/lib/googleFit'
+import { GoogleFitService } from '@/lib/googleFit'
 import { signIn } from 'next-auth/react'
 
 interface GoogleFitConnectProps {
   userId: string
+  accessToken?: string
   onSync: (sessions: any[]) => void
 }
 
-export function GoogleFitConnect({ userId, onSync }: GoogleFitConnectProps) {
+export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConnectProps) {
   const [isConnected, setIsConnected] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSync, setLastSync] = useState<Date | null>(null)
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   useEffect(() => {
-    // Check if Google Fit is already connected
-    const token = getGoogleFitToken(userId)
-    setIsConnected(!!token)
+    // Check if Google Fit is connected (use session access token)
+    setIsConnected(!!accessToken)
 
     // Load last sync time
     const lastSyncStr = localStorage.getItem(`google_fit_last_sync_${userId}`)
     if (lastSyncStr) {
       setLastSync(new Date(lastSyncStr))
     }
-  }, [userId])
+  }, [userId, accessToken])
 
   const handleConnect = async () => {
     // Redirect to Google OAuth with Fitness scopes
@@ -41,9 +41,8 @@ export function GoogleFitConnect({ userId, onSync }: GoogleFitConnectProps) {
   }
 
   const handleDisconnect = () => {
-    if (confirm('Disconnect Google Fit? Your health data will no longer sync.')) {
-      removeGoogleFitToken(userId)
-      setIsConnected(false)
+    if (confirm('Clear sync data? You will need to sign out and back in to fully disconnect Google Fit.')) {
+      localStorage.removeItem(`google_fit_last_sync_${userId}`)
       setLastSync(null)
     }
   }
@@ -53,17 +52,20 @@ export function GoogleFitConnect({ userId, onSync }: GoogleFitConnectProps) {
     setSyncStatus('idle')
 
     try {
-      const token = getGoogleFitToken(userId)
-      if (!token) {
-        throw new Error('Not connected')
+      if (!accessToken) {
+        throw new Error('Not connected - no access token')
       }
 
-      const service = new GoogleFitService(token)
+      const service = new GoogleFitService(accessToken)
 
-      // Fetch last 7 days of data
+      // Fetch last 14 days of data (extended range)
       const endDate = new Date()
+      endDate.setDate(endDate.getDate() + 1) // Set to tomorrow to include all of today
+      endDate.setHours(23, 59, 59, 999) // End of tomorrow
+      
       const startDate = new Date()
-      startDate.setDate(startDate.getDate() - 7)
+      startDate.setDate(startDate.getDate() - 14)
+      startDate.setHours(0, 0, 0, 0) // Start of day
 
       const [sleepData, workoutData] = await Promise.all([
         service.getSleepData(startDate, endDate),

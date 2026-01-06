@@ -285,3 +285,5 @@ Your time tracker now syncs across all devices! Users can:
 
 **Need help?** Check Vercel docs: https://vercel.com/docs/storage/vercel-postgres
 
+
+

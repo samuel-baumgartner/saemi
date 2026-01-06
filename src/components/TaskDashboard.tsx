@@ -4,13 +4,15 @@ import { useTimeTracker } from '@/hooks/useTimeTracker'
 import { ActiveSessionTracker } from '@/components/ActiveSessionTracker'
 import { TimelineView } from '@/components/TimelineView'
 import { GoogleFitConnect } from '@/components/GoogleFitConnect'
+import { AnkiConnect } from '@/components/AnkiConnect'
 import { MigrateLocalData } from '@/components/MigrateLocalData'
 
 interface TaskDashboardProps {
   userId: string
+  accessToken?: string
 }
 
-export function TaskDashboard({ userId }: TaskDashboardProps) {
+export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
   const {
     sessions,
     activeSession,
@@ -38,6 +40,13 @@ export function TaskDashboard({ userId }: TaskDashboardProps) {
 
       {/* Google Fit Integration */}
       <GoogleFitConnect
+        userId={userId}
+        accessToken={accessToken}
+        onSync={syncHealthSessions}
+      />
+
+      {/* Anki Integration */}
+      <AnkiConnect
         userId={userId}
         onSync={syncHealthSessions}
       />

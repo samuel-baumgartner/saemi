@@ -1550,6 +1550,8 @@ class GoogleFitService {
                 throw new Error(`Google Fit API error: ${response.status}`);
             }
             const data = await response.json();
+            console.log('🌙 Sleep API Response:', data);
+            console.log('  Sessions found:', data.session?.length || 0);
             // Convert Google Fit sessions to our SleepData format
             return (data.session || []).filter((session)=>session.activityType === 72) // Sleep activity
             .map((session)=>{
@@ -1587,6 +1589,8 @@ class GoogleFitService {
                 throw new Error(`Google Fit API error: ${response.status}`);
             }
             const data = await response.json();
+            console.log('🏃 Workout API Response:', data);
+            console.log('  Sessions found:', data.session?.length || 0);
             // Convert Google Fit sessions to our WorkoutData format
             return (data.session || []).filter((session)=>session.activityType !== 72) // Exclude sleep
             .map((session)=>{
@@ -1624,6 +1628,14 @@ class GoogleFitService {
         return activityMap[activityType] || 'Exercise';
     }
     /**
+   * Get date in local timezone (not UTC)
+   */ static getLocalDateString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    /**
    * Convert health data to timeline sessions
    */ static convertToSessions(sleepData, workoutData) {
         const sessions = [];
@@ -1635,7 +1647,7 @@ class GoogleFitService {
                 description: this.formatSleepDescription(sleep),
                 startTime: sleep.startTime,
                 endTime: sleep.endTime,
-                date: sleep.startTime.toISOString().split('T')[0],
+                date: this.getLocalDateString(sleep.startTime),
                 source: 'google-fit',
                 healthData: {
                     type: 'sleep',
@@ -1651,7 +1663,7 @@ class GoogleFitService {
                 description: this.formatWorkoutDescription(workout),
                 startTime: workout.startTime,
                 endTime: workout.endTime,
-                date: workout.startTime.toISOString().split('T')[0],
+                date: this.getLocalDateString(workout.startTime),
                 source: 'google-fit',
                 healthData: {
                     type: 'workout',
@@ -1744,7 +1756,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function GoogleFitConnect({ userId, onSync }) {
+function GoogleFitConnect({ userId, accessToken, onSync }) {
     _s();
     const [isConnected, setIsConnected] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isSyncing, setIsSyncing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -1752,9 +1764,8 @@ function GoogleFitConnect({ userId, onSync }) {
     const [syncStatus, setSyncStatus] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('idle');
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "GoogleFitConnect.useEffect": ()=>{
-            // Check if Google Fit is already connected
-            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$googleFit$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getGoogleFitToken"])(userId);
-            setIsConnected(!!token);
+            // Check if Google Fit is connected (use session access token)
+            setIsConnected(!!accessToken);
             // Load last sync time
             const lastSyncStr = localStorage.getItem(`google_fit_last_sync_${userId}`);
             if (lastSyncStr) {
@@ -1762,7 +1773,8 @@ function GoogleFitConnect({ userId, onSync }) {
             }
         }
     }["GoogleFitConnect.useEffect"], [
-        userId
+        userId,
+        accessToken
     ]);
     const handleConnect = async ()=>{
         // Redirect to Google OAuth with Fitness scopes
@@ -1776,9 +1788,8 @@ function GoogleFitConnect({ userId, onSync }) {
         });
     };
     const handleDisconnect = ()=>{
-        if (confirm('Disconnect Google Fit? Your health data will no longer sync.')) {
-            (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$googleFit$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["removeGoogleFitToken"])(userId);
-            setIsConnected(false);
+        if (confirm('Clear sync data? You will need to sign out and back in to fully disconnect Google Fit.')) {
+            localStorage.removeItem(`google_fit_last_sync_${userId}`);
             setLastSync(null);
         }
     };
@@ -1786,11 +1797,10 @@ function GoogleFitConnect({ userId, onSync }) {
         setIsSyncing(true);
         setSyncStatus('idle');
         try {
-            const token = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$googleFit$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getGoogleFitToken"])(userId);
-            if (!token) {
-                throw new Error('Not connected');
+            if (!accessToken) {
+                throw new Error('Not connected - no access token');
             }
-            const service = new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$googleFit$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GoogleFitService"](token);
+            const service = new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$googleFit$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GoogleFitService"](accessToken);
             // Fetch last 7 days of data
             const endDate = new Date();
             const startDate = new Date();
@@ -1799,8 +1809,15 @@ function GoogleFitConnect({ userId, onSync }) {
                 service.getSleepData(startDate, endDate),
                 service.getWorkoutData(startDate, endDate)
             ]);
+            console.log('📊 Google Fit Data:');
+            console.log('  Sleep sessions:', sleepData.length);
+            console.log('  Workout sessions:', workoutData.length);
+            console.log('  Sleep data:', sleepData);
+            console.log('  Workout data:', workoutData);
             // Convert to sessions
             const healthSessions = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$googleFit$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GoogleFitService"].convertToSessions(sleepData, workoutData);
+            console.log('  Converted to sessions:', healthSessions.length);
+            console.log('  Sessions:', healthSessions);
             // Notify parent component
             onSync(healthSessions);
             // Update last sync time
@@ -1829,12 +1846,12 @@ function GoogleFitConnect({ userId, onSync }) {
                             size: 24
                         }, void 0, false, {
                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                            lineNumber: 102,
+                            lineNumber: 109,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                        lineNumber: 101,
+                        lineNumber: 108,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1845,7 +1862,7 @@ function GoogleFitConnect({ userId, onSync }) {
                                 children: "Google Fit Integration"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                lineNumber: 106,
+                                lineNumber: 113,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1854,7 +1871,7 @@ function GoogleFitConnect({ userId, onSync }) {
                                     "Automatically import your sleep and workout data from Google Fit",
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                         fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                        lineNumber: 111,
+                                        lineNumber: 118,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1862,13 +1879,13 @@ function GoogleFitConnect({ userId, onSync }) {
                                         children: "💡 Syncs with Samsung Health if connected!"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                        lineNumber: 112,
+                                        lineNumber: 119,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                lineNumber: 109,
+                                lineNumber: 116,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1884,7 +1901,7 @@ function GoogleFitConnect({ userId, onSync }) {
                                                 d: "M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                                lineNumber: 120,
+                                                lineNumber: 127,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1892,7 +1909,7 @@ function GoogleFitConnect({ userId, onSync }) {
                                                 d: "M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                                lineNumber: 124,
+                                                lineNumber: 131,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1900,7 +1917,7 @@ function GoogleFitConnect({ userId, onSync }) {
                                                 d: "M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                                lineNumber: 128,
+                                                lineNumber: 135,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -1908,20 +1925,20 @@ function GoogleFitConnect({ userId, onSync }) {
                                                 d: "M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                                lineNumber: 132,
+                                                lineNumber: 139,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                        lineNumber: 119,
+                                        lineNumber: 126,
                                         columnNumber: 15
                                     }, this),
                                     "Connect Google Fit"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                lineNumber: 115,
+                                lineNumber: 122,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1929,24 +1946,24 @@ function GoogleFitConnect({ userId, onSync }) {
                                 children: "Tip: Connect Samsung Health to Google Fit first for automatic sync"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                lineNumber: 140,
+                                lineNumber: 147,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                        lineNumber: 105,
+                        lineNumber: 112,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                lineNumber: 100,
+                lineNumber: 107,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-            lineNumber: 99,
+            lineNumber: 106,
             columnNumber: 7
         }, this);
     }
@@ -1965,12 +1982,12 @@ function GoogleFitConnect({ userId, onSync }) {
                                 size: 20
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                lineNumber: 154,
+                                lineNumber: 161,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                            lineNumber: 153,
+                            lineNumber: 160,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1983,7 +2000,7 @@ function GoogleFitConnect({ userId, onSync }) {
                                             children: "Google Fit"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                            lineNumber: 159,
+                                            lineNumber: 166,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$lucide$2d$react$40$0$2e$560$2e$0_react$40$19$2e$2$2e$1$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__["CheckCircle2"], {
@@ -1991,13 +2008,13 @@ function GoogleFitConnect({ userId, onSync }) {
                                             size: 16
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                            lineNumber: 160,
+                                            lineNumber: 167,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                    lineNumber: 158,
+                                    lineNumber: 165,
                                     columnNumber: 13
                                 }, this),
                                 lastSync && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2008,19 +2025,19 @@ function GoogleFitConnect({ userId, onSync }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                    lineNumber: 163,
+                                    lineNumber: 170,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                            lineNumber: 157,
+                            lineNumber: 164,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                    lineNumber: 152,
+                    lineNumber: 159,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2033,14 +2050,14 @@ function GoogleFitConnect({ userId, onSync }) {
                                     size: 16
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                    lineNumber: 173,
+                                    lineNumber: 180,
                                     columnNumber: 15
                                 }, this),
                                 "Synced!"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                            lineNumber: 172,
+                            lineNumber: 179,
                             columnNumber: 13
                         }, this),
                         syncStatus === 'error' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2050,14 +2067,14 @@ function GoogleFitConnect({ userId, onSync }) {
                                     size: 16
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                    lineNumber: 179,
+                                    lineNumber: 186,
                                     columnNumber: 15
                                 }, this),
                                 "Error"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                            lineNumber: 178,
+                            lineNumber: 185,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2070,14 +2087,14 @@ function GoogleFitConnect({ userId, onSync }) {
                                     className: isSyncing ? 'animate-spin' : ''
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                    lineNumber: 189,
+                                    lineNumber: 196,
                                     columnNumber: 13
                                 }, this),
                                 isSyncing ? 'Syncing...' : 'Sync Now'
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                            lineNumber: 184,
+                            lineNumber: 191,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2088,29 +2105,29 @@ function GoogleFitConnect({ userId, onSync }) {
                                 size: 16
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                                lineNumber: 198,
+                                lineNumber: 205,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                            lineNumber: 193,
+                            lineNumber: 200,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/GoogleFitConnect.tsx",
-                    lineNumber: 170,
+                    lineNumber: 177,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/GoogleFitConnect.tsx",
-            lineNumber: 151,
+            lineNumber: 158,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/GoogleFitConnect.tsx",
-        lineNumber: 150,
+        lineNumber: 157,
         columnNumber: 5
     }, this);
 }
@@ -2571,7 +2588,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function TaskDashboard({ userId }) {
+function TaskDashboard({ userId, accessToken }) {
     _s();
     const { sessions, activeSession, isLoading, startSession, stopSession, addManualSession, syncHealthSessions, updateSession, deleteSession } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$useTimeTracker$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTimeTracker"])();
     if (isLoading) {
@@ -2582,12 +2599,12 @@ function TaskDashboard({ userId }) {
                 children: "Loading sessions..."
             }, void 0, false, {
                 fileName: "[project]/src/components/TaskDashboard.tsx",
-                lineNumber: 29,
+                lineNumber: 30,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/TaskDashboard.tsx",
-            lineNumber: 28,
+            lineNumber: 29,
             columnNumber: 7
         }, this);
     }
@@ -2596,15 +2613,16 @@ function TaskDashboard({ userId }) {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$MigrateLocalData$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MigrateLocalData"], {}, void 0, false, {
                 fileName: "[project]/src/components/TaskDashboard.tsx",
-                lineNumber: 37,
+                lineNumber: 38,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$GoogleFitConnect$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GoogleFitConnect"], {
                 userId: userId,
+                accessToken: accessToken,
                 onSync: syncHealthSessions
             }, void 0, false, {
                 fileName: "[project]/src/components/TaskDashboard.tsx",
-                lineNumber: 40,
+                lineNumber: 41,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ActiveSessionTracker$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ActiveSessionTracker"], {
@@ -2613,7 +2631,7 @@ function TaskDashboard({ userId }) {
                 onStop: stopSession
             }, void 0, false, {
                 fileName: "[project]/src/components/TaskDashboard.tsx",
-                lineNumber: 46,
+                lineNumber: 48,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$0$2e$8_$40$babel$2b$core$40$7$2e$28$2e$5_react$2d$dom$40$19$2e$2$2e$1_react$40$19$2e$2$2e$1_$5f$react$40$19$2e$2$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$TimelineView$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TimelineView"], {
@@ -2624,13 +2642,13 @@ function TaskDashboard({ userId }) {
                 activeSessionId: activeSession?.id
             }, void 0, false, {
                 fileName: "[project]/src/components/TaskDashboard.tsx",
-                lineNumber: 53,
+                lineNumber: 55,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/TaskDashboard.tsx",
-        lineNumber: 35,
+        lineNumber: 36,
         columnNumber: 5
     }, this);
 }

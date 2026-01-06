@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { TimeSession } from '@/types/task'
+import { getLocalDateString } from '@/lib/dateUtils'
 
 export function useTimeTracker() {
   const [sessions, setSessions] = useState<TimeSession[]>([])
@@ -53,7 +54,7 @@ export function useTimeTracker() {
       description,
       startTime: now,
       endTime: undefined,
-      date: now.toISOString().split('T')[0],
+      date: getLocalDateString(now),
       source: 'tracked',
     }
 
@@ -126,7 +127,7 @@ export function useTimeTracker() {
       description,
       startTime,
       endTime,
-      date: startTime.toISOString().split('T')[0],
+      date: getLocalDateString(startTime),
       source: 'manual',
     }
 
