@@ -6,6 +6,7 @@ import { SessionCard } from './SessionCard'
 import { TimelineGraph } from './TimelineGraph'
 import { ManualSessionForm } from './ManualSessionForm'
 import { ChevronLeft, ChevronRight, Calendar, Clock, List, BarChart3 } from 'lucide-react'
+import { getTodayString, getLocalDateString } from '@/lib/dateUtils'
 
 interface TimelineViewProps {
   sessions: TimeSession[]
@@ -22,29 +23,27 @@ export function TimelineView({
   onAddManual,
   activeSessionId,
 }: TimelineViewProps) {
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split('T')[0]
-  )
+  const [selectedDate, setSelectedDate] = useState(getTodayString())
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph')
 
-  const isToday = selectedDate === new Date().toISOString().split('T')[0]
+  const isToday = selectedDate === getTodayString()
 
   const daySessions = sessions
     .filter((s) => s.date === selectedDate)
     .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
 
   const navigateDay = (direction: 'prev' | 'next') => {
-    const current = new Date(selectedDate)
+    const current = new Date(selectedDate + 'T00:00:00')
     if (direction === 'prev') {
       current.setDate(current.getDate() - 1)
     } else {
       current.setDate(current.getDate() + 1)
     }
-    setSelectedDate(current.toISOString().split('T')[0])
+    setSelectedDate(getLocalDateString(current))
   }
 
   const goToToday = () => {
-    setSelectedDate(new Date().toISOString().split('T')[0])
+    setSelectedDate(getTodayString())
   }
 
   const formatDate = (dateStr: string) => {
@@ -53,10 +52,10 @@ export function TimelineView({
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
 
-    if (dateStr === today.toISOString().split('T')[0]) {
+    if (dateStr === getTodayString()) {
       return 'Today'
     }
-    if (dateStr === yesterday.toISOString().split('T')[0]) {
+    if (dateStr === getLocalDateString(yesterday)) {
       return 'Yesterday'
     }
 
@@ -78,6 +77,31 @@ export function TimelineView({
         : new Date().getTime()
       return total + (endTime - session.startTime.getTime())
     }, 0)
+  }
+
+  const getWorkTime = () => {
+    // Exclude Google Fit health data (sleep and exercise)
+    return daySessions
+      .filter((session: any) => {
+        // Exclude sleep sessions
+        if (session.source === 'google-fit' && session.healthDataType === 'sleep') {
+          return false
+        }
+        // Exclude workout/exercise sessions
+        if (session.source === 'google-fit' && session.healthDataType === 'workout') {
+          return false
+        }
+        return true
+      })
+      .reduce((total, session) => {
+        if (!session.endTime && session.id !== activeSessionId) {
+          return total
+        }
+        const endTime = session.endTime
+          ? session.endTime.getTime()
+          : new Date().getTime()
+        return total + (endTime - session.startTime.getTime())
+      }, 0)
   }
 
   const formatTotalTime = (ms: number) => {
@@ -105,6 +129,9 @@ export function TimelineView({
             <p className="text-white/60 text-sm mt-1">
               {daySessions.length} session{daySessions.length !== 1 ? 's' : ''} •{' '}
               {formatTotalTime(getTotalTime())} total
+            </p>
+            <p className="text-white/40 text-xs mt-0.5">
+              {formatTotalTime(getWorkTime())} work
             </p>
           </div>
 
