@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Activity, RefreshCw, Unplug, CheckCircle2, AlertCircle } from 'lucide-react'
 import { GoogleFitService } from '@/lib/googleFit'
-import { signIn } from 'next-auth/react'
 
 interface GoogleFitConnectProps {
   userId: string
@@ -18,8 +17,11 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   useEffect(() => {
+    // Check if user has disabled Google Fit
+    const isDisabled = localStorage.getItem(`google_fit_disabled_${userId}`) === 'true'
+    
     // Check if Google Fit is connected (use session access token)
-    setIsConnected(!!accessToken)
+    setIsConnected(!!accessToken && !isDisabled)
 
     // Load last sync time
     const lastSyncStr = localStorage.getItem(`google_fit_last_sync_${userId}`)
@@ -28,21 +30,18 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
     }
   }, [userId, accessToken])
 
-  const handleConnect = async () => {
-    // Redirect to Google OAuth with Fitness scopes
-    await signIn('google', {
-      callbackUrl: window.location.href,
-      scope: [
-        'https://www.googleapis.com/auth/fitness.activity.read',
-        'https://www.googleapis.com/auth/fitness.sleep.read',
-        'https://www.googleapis.com/auth/fitness.heart_rate.read',
-      ].join(' '),
-    })
+  const handleConnect = () => {
+    // Re-enable Google Fit
+    localStorage.removeItem(`google_fit_disabled_${userId}`)
+    setIsConnected(true)
   }
 
   const handleDisconnect = () => {
-    if (confirm('Clear sync data? You will need to sign out and back in to fully disconnect Google Fit.')) {
+    if (confirm('Disconnect Google Fit? Your health data will stop syncing (you can reconnect anytime).')) {
+      // Mark as disabled
+      localStorage.setItem(`google_fit_disabled_${userId}`, 'true')
       localStorage.removeItem(`google_fit_last_sync_${userId}`)
+      setIsConnected(false)
       setLastSync(null)
     }
   }
