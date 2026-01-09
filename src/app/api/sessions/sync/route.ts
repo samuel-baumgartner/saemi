@@ -13,6 +13,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { sessions } = body
 
+    console.log('📥 Received sync request:', {
+      isArray: Array.isArray(sessions),
+      count: sessions?.length || 0,
+      firstSession: sessions?.[0],
+      sessionSample: sessions?.slice(0, 2)
+    })
+
     if (!Array.isArray(sessions)) {
       return NextResponse.json(
         { error: 'Sessions must be an array' },
