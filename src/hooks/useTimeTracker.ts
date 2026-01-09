@@ -157,13 +157,24 @@ export function useTimeTracker() {
 
   const syncHealthSessions = async (healthSessions: TimeSession[]) => {
     try {
+      console.log('📤 Sending sessions to sync:', {
+        count: healthSessions.length,
+        firstSession: healthSessions[0],
+        sample: healthSessions.slice(0, 2)
+      })
+      
       const response = await fetch('/api/sessions/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessions: healthSessions }),
       })
 
-      if (!response.ok) throw new Error('Failed to sync health sessions')
+      console.log('📡 Sync response status:', response.status)
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Sync failed:', errorText)
+        throw new Error('Failed to sync health sessions')
+      }
 
       // Reload all sessions from database
       await loadSessions()
