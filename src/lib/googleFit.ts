@@ -28,24 +28,31 @@ export class GoogleFitService {
     }
 
     try {
+      const url = `${this.baseUrl}/sessions?startTime=${startDate.toISOString()}&endTime=${endDate.toISOString()}&activityType=72`
+      console.log('🔍 Fetching sleep from Google Fit:', { url, startDate: startDate.toISOString(), endDate: endDate.toISOString() })
+      
       // Fetch sleep sessions from Google Fit
-      const response = await fetch(
-        `${this.baseUrl}/sessions?startTime=${startDate.toISOString()}&endTime=${endDate.toISOString()}&activityType=72`, // 72 = Sleep
-        {
-          headers: {
-            Authorization: `Bearer ${this.accessToken}`,
-          },
-        }
-      )
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      })
 
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Google Fit API error:', response.status, errorText)
         throw new Error(`Google Fit API error: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log('📦 Raw Google Fit sleep response:', {
+        totalSessions: data.session?.length || 0,
+        hasSession: !!data.session,
+        firstSession: data.session?.[0]
+      })
       
       // Convert Google Fit sessions to our SleepData format
-      return (data.session || [])
+      const sleepSessions = (data.session || [])
         .filter((session: any) => session.activityType === 72) // Sleep activity
         .map((session: any) => {
           const startTime = new Date(parseInt(session.startTimeMillis))
@@ -61,8 +68,11 @@ export class GoogleFitService {
             // Note: Sleep stages require additional API call to dataset
           }
         })
+      
+      console.log('💤 Converted sleep sessions:', sleepSessions.length, 'sessions')
+      return sleepSessions
     } catch (error) {
-      console.error('Failed to fetch sleep data:', error)
+      console.error('❌ Failed to fetch sleep data:', error)
       return []
     }
   }
@@ -76,24 +86,32 @@ export class GoogleFitService {
     }
 
     try {
+      const url = `${this.baseUrl}/sessions?startTime=${startDate.toISOString()}&endTime=${endDate.toISOString()}`
+      console.log('🔍 Fetching workouts from Google Fit:', { url, startDate: startDate.toISOString(), endDate: endDate.toISOString() })
+      
       // Fetch activity sessions from Google Fit
-      const response = await fetch(
-        `${this.baseUrl}/sessions?startTime=${startDate.toISOString()}&endTime=${endDate.toISOString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.accessToken}`,
-          },
-        }
-      )
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      })
 
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Google Fit API error:', response.status, errorText)
         throw new Error(`Google Fit API error: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log('📦 Raw Google Fit workout response:', {
+        totalSessions: data.session?.length || 0,
+        hasSession: !!data.session,
+        activityTypes: data.session?.map((s: any) => s.activityType).join(', ') || 'none',
+        firstSession: data.session?.[0]
+      })
 
       // Convert Google Fit sessions to our WorkoutData format
-      return (data.session || [])
+      const workoutSessions = (data.session || [])
         .filter((session: any) => session.activityType !== 72) // Exclude sleep
         .map((session: any) => {
           const startTime = new Date(parseInt(session.startTimeMillis))
@@ -110,8 +128,11 @@ export class GoogleFitService {
             distance: undefined, // Would need additional dataset query
           }
         })
+      
+      console.log('🏋️ Converted workout sessions:', workoutSessions.length, 'sessions')
+      return workoutSessions
     } catch (error) {
-      console.error('Failed to fetch workout data:', error)
+      console.error('❌ Failed to fetch workout data:', error)
       return []
     }
   }
@@ -193,6 +214,7 @@ export class GoogleFitService {
     sleepData: SleepData[],
     workoutData: WorkoutData[]
   ): TimeSession[] {
+    console.log('🔄 Converting to sessions:', { sleepCount: sleepData.length, workoutCount: workoutData.length })
     const sessions: TimeSession[] = []
 
     // Convert sleep data
@@ -265,6 +287,7 @@ export class GoogleFitService {
       }
     })
 
+    console.log('✅ Total sessions after conversion:', sessions.length)
     return sessions
   }
 

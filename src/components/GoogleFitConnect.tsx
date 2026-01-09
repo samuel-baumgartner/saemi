@@ -55,6 +55,7 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
         throw new Error('Not connected - no access token')
       }
 
+      console.log('🚀 Starting Google Fit sync...')
       const service = new GoogleFitService(accessToken)
 
       // Fetch last 14 days of data (extended range)
@@ -66,16 +67,26 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
       startDate.setDate(startDate.getDate() - 14)
       startDate.setHours(0, 0, 0, 0) // Start of day
 
+      console.log('📅 Date range:', { 
+        start: startDate.toISOString(), 
+        end: endDate.toISOString(),
+        days: Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+      })
+
       const [sleepData, workoutData] = await Promise.all([
         service.getSleepData(startDate, endDate),
         service.getWorkoutData(startDate, endDate),
       ])
+
+      console.log('📊 Fetched data:', { sleep: sleepData.length, workouts: workoutData.length })
 
       // Convert to sessions
       const healthSessions = GoogleFitService.convertToSessions(
         sleepData,
         workoutData
       )
+
+      console.log('📦 Final sessions to sync:', healthSessions.length)
 
       // Notify parent component
       onSync(healthSessions)
