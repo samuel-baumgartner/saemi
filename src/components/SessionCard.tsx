@@ -20,6 +20,18 @@ export function SessionCard({
   const [isEditing, setIsEditing] = useState(false)
   const [editActivity, setEditActivity] = useState(session.activity)
   const [editDescription, setEditDescription] = useState(session.description || '')
+  
+  // Helper to convert Date to HH:MM format for time input
+  const dateToTimeString = (date: Date) => {
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
+  }
+  
+  const [editStartTime, setEditStartTime] = useState(dateToTimeString(session.startTime))
+  const [editEndTime, setEditEndTime] = useState(
+    session.endTime ? dateToTimeString(session.endTime) : ''
+  )
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -51,9 +63,23 @@ export function SessionCard({
   }
 
   const handleSave = () => {
+    // Convert time strings back to Date objects
+    const [startHours, startMinutes] = editStartTime.split(':').map(Number)
+    const newStartTime = new Date(session.startTime)
+    newStartTime.setHours(startHours, startMinutes, 0, 0)
+    
+    let newEndTime: Date | undefined = undefined
+    if (editEndTime) {
+      const [endHours, endMinutes] = editEndTime.split(':').map(Number)
+      newEndTime = new Date(session.endTime || session.startTime)
+      newEndTime.setHours(endHours, endMinutes, 0, 0)
+    }
+    
     onUpdate(session.id, {
       activity: editActivity,
       description: editDescription,
+      startTime: newStartTime,
+      endTime: newEndTime,
     })
     setIsEditing(false)
   }
@@ -84,6 +110,26 @@ export function SessionCard({
                 className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-white/80 text-sm outline-none focus:border-white/30"
                 placeholder="Description..."
               />
+              <div className="flex gap-2 items-center">
+                <div className="flex-1">
+                  <label className="text-white/60 text-xs mb-1 block">Start Time</label>
+                  <input
+                    type="time"
+                    value={editStartTime}
+                    onChange={(e) => setEditStartTime(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-sm outline-none focus:border-white/30"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-white/60 text-xs mb-1 block">End Time</label>
+                  <input
+                    type="time"
+                    value={editEndTime}
+                    onChange={(e) => setEditEndTime(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-sm outline-none focus:border-white/30"
+                  />
+                </div>
+              </div>
             </div>
           ) : (
             <>
@@ -137,6 +183,8 @@ export function SessionCard({
     </div>
   )
 }
+
+
 
 
 
