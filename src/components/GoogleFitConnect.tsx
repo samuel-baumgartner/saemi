@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import { Activity, RefreshCw, Unplug, CheckCircle2, AlertCircle } from 'lucide-react'
 import { GoogleFitService } from '@/lib/googleFit'
 
@@ -12,7 +11,6 @@ interface GoogleFitConnectProps {
 }
 
 export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConnectProps) {
-  const { data: session, update } = useSession()
   const [isConnected, setIsConnected] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSync, setLastSync] = useState<Date | null>(null)
@@ -53,12 +51,15 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
     setSyncStatus('idle')
 
     try {
-      // 🔄 Force session refresh to get a fresh access token
-      console.log('🔄 Refreshing session to get fresh token...')
-      const updatedSession = await update()
+      // 🔄 Get a fresh access token from the server
+      console.log('🔄 Fetching fresh access token...')
+      const tokenResponse = await fetch('/api/auth/token')
       
-      // Get the fresh token from the updated session
-      const freshToken = updatedSession?.accessToken
+      if (!tokenResponse.ok) {
+        throw new Error('Failed to get fresh token')
+      }
+      
+      const { accessToken: freshToken } = await tokenResponse.json()
       
       if (!freshToken) {
         throw new Error('Not connected - no access token')
