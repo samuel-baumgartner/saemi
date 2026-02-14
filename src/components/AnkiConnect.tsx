@@ -1,9 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BookOpen, RefreshCw, Unplug, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react'
-import { AnkiConnectService, getAnkiConnected, storeAnkiConnected } from '@/lib/anki'
+import { BookOpen, RefreshCw, Unplug, CheckCircle2, AlertCircle, ExternalLink, Settings } from 'lucide-react'
+import { AnkiConnectService, getAnkiConnected, storeAnkiConnected, getAnkiSessionGap, storeAnkiSessionGap } from '@/lib/anki'
 import { getLocalDateString } from '@/lib/dateUtils'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface AnkiConnectProps {
   userId: string
@@ -17,6 +26,9 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
   const [lastSync, setLastSync] = useState<Date | null>(null)
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [sessionGapMinutes, setSessionGapMinutes] = useState<number>(10)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [tempSessionGap, setTempSessionGap] = useState<string>('10')
 
   useEffect(() => {
     // Check if Anki was previously connected
@@ -31,6 +43,11 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
     if (lastSyncStr) {
       setLastSync(new Date(lastSyncStr))
     }
+
+    // Load session gap preference
+    const savedGap = getAnkiSessionGap(userId)
+    setSessionGapMinutes(savedGap)
+    setTempSessionGap(savedGap.toString())
   }, [userId])
 
   const testConnection = async () => {
@@ -70,6 +87,17 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
     localStorage.removeItem(`anki_last_sync_${userId}`)
   }
 
+  const handleSaveSettings = () => {
+    const gap = parseInt(tempSessionGap, 10)
+    if (isNaN(gap) || gap < 1 || gap > 120) {
+      alert('Please enter a valid time between 1 and 120 minutes')
+      return
+    }
+    setSessionGapMinutes(gap)
+    storeAnkiSessionGap(userId, gap)
+    setIsSettingsOpen(false)
+  }
+
   const handleSync = async () => {
     setIsSyncing(true)
     setSyncStatus('idle')
@@ -97,7 +125,7 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
       }
 
       // Group reviews into study sessions
-      const studySessions = AnkiConnectService.convertToStudySessions(reviews)
+      const studySessions = AnkiConnectService.convertToStudySessions(reviews, sessionGapMinutes)
 
       console.log(`Found ${studySessions.length} Anki study sessions`)
 
@@ -208,6 +236,9 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
                 Last synced: {lastSync.toLocaleString()}
               </p>
             )}
+            <p className="text-xs text-white/40">
+              Session gap: {sessionGapMinutes} min
+            </p>
           </div>
         </div>
 
@@ -224,6 +255,59 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
               Error
             </span>
           )}
+
+          <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+            <DialogTrigger asChild>
+              <button
+                className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                title="Settings"
+              >
+                <Settings size={16} />
+              </button>
+            </DialogTrigger>
+            <DialogContent className="bg-black/90 border-white/20 text-white">
+              <DialogHeader>
+                <DialogTitle className="text-white">Anki Import Settings</DialogTitle>
+                <DialogDescription className="text-white/60">
+                  Configure how Anki reviews are grouped into study sessions
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <label className="block text-sm font-medium text-white mb-2">
+                  Session Gap Time (minutes)
+                </label>
+                <p className="text-xs text-white/60 mb-3">
+                  Reviews separated by more than this time will be counted as separate sessions.
+                </p>
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={tempSessionGap}
+                  onChange={(e) => setTempSessionGap(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="10"
+                />
+                <p className="text-xs text-white/40 mt-2">
+                  Currently set to: {sessionGapMinutes} minutes
+                </p>
+              </div>
+              <DialogFooter>
+                <button
+                  onClick={() => setIsSettingsOpen(false)}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveSettings}
+                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg text-white transition-colors"
+                >
+                  Save
+                </button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           <button
             onClick={handleSync}
@@ -246,6 +330,13 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
     </div>
   )
 }
+
+
+
+
+
+
+
 
 
 
