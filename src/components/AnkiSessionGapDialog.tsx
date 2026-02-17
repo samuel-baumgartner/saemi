@@ -6,26 +6,30 @@ import { X } from 'lucide-react'
 interface AnkiSessionGapDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (gapMinutes: number) => void
-  defaultValue?: number
+  onConfirm: (gapMinutes: number, importDays: number) => void
+  defaultGapValue?: number
+  defaultImportDays?: number
 }
 
 export function AnkiSessionGapDialog({ 
   isOpen, 
   onClose, 
   onConfirm, 
-  defaultValue = 10 
+  defaultGapValue = 10,
+  defaultImportDays = 14
 }: AnkiSessionGapDialogProps) {
-  const [gapMinutes, setGapMinutes] = useState(defaultValue)
+  const [gapMinutes, setGapMinutes] = useState(defaultGapValue)
+  const [importDays, setImportDays] = useState(defaultImportDays)
 
   useEffect(() => {
-    setGapMinutes(defaultValue)
-  }, [defaultValue, isOpen])
+    setGapMinutes(defaultGapValue)
+    setImportDays(defaultImportDays)
+  }, [defaultGapValue, defaultImportDays, isOpen])
 
   if (!isOpen) return null
 
   const handleConfirm = () => {
-    onConfirm(gapMinutes)
+    onConfirm(gapMinutes, importDays)
     onClose()
   }
 
@@ -43,7 +47,7 @@ export function AnkiSessionGapDialog({
       <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-white/20 rounded-xl p-6 shadow-2xl max-w-md w-full mx-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-semibold text-white">
-            Session Gap Configuration
+            Anki Sync Configuration
           </h3>
           <button
             onClick={onClose}
@@ -54,10 +58,33 @@ export function AnkiSessionGapDialog({
         </div>
 
         <p className="text-white/70 text-sm mb-6">
-          Define how many minutes of inactivity should create a new study session.
-          Reviews within this time window will be grouped together.
+          Configure how Anki reviews are imported and grouped into study sessions.
         </p>
 
+        {/* Import Time Range */}
+        <div className="mb-6">
+          <label className="block text-white/80 text-sm font-medium mb-2">
+            Import Time Range
+          </label>
+          <select
+            value={importDays}
+            onChange={(e) => setImportDays(parseInt(e.target.value))}
+            className="w-full bg-black/40 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          >
+            <option value="7">Last 7 days (1 week)</option>
+            <option value="14">Last 14 days (2 weeks)</option>
+            <option value="30">Last 30 days (1 month)</option>
+            <option value="60">Last 60 days (2 months)</option>
+            <option value="90">Last 90 days (3 months)</option>
+            <option value="180">Last 180 days (6 months)</option>
+            <option value="365">Last 365 days (1 year)</option>
+          </select>
+          <p className="text-white/50 text-xs mt-2">
+            How far back to fetch Anki review data
+          </p>
+        </div>
+
+        {/* Session Gap */}
         <div className="mb-6">
           <label className="block text-white/80 text-sm font-medium mb-2">
             Session Gap (minutes)
@@ -74,14 +101,14 @@ export function AnkiSessionGapDialog({
             <span className="text-white/60 text-sm">minutes</span>
           </div>
           <p className="text-white/50 text-xs mt-2">
-            Current: {gapMinutes} minute{gapMinutes !== 1 ? 's' : ''} gap between sessions
+            Gap of inactivity before starting a new session
           </p>
         </div>
 
         <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 mb-6">
           <p className="text-purple-300 text-xs">
-            💡 <strong>Tip:</strong> A smaller gap (e.g., 5 min) creates more sessions, 
-            while a larger gap (e.g., 15 min) groups more reviews together.
+            💡 <strong>Tip:</strong> Longer import ranges give you more historical data. 
+            Smaller session gaps create more distinct sessions.
           </p>
         </div>
 
@@ -103,4 +130,5 @@ export function AnkiSessionGapDialog({
     </div>
   )
 }
+
 
