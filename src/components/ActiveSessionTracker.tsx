@@ -3,17 +3,20 @@
 import { useState, useEffect } from 'react'
 import { TimeSession } from '@/types/task'
 import { Play, Square, Clock } from 'lucide-react'
+import { SubjectAutocomplete } from './SubjectAutocomplete'
 
 interface ActiveSessionTrackerProps {
   activeSession: TimeSession | null
   onStart: (activity: string, description?: string) => void
   onStop: () => void
+  subjectSuggestions?: string[]
 }
 
 export function ActiveSessionTracker({
   activeSession,
   onStart,
   onStop,
+  subjectSuggestions = [],
 }: ActiveSessionTrackerProps) {
   const [activity, setActivity] = useState('')
   const [description, setDescription] = useState('')
@@ -100,13 +103,13 @@ export function ActiveSessionTracker({
 
       <div className="space-y-4">
         <div>
-          <input
-            type="text"
+          <SubjectAutocomplete
             value={activity}
-            onChange={(e) => setActivity(e.target.value)}
+            onChange={setActivity}
             onKeyDown={(e) => e.key === 'Enter' && handleStart()}
             placeholder="What are you working on?"
             className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-white/30 transition-colors text-lg"
+            suggestions={subjectSuggestions}
             autoFocus
           />
         </div>
@@ -134,6 +137,15 @@ export function ActiveSessionTracker({
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
 
 
 

@@ -166,8 +166,8 @@ export class AnkiConnectService {
   /**
    * Convert reviews to study sessions
    * Groups reviews that are close together into sessions
-   * @param reviews Array of Anki reviews
-   * @param sessionGapMinutes Number of minutes gap to consider as a new session (default 10)
+   * @param reviews - Array of Anki reviews
+   * @param sessionGapMinutes - Minutes of inactivity to create a new session (default: 10)
    */
   static convertToStudySessions(reviews: AnkiReview[], sessionGapMinutes: number = 10): AnkiStudySession[] {
     if (reviews.length === 0) return []
@@ -271,17 +271,5 @@ export function storeAnkiConnected(userId: string, connected: boolean) {
 
 export function getAnkiConnected(userId: string): boolean {
   return localStorage.getItem(`anki_connected_${userId}`) === 'true'
-}
-
-/**
- * Store/retrieve Anki session gap preference (in minutes)
- */
-export function storeAnkiSessionGap(userId: string, gapMinutes: number) {
-  localStorage.setItem(`anki_session_gap_${userId}`, gapMinutes.toString())
-}
-
-export function getAnkiSessionGap(userId: string): number {
-  const stored = localStorage.getItem(`anki_session_gap_${userId}`)
-  return stored ? parseInt(stored, 10) : 10 // Default to 10 minutes
 }
 

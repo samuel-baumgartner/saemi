@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { TimeSession } from '@/types/task';
 import { Clock, TrendingUp, Calendar } from 'lucide-react';
 
@@ -14,9 +15,47 @@ interface SubjectSummary {
   source: string;
 }
 
+type TimePeriod = 'all' | 'today' | 'week' | 'month';
+
 export default function SummaryView({ sessions }: SummaryViewProps) {
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
+
+  // Filter sessions based on selected time period
+  const getFilteredSessions = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    switch (timePeriod) {
+      case 'today': {
+        const todayStr = today.toISOString().split('T')[0];
+        return sessions.filter(s => s.date === todayStr);
+      }
+      case 'week': {
+        const weekAgo = new Date(today);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return sessions.filter(s => {
+          const sessionDate = new Date(s.date);
+          return sessionDate >= weekAgo;
+        });
+      }
+      case 'month': {
+        const monthAgo = new Date(today);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        return sessions.filter(s => {
+          const sessionDate = new Date(s.date);
+          return sessionDate >= monthAgo;
+        });
+      }
+      case 'all':
+      default:
+        return sessions;
+    }
+  };
+
+  const filteredSessions = getFilteredSessions();
+  
   // Filter out Google Fit data (only show work/study activities)
-  const workSessions = sessions.filter(session => session.source !== 'google-fit');
+  const workSessions = filteredSessions.filter(session => session.source !== 'google-fit');
   
   // Aggregate sessions by subject
   const summaryMap = new Map<string, SubjectSummary>();
@@ -100,6 +139,50 @@ export default function SummaryView({ sessions }: SummaryViewProps) {
 
   return (
     <div className="space-y-6">
+      {/* Time Period Filter */}
+      <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-lg p-1">
+        <button
+          onClick={() => setTimePeriod('all')}
+          className={`flex-1 px-4 py-2 rounded-lg transition-all font-medium ${
+            timePeriod === 'all'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              : 'text-white/60 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          All Time
+        </button>
+        <button
+          onClick={() => setTimePeriod('month')}
+          className={`flex-1 px-4 py-2 rounded-lg transition-all font-medium ${
+            timePeriod === 'month'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              : 'text-white/60 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          This Month
+        </button>
+        <button
+          onClick={() => setTimePeriod('week')}
+          className={`flex-1 px-4 py-2 rounded-lg transition-all font-medium ${
+            timePeriod === 'week'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              : 'text-white/60 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          This Week
+        </button>
+        <button
+          onClick={() => setTimePeriod('today')}
+          className={`flex-1 px-4 py-2 rounded-lg transition-all font-medium ${
+            timePeriod === 'today'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              : 'text-white/60 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          Today
+        </button>
+      </div>
+
       {/* Total Overview */}
       <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-2">

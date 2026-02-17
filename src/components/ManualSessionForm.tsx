@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { Plus, X } from 'lucide-react'
+import { SubjectAutocomplete } from './SubjectAutocomplete'
 
 interface ManualSessionFormProps {
   onAdd: (activity: string, startTime: Date, endTime: Date, description?: string) => void
   selectedDate: string
+  subjectSuggestions?: string[]
 }
 
-export function ManualSessionForm({ onAdd, selectedDate }: ManualSessionFormProps) {
+export function ManualSessionForm({ onAdd, selectedDate, subjectSuggestions = [] }: ManualSessionFormProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activity, setActivity] = useState('')
   const [description, setDescription] = useState('')
@@ -66,13 +68,12 @@ export function ManualSessionForm({ onAdd, selectedDate }: ManualSessionFormProp
           <label className="block text-sm font-medium text-white/80 mb-2">
             Activity *
           </label>
-          <input
-            type="text"
+          <SubjectAutocomplete
             value={activity}
-            onChange={(e) => setActivity(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-white/30 transition-colors"
+            onChange={setActivity}
             placeholder="What did you work on?"
-            required
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-white/40 outline-none focus:border-white/30 transition-colors"
+            suggestions={subjectSuggestions}
           />
         </div>
 
@@ -84,7 +85,7 @@ export function ManualSessionForm({ onAdd, selectedDate }: ManualSessionFormProp
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white outline-none focus:border-white/30 transition-colors"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-white/40 outline-none focus:border-white/30 transition-colors"
             placeholder="Additional details (optional)"
           />
         </div>
@@ -127,6 +128,14 @@ export function ManualSessionForm({ onAdd, selectedDate }: ManualSessionFormProp
     </div>
   )
 }
+
+
+
+
+
+
+
+
 
 
 
