@@ -7,6 +7,7 @@ import { TimelineGraph } from './TimelineGraph'
 import { ManualSessionForm } from './ManualSessionForm'
 import { ChevronLeft, ChevronRight, Calendar, Clock, List, BarChart3 } from 'lucide-react'
 import { getTodayString, getLocalDateString } from '@/lib/dateUtils'
+import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 
 interface TimelineViewProps {
   sessions: TimeSession[]
@@ -26,6 +27,8 @@ export function TimelineView({
   const [selectedDate, setSelectedDate] = useState(getTodayString())
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph')
 
+  const subjectSuggestions = useSubjectSuggestions(sessions)
+  
   const isToday = selectedDate === getTodayString()
 
   const daySessions = sessions
@@ -174,6 +177,7 @@ export function TimelineView({
           <ManualSessionForm
             onAdd={onAddManual}
             selectedDate={selectedDate}
+            subjectSuggestions={subjectSuggestions}
           />
 
           {!isToday && (

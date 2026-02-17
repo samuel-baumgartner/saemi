@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTimeTracker } from '@/hooks/useTimeTracker'
+import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 import { ActiveSessionTracker } from '@/components/ActiveSessionTracker'
 import { TimelineView } from '@/components/TimelineView'
 import { GoogleFitConnect } from '@/components/GoogleFitConnect'
@@ -28,6 +29,8 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
     updateSession,
     deleteSession,
   } = useTimeTracker()
+
+  const subjectSuggestions = useSubjectSuggestions(sessions)
 
   if (isLoading) {
     return (
@@ -57,6 +60,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
         activeSession={activeSession}
         onStart={startSession}
         onStop={stopSession}
+        subjectSuggestions={subjectSuggestions}
       />
 
       {/* Tab Switcher */}
