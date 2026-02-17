@@ -20,6 +20,7 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [showGapDialog, setShowGapDialog] = useState(false)
   const [sessionGapMinutes, setSessionGapMinutes] = useState(10)
+  const [importDays, setImportDays] = useState(14)
 
   useEffect(() => {
     // Check if Anki was previously connected
@@ -39,6 +40,12 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
     const savedGap = localStorage.getItem(`anki_session_gap_${userId}`)
     if (savedGap) {
       setSessionGapMinutes(parseInt(savedGap))
+    }
+
+    // Load saved import days preference
+    const savedImportDays = localStorage.getItem(`anki_import_days_${userId}`)
+    if (savedImportDays) {
+      setImportDays(parseInt(savedImportDays))
     }
   }, [userId])
 
@@ -80,12 +87,13 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
   }
 
   const handleSync = async () => {
-    // Check if user has a saved preference
+    // Check if user has saved preferences
     const savedGap = localStorage.getItem(`anki_session_gap_${userId}`)
+    const savedImportDays = localStorage.getItem(`anki_import_days_${userId}`)
     
-    if (savedGap) {
-      // Use saved preference and sync directly
-      performSync(parseInt(savedGap))
+    if (savedGap && savedImportDays) {
+      // Use saved preferences and sync directly
+      performSync(parseInt(savedGap), parseInt(savedImportDays))
     } else {
       // First time - show the dialog
       setShowGapDialog(true)
@@ -97,24 +105,26 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
     setShowGapDialog(true)
   }
 
-  const performSync = async (gapMinutes: number) => {
+  const performSync = async (gapMinutes: number, days: number) => {
     setIsSyncing(true)
     setSyncStatus('idle')
     setErrorMessage('')
 
-    // Save the preference
+    // Save the preferences
     localStorage.setItem(`anki_session_gap_${userId}`, gapMinutes.toString())
+    localStorage.setItem(`anki_import_days_${userId}`, days.toString())
     setSessionGapMinutes(gapMinutes)
+    setImportDays(days)
 
     try {
       const service = new AnkiConnectService()
 
-      // Fetch last 14 days of reviews
+      // Fetch reviews based on configured time range
       const endDate = new Date()
       const startDate = new Date()
-      startDate.setDate(startDate.getDate() - 14)
+      startDate.setDate(startDate.getDate() - days)
 
-      console.log('📚 Fetching Anki reviews from', startDate, 'to', endDate)
+      console.log(`📚 Fetching Anki reviews from last ${days} days:`, startDate, 'to', endDate)
 
       const reviews = await service.getReviews(startDate, endDate)
       
@@ -227,7 +237,8 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
         isOpen={showGapDialog}
         onClose={() => setShowGapDialog(false)}
         onConfirm={performSync}
-        defaultValue={sessionGapMinutes}
+        defaultGapValue={sessionGapMinutes}
+        defaultImportDays={importDays}
       />
       
       <div className="flex items-center justify-between">
@@ -266,7 +277,7 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
           <button
             onClick={handleConfigureGap}
             className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-            title={`Session gap: ${sessionGapMinutes} min`}
+            title={`Import: ${importDays} days, Gap: ${sessionGapMinutes} min`}
           >
             <Settings size={16} />
           </button>
