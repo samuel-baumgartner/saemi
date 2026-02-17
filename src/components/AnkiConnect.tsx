@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BookOpen, RefreshCw, Unplug, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react'
+import { BookOpen, RefreshCw, Unplug, CheckCircle2, AlertCircle, ExternalLink, Settings } from 'lucide-react'
 import { AnkiConnectService, getAnkiConnected, storeAnkiConnected } from '@/lib/anki'
 import { getLocalDateString } from '@/lib/dateUtils'
 import { AnkiSessionGapDialog } from './AnkiSessionGapDialog'
@@ -80,7 +80,20 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
   }
 
   const handleSync = async () => {
-    // Show the gap configuration dialog
+    // Check if user has a saved preference
+    const savedGap = localStorage.getItem(`anki_session_gap_${userId}`)
+    
+    if (savedGap) {
+      // Use saved preference and sync directly
+      performSync(parseInt(savedGap))
+    } else {
+      // First time - show the dialog
+      setShowGapDialog(true)
+    }
+  }
+
+  const handleConfigureGap = () => {
+    // Show dialog to reconfigure
     setShowGapDialog(true)
   }
 
@@ -249,6 +262,14 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
               Error
             </span>
           )}
+
+          <button
+            onClick={handleConfigureGap}
+            className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+            title={`Session gap: ${sessionGapMinutes} min`}
+          >
+            <Settings size={16} />
+          </button>
 
           <button
             onClick={handleSync}
