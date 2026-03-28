@@ -11,7 +11,9 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  // Skip auth on public assets (e.g. scroll images) — otherwise many parallel
+  // requests each run JWT refresh when the access token expires.
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|data/).*)'],
 }
 
 

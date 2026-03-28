@@ -70,20 +70,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
  */
 async function refreshAccessToken(token: any) {
   try {
-    const url =
-      "https://oauth2.googleapis.com/token?" +
-      new URLSearchParams({
+    const response = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
         grant_type: "refresh_token",
         refresh_token: token.refreshToken,
-      })
-
-    const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      method: "POST",
+      }),
     })
 
     const refreshedTokens = await response.json()

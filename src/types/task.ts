@@ -5,7 +5,7 @@ export interface TimeSession {
   startTime: Date
   endTime?: Date  // null if currently active
   date: string    // YYYY-MM-DD format for grouping by day
-  source?: 'manual' | 'tracked' | 'google-fit' | 'anki'  // where the data came from
+  source?: 'manual' | 'tracked' | 'google-fit' | 'anki' | 'timechecker'  // where the data came from
   healthData?: {
     type: 'sleep' | 'workout' | 'activity' | 'study'
     details?: any  // specific health metrics
