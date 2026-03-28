@@ -30,3 +30,13 @@ model TimeSession {
   @@index([userId, date]) // Index for fast queries by user and date
   @@index([userId, startTime]) // Index for time-range queries
 }
+
+model FocusSyncLog {
+  id             String   @id @default(cuid())
+  userId         String
+  sessionCount   Int
+  message        String   @default("")
+  createdAt      DateTime @default(now())
+
+  @@index([userId, createdAt])
+}

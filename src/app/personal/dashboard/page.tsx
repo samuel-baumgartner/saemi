@@ -27,6 +27,12 @@ export default async function DashboardPage() {
                 <Home size={20} />
               </Link>
               <h1 className="text-xl font-bold text-white">Time Tracker</h1>
+              <Link
+                href="/info"
+                className="text-sm text-cyan-400/80 hover:text-cyan-300"
+              >
+                Focus info
+              </Link>
             </div>
 
             <div className="flex items-center gap-4">

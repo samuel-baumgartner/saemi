@@ -28,6 +28,16 @@ type IncomingSession = {
   healthData?: { type?: string; details?: unknown } | null
 }
 
+async function logSync(userId: string, sessionCount: number, message: string) {
+  try {
+    await prisma.focusSyncLog.create({
+      data: { userId, sessionCount, message },
+    })
+  } catch (e) {
+    console.error('FocusSyncLog create failed:', e)
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const secret = process.env.TIMECHECKER_SYNC_SECRET
@@ -73,6 +83,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (sessions.length === 0) {
+      await logSync(userEmail, 0, 'ok_empty')
       return NextResponse.json({ success: true, count: 0 })
     }
 
@@ -92,6 +103,8 @@ export async function POST(request: NextRequest) {
     }))
 
     const created = await prisma.timeSession.createMany({ data: rows })
+
+    await logSync(userEmail, created.count, 'ok')
 
     return NextResponse.json({ success: true, count: created.count })
   } catch (error) {
