@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { TimeSession } from '@/types/task'
 import { getTodayString } from '@/lib/dateUtils'
 import type { DailyGoalDef } from '@/lib/goalConfig'
@@ -50,9 +50,11 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const load = useCallback(async (silent = false) => {
+    if (!silent) {
+      setLoading(true)
+      setError(null)
+    }
     try {
       const r = await fetch('/api/user/goals')
       if (!r.ok) throw new Error('Failed to load goals')
@@ -60,18 +62,21 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
       const g = data.goals as DailyGoalDef[]
       setGoals(cloneGoals(g))
       setDraft(cloneGoals(g))
+      if (silent) setError(null)
     } catch {
-      const fallback = cloneGoals(DEFAULT_DAILY_GOALS)
-      setGoals(fallback)
-      setDraft(cloneGoals(fallback))
-      setError('Could not load saved goals — using defaults until you save.')
+      if (!silent) {
+        const fallback = cloneGoals(DEFAULT_DAILY_GOALS)
+        setGoals(fallback)
+        setDraft(cloneGoals(fallback))
+        setError('Could not load saved goals — using defaults until you save.')
+      }
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    load()
+    load(false)
   }, [load])
 
   const displayGoals = draft ?? goals ?? DEFAULT_DAILY_GOALS
@@ -80,6 +85,30 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
     if (!draft || !goals) return false
     return !goalsEqual(draft, goals)
   }, [draft, goals])
+
+  const dirtyRef = useRef(dirty)
+  dirtyRef.current = dirty
+
+  const goalsDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    const scheduleRefetch = () => {
+      if (document.visibilityState !== 'visible') return
+      if (dirtyRef.current) return
+      if (goalsDebounceRef.current) clearTimeout(goalsDebounceRef.current)
+      goalsDebounceRef.current = setTimeout(() => {
+        goalsDebounceRef.current = null
+        void load(true)
+      }, 150)
+    }
+
+    document.addEventListener('visibilitychange', scheduleRefetch)
+    window.addEventListener('focus', scheduleRefetch)
+    return () => {
+      if (goalsDebounceRef.current) clearTimeout(goalsDebounceRef.current)
+      document.removeEventListener('visibilitychange', scheduleRefetch)
+      window.removeEventListener('focus', scheduleRefetch)
+    }
+  }, [load])
 
   const updateDraft = (id: string, patch: Partial<DailyGoalDef>) => {
     setDraft((d) => {

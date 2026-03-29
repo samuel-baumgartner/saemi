@@ -1,0 +1,1 @@
+# Widget app — no extra rules for release yet.

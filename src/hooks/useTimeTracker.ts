@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { TimeSession } from '@/types/task'
 import { getLocalDateString } from '@/lib/dateUtils'
 
@@ -9,38 +9,53 @@ export function useTimeTracker() {
   const [activeSession, setActiveSession] = useState<TimeSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Load sessions from database on mount
-  useEffect(() => {
-    loadSessions()
-  }, [])
-
-  const loadSessions = async () => {
+  const loadSessions = useCallback(async () => {
     try {
       const response = await fetch('/api/sessions')
       if (!response.ok) throw new Error('Failed to fetch sessions')
-      
+
       const data = await response.json()
-      
-      // Convert date strings back to Date objects
+
       const sessionsWithDates = data.map((session: any) => ({
         ...session,
         startTime: new Date(session.startTime),
         endTime: session.endTime ? new Date(session.endTime) : null,
       }))
-      
+
       setSessions(sessionsWithDates)
-      
-      // Check if there's an active session
+
       const active = sessionsWithDates.find((s: TimeSession) => !s.endTime)
-      if (active) {
-        setActiveSession(active)
-      }
+      setActiveSession(active ?? null)
     } catch (error) {
       console.error('Failed to load sessions:', error)
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadSessions()
+  }, [loadSessions])
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    const scheduleRefetch = () => {
+      if (document.visibilityState !== 'visible') return
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        debounceRef.current = null
+        loadSessions()
+      }, 150)
+    }
+
+    document.addEventListener('visibilitychange', scheduleRefetch)
+    window.addEventListener('focus', scheduleRefetch)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      document.removeEventListener('visibilitychange', scheduleRefetch)
+      window.removeEventListener('focus', scheduleRefetch)
+    }
+  }, [loadSessions])
 
   const startSession = async (activity: string, description?: string) => {
     // Stop any active session first

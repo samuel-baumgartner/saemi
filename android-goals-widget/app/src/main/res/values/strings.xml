@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Saemi Goals</string>
+    <string name="widget_name">Saemi daily goals</string>
+    <string name="configure_title">Widget setup</string>
+    <string name="base_url_hint">Server URL (https://…)</string>
+    <string name="token_hint">Widget API token</string>
+    <string name="save">Save</string>
+    <string name="refresh">Refresh</string>
+    <string name="widget_empty_configure">Open Saemi Goals to set URL and token, then tap Refresh.</string>
+    <string name="widget_error">Could not load goals. Tap Refresh.</string>
+    <string name="widget_loading">Loading…</string>
+</resources>

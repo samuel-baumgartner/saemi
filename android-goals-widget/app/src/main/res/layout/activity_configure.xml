@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:text="@string/configure_title"
+            android:textColor="@color/widget_text"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:text="Use the same values as in your server .env.local (WIDGET_API_TOKEN). Deploy the Next.js app with WIDGET_USER_ID set to your sign-in email."
+            android:textColor="@color/widget_muted"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edit_base_url"
+            android:text="@string/base_url_hint"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/edit_base_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="https://your-domain.com"
+            android:inputType="textUri"
+            android:textColor="@color/widget_text"
+            android:textColorHint="@color/widget_muted" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edit_token"
+            android:text="@string/token_hint"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/edit_token"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:hint="paste token"
+            android:importantForAutofill="no"
+            android:inputType="textPassword|textVisiblePassword"
+            android:textColor="@color/widget_text"
+            android:textColorHint="@color/widget_muted" />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/save" />
+    </LinearLayout>
+</ScrollView>
