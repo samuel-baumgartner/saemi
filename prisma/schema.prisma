@@ -40,3 +40,9 @@ model FocusSyncLog {
 
   @@index([userId, createdAt])
 }
+
+model UserGoalSettings {
+  userId    String   @id
+  goalsJson Json
+  updatedAt DateTime @updatedAt
+}

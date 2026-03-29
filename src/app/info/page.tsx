@@ -1,7 +1,9 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { aggregateFocusByActivity, overlapMs } from '@/lib/focusInfo'
-import { FocusComputerUseSection } from '@/components/FocusComputerUseSection'
+import {
+  aggregateFocusByActivity,
+  formatDurationMs,
+} from '@/lib/focusInfo'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
@@ -32,26 +34,12 @@ export default async function InfoPage() {
           { endTime: { gte: dayAgo } },
         ],
       },
-      orderBy: { startTime: 'asc' },
       select: { activity: true, startTime: true, endTime: true },
     }),
   ])
 
   const lastHour = aggregateFocusByActivity(focusSessions, hourAgo, now)
   const last24h = aggregateFocusByActivity(focusSessions, dayAgo, now)
-
-  const toSegments = (winStart: Date, winEnd: Date) =>
-    focusSessions
-      .filter(
-        (s) =>
-          s.endTime &&
-          overlapMs(s.startTime, s.endTime, winStart, winEnd) > 0
-      )
-      .map((s) => ({
-        activity: s.activity,
-        startTime: s.startTime.toISOString(),
-        endTime: s.endTime!.toISOString(),
-      }))
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-8 max-w-3xl mx-auto">
@@ -69,21 +57,47 @@ export default async function InfoPage() {
         TimeChecker uploads and recent focus totals (source: timechecker).
       </p>
 
-      <FocusComputerUseSection
-        title="Last hour"
-        aggregates={lastHour}
-        segments={toSegments(hourAgo, now)}
-        windowStart={hourAgo.toISOString()}
-        windowEnd={now.toISOString()}
-      />
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold mb-3 text-cyan-300">
+          Last hour
+        </h2>
+        {lastHour.length === 0 ? (
+          <p className="text-white/40">No focus data in the last 60 minutes.</p>
+        ) : (
+          <ul className="space-y-2">
+            {lastHour.map(({ activity, ms }) => (
+              <li
+                key={activity}
+                className="flex justify-between border-b border-white/10 py-2"
+              >
+                <span>{activity}</span>
+                <span className="text-white/70">{formatDurationMs(ms)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-      <FocusComputerUseSection
-        title="Last 24 hours"
-        aggregates={last24h}
-        segments={toSegments(dayAgo, now)}
-        windowStart={dayAgo.toISOString()}
-        windowEnd={now.toISOString()}
-      />
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold mb-3 text-cyan-300">
+          Last 24 hours
+        </h2>
+        {last24h.length === 0 ? (
+          <p className="text-white/40">No focus data in the last 24 hours.</p>
+        ) : (
+          <ul className="space-y-2">
+            {last24h.map(({ activity, ms }) => (
+              <li
+                key={activity}
+                className="flex justify-between border-b border-white/10 py-2"
+              >
+                <span>{activity}</span>
+                <span className="text-white/70">{formatDurationMs(ms)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section>
         <h2 className="text-lg font-semibold mb-3 text-cyan-300">

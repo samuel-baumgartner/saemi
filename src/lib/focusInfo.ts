@@ -35,3 +35,36 @@ export function formatDurationMs(ms: number): string {
   if (m === 0) return `${h}h`
   return `${h}h ${m}m`
 }
+
+/**
+ * Merge TimeChecker segments into continuous "at computer" spans.
+ * Gaps shorter than gapMergeMs are treated as one continuous block.
+ */
+export function mergeComputerUseBlocks(
+  sessions: { startTime: Date; endTime?: Date | null }[],
+  gapMergeMs = 2 * 60 * 1000
+): { start: Date; end: Date }[] {
+  const segments = sessions
+    .map((s) => {
+      const start = s.startTime.getTime()
+      const end = (s.endTime != null ? s.endTime : new Date()).getTime()
+      return { start, end }
+    })
+    .filter((x) => x.end > x.start)
+    .sort((a, b) => a.start - b.start)
+
+  const blocks: { start: number; end: number }[] = []
+  for (const seg of segments) {
+    if (!blocks.length) {
+      blocks.push({ ...seg })
+      continue
+    }
+    const last = blocks[blocks.length - 1]
+    if (seg.start <= last.end + gapMergeMs) {
+      last.end = Math.max(last.end, seg.end)
+    } else {
+      blocks.push({ ...seg })
+    }
+  }
+  return blocks.map((b) => ({ start: new Date(b.start), end: new Date(b.end) }))
+}
