@@ -8,7 +8,11 @@ import { TimelineView } from '@/components/TimelineView'
 import { GoogleFitConnect } from '@/components/GoogleFitConnect'
 import { AnkiConnect } from '@/components/AnkiConnect'
 import SummaryView from '@/components/SummaryView'
-import { Calendar, BarChart3 } from 'lucide-react'
+import { GoalsTab } from '@/components/GoalsTab'
+import { Calendar, BarChart3, Target } from 'lucide-react'
+
+/** Set to `true` to show AnkiConnect sync UI again. */
+const SHOW_ANKI_SYNC = false
 
 interface TaskDashboardProps {
   userId: string
@@ -16,7 +20,7 @@ interface TaskDashboardProps {
 }
 
 export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'summary'>('timeline')
+  const [activeTab, setActiveTab] = useState<'goals' | 'timeline' | 'summary'>('goals')
   
   const {
     sessions,
@@ -49,11 +53,9 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
         onSync={syncHealthSessions}
       />
 
-      {/* Anki Integration */}
-      <AnkiConnect
-        userId={userId}
-        onSync={syncHealthSessions}
-      />
+      {SHOW_ANKI_SYNC && (
+        <AnkiConnect userId={userId} onSync={syncHealthSessions} />
+      )}
 
       {/* Active Session Tracker */}
       <ActiveSessionTracker
@@ -64,7 +66,18 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
       />
 
       {/* Tab Switcher */}
-      <div className="flex gap-2 border-b border-white/10 pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-white/10 pb-2">
+        <button
+          onClick={() => setActiveTab('goals')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+            activeTab === 'goals'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
+          }`}
+        >
+          <Target className="w-4 h-4" />
+          Goals
+        </button>
         <button
           onClick={() => setActiveTab('timeline')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
@@ -90,7 +103,9 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
       </div>
 
       {/* Content based on active tab */}
-      {activeTab === 'timeline' ? (
+      {activeTab === 'goals' ? (
+        <GoalsTab sessions={sessions} />
+      ) : activeTab === 'timeline' ? (
         <TimelineView
           sessions={sessions}
           onUpdate={updateSession}
