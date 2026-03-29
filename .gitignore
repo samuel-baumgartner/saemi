@@ -16,6 +16,9 @@ dist-ssr
 .env
 .env*.local
 
+# Local widget token copy (do not commit)
+/token.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
