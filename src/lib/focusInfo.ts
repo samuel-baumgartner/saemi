@@ -10,25 +10,72 @@ export function overlapMs(
   return Math.max(0, b - a)
 }
 
+type SessionSlice = {
+  activity: string
+  startTime: Date
+  endTime: Date | null
+  healthData?: { details?: { focusSeconds?: unknown } }
+}
+
+function focusSecondsWeight(s: SessionSlice): number | null {
+  const v = s.healthData?.details?.focusSeconds
+  if (typeof v === 'number' && Number.isFinite(v) && v > 0) return v
+  return null
+}
+
+/**
+ * Sums overlap of each session with [winStart, winEnd].
+ * If overlaps double-count wall time (legacy TimeChecker hourly upload placed every
+ * rule at the same hour start), scale breakdown to the window using focusSeconds weights.
+ */
 export function aggregateFocusByActivity(
-  sessions: { activity: string; startTime: Date; endTime: Date | null }[],
+  sessions: SessionSlice[],
   winStart: Date,
   winEnd: Date
 ): { activity: string; ms: number }[] {
-  const m = new Map<string, number>()
+  const wallMs = Math.max(0, winEnd.getTime() - winStart.getTime())
+  if (wallMs <= 0) return []
+
+  let totalOverlap = 0
+  const byActivityOverlap = new Map<string, number>()
+  const byActivityWeight = new Map<string, number>()
+
   for (const s of sessions) {
     if (!s.endTime) continue
-    const ms = overlapMs(s.startTime, s.endTime, winStart, winEnd)
-    if (ms <= 0) continue
-    m.set(s.activity, (m.get(s.activity) ?? 0) + ms)
+    const ov = overlapMs(s.startTime, s.endTime, winStart, winEnd)
+    if (ov <= 0) continue
+    totalOverlap += ov
+    byActivityOverlap.set(
+      s.activity,
+      (byActivityOverlap.get(s.activity) ?? 0) + ov
+    )
+    const fs = focusSecondsWeight(s)
+    const w = fs ?? ov / 1000
+    byActivityWeight.set(
+      s.activity,
+      (byActivityWeight.get(s.activity) ?? 0) + w
+    )
   }
-  return Array.from(m.entries())
+
+  if (byActivityOverlap.size === 0) return []
+
+  if (totalOverlap > wallMs + 1500) {
+    const tw = [...byActivityWeight.values()].reduce((a, b) => a + b, 0)
+    if (tw <= 0) return []
+    return Array.from(byActivityWeight.entries())
+      .map(([activity, w]) => ({ activity, ms: (wallMs * w) / tw }))
+      .sort((x, y) => y.ms - x.ms)
+  }
+
+  return Array.from(byActivityOverlap.entries())
     .map(([activity, ms]) => ({ activity, ms }))
     .sort((x, y) => y.ms - x.ms)
 }
 
 export function formatDurationMs(ms: number): string {
-  const mins = Math.round(ms / 60000)
+  // Floor so "5:00 – 5:56" labels (minute precision) match the shown total.
+  const mins = Math.floor(ms / 60000)
+  if (mins < 1) return ms > 0 ? '< 1 min' : '0 min'
   if (mins < 60) return `${mins} min`
   const h = Math.floor(mins / 60)
   const m = mins % 60
@@ -37,12 +84,19 @@ export function formatDurationMs(ms: number): string {
 }
 
 /**
+ * Default gap for merging adjacent TimeChecker spans on the timeline.
+ * Hourly buckets often leave a few minutes “short” of :00; real breaks away
+ * from the machine are usually longer than this.
+ */
+export const COMPUTER_USE_VISUAL_MERGE_GAP_MS = 15 * 60 * 1000
+
+/**
  * Merge TimeChecker segments into continuous "at computer" spans.
  * Gaps shorter than gapMergeMs are treated as one continuous block.
  */
 export function mergeComputerUseBlocks(
   sessions: { startTime: Date; endTime?: Date | null }[],
-  gapMergeMs = 2 * 60 * 1000
+  gapMergeMs = COMPUTER_USE_VISUAL_MERGE_GAP_MS
 ): { start: Date; end: Date }[] {
   const segments = sessions
     .map((s) => {

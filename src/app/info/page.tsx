@@ -34,12 +34,27 @@ export default async function InfoPage() {
           { endTime: { gte: dayAgo } },
         ],
       },
-      select: { activity: true, startTime: true, endTime: true },
+      select: {
+        activity: true,
+        startTime: true,
+        endTime: true,
+        healthDataDetails: true,
+      },
     }),
   ])
 
-  const lastHour = aggregateFocusByActivity(focusSessions, hourAgo, now)
-  const last24h = aggregateFocusByActivity(focusSessions, dayAgo, now)
+  const focusSlices = focusSessions.map((s) => ({
+    activity: s.activity,
+    startTime: s.startTime,
+    endTime: s.endTime,
+    healthData:
+      s.healthDataDetails !== null && typeof s.healthDataDetails === 'object'
+        ? { details: s.healthDataDetails as { focusSeconds?: number } }
+        : undefined,
+  }))
+
+  const lastHour = aggregateFocusByActivity(focusSlices, hourAgo, now)
+  const last24h = aggregateFocusByActivity(focusSlices, dayAgo, now)
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-8 max-w-3xl mx-auto">

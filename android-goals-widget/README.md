@@ -47,7 +47,7 @@ cd android-goals-widget
 1. Long-press the home screen → **Widgets**.
 2. Find **Saemi daily goals** and drag it to the home screen.
 3. When prompted, enter:
-   - **Server URL** — base URL only, no path (e.g. `https://your-app.vercel.app`).
+   - **Server URL** — base URL only, no path. Use the URL you actually open in the browser (if that is `https://www.…`, use that). Apex→www redirects used to drop the auth header in older builds; the app now re-sends `Authorization` after each redirect.
    - **Widget API token** — the same value as `WIDGET_API_TOKEN`.
 4. Tap **Save**. Use **Refresh** on the widget if data does not appear immediately.
 

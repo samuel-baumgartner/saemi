@@ -4,6 +4,7 @@ import { TimeSession } from '@/types/task'
 import { useState, useEffect } from 'react'
 import {
   aggregateFocusByActivity,
+  COMPUTER_USE_VISUAL_MERGE_GAP_MS,
   formatDurationMs,
   mergeComputerUseBlocks,
 } from '@/lib/focusInfo'
@@ -12,9 +13,6 @@ interface TimelineGraphProps {
   sessions: TimeSession[]
   onSessionClick?: (session: TimeSession) => void
 }
-
-/** Gaps under this length between TimeChecker segments count as one computer session. */
-const COMPUTER_USE_GAP_MERGE_MS = 2 * 60 * 1000
 
 function getRangePosition(start: Date, end: Date) {
   const startPercent =
@@ -46,7 +44,7 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
 
   const computerBlocks = mergeComputerUseBlocks(
     timecheckerSessions,
-    COMPUTER_USE_GAP_MERGE_MS
+    COMPUTER_USE_VISUAL_MERGE_GAP_MS
   )
 
   const breakdownForModal = beamModal
@@ -55,6 +53,7 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
           activity: s.activity,
           startTime: s.startTime,
           endTime: s.endTime ?? new Date(),
+          healthData: s.healthData,
         })),
         beamModal.start,
         beamModal.end
@@ -113,12 +112,6 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
 
   return (
     <div className="bg-black/40 border border-white/10 rounded-lg p-4">
-      <p className="text-xs text-white/45 mb-3">
-        <span className="text-cyan-300/90">Computer use</span> bars merge
-        TimeChecker segments (gaps under 2 min count as one stretch). Click a
-        bar for Cursor, Chrome, etc. Other sessions stay as separate colored
-        blocks.
-      </p>
       <div className="flex gap-2">
         <div className="flex flex-col justify-between text-xs text-white/40 w-12 flex-shrink-0">
           {hours.map((hour) => (
@@ -144,7 +137,7 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
               <button
                 key={`beam-${index}-${block.start.getTime()}`}
                 type="button"
-                className={`absolute left-0 right-0 mx-0.5 rounded-lg border-2 border-cyan-400/60 bg-cyan-600/35 hover:bg-cyan-500/45 transition-all text-left z-[5] ${
+                className={`absolute left-0 right-0 mx-0.5 rounded-lg border-2 border-cyan-400/60 bg-cyan-600/35 hover:bg-cyan-500/45 transition-all text-left z-[5] antialiased ${
                   isHovered ? 'z-[6] ring-2 ring-cyan-300/40' : ''
                 }`}
                 style={position}
@@ -152,11 +145,11 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
                 onMouseLeave={() => setHoveredBeamIndex(null)}
                 onClick={() => setBeamModal({ start: block.start, end: block.end })}
               >
-                <div className="px-2 py-1 h-full flex flex-col justify-center overflow-hidden pointer-events-none">
-                  <div className="font-semibold text-cyan-100 text-sm truncate">
+                <div className="px-2 py-1 h-full flex flex-col justify-center overflow-hidden pointer-events-none select-none">
+                  <div className="font-semibold text-cyan-100 text-sm truncate leading-tight">
                     Computer use
                   </div>
-                  <div className="text-xs text-cyan-200/90">
+                  <div className="text-xs text-cyan-200/90 leading-tight mt-0.5 truncate">
                     {formatTime(block.start)} – {formatTime(block.end)}
                   </div>
                   {isHovered && (
