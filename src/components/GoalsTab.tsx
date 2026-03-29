@@ -238,10 +238,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
                       />
                     </label>
                   </div>
-                  <div className="flex items-center justify-between gap-4 mb-2">
-                    <span className="text-xs text-white/40">
-                      Matched by activity rules in code (id: {g.id})
-                    </span>
+                  <div className="flex justify-end mb-2">
                     <span className="text-sm text-white/70 tabular-nums">
                       {doneStr}
                       <span className="text-white/40"> / </span>
