@@ -4,6 +4,8 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
@@ -37,30 +39,55 @@ class ConfigureActivity : Activity() {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
 
-        fun detectInto(target: EditText) {
-            val pkg = ForegroundApp.getCurrentForegroundPackage(this)
-            if (pkg == null) {
+        val ui = Handler(Looper.getMainLooper())
+        fun detectInto(target: EditText, button: Button) {
+            if (!UsageAccess.hasUsageAccess(this)) {
                 Toast.makeText(
                     this,
                     "Grant Usage Access, then try again.",
                     Toast.LENGTH_SHORT,
                 ).show()
-            } else {
-                target.setText(pkg)
+                return
             }
+
+            button.isEnabled = false
+            Toast.makeText(
+                this,
+                "Switch to the target app now…",
+                Toast.LENGTH_SHORT,
+            ).show()
+
+            ui.postDelayed({
+                val pkg = ForegroundApp.getCurrentForegroundPackage(this, lookbackMs = 30_000L)
+                if (pkg == null) {
+                    Toast.makeText(
+                        this,
+                        "Could not detect. Try again.",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                } else {
+                    target.setText(pkg)
+                }
+                button.isEnabled = true
+            }, 3_000L)
         }
 
-        findViewById<Button>(R.id.btn_detect_bunpro).setOnClickListener {
-            detectInto(editBunpro)
+        val btnDetectBunpro = findViewById<Button>(R.id.btn_detect_bunpro)
+        val btnDetectAnki = findViewById<Button>(R.id.btn_detect_anki)
+        val btnDetectYoutube = findViewById<Button>(R.id.btn_detect_youtube)
+        val btnDetectInstagram = findViewById<Button>(R.id.btn_detect_instagram)
+
+        btnDetectBunpro.setOnClickListener {
+            detectInto(editBunpro, btnDetectBunpro)
         }
-        findViewById<Button>(R.id.btn_detect_anki).setOnClickListener {
-            detectInto(editAnki)
+        btnDetectAnki.setOnClickListener {
+            detectInto(editAnki, btnDetectAnki)
         }
-        findViewById<Button>(R.id.btn_detect_youtube).setOnClickListener {
-            detectInto(editYoutube)
+        btnDetectYoutube.setOnClickListener {
+            detectInto(editYoutube, btnDetectYoutube)
         }
-        findViewById<Button>(R.id.btn_detect_instagram).setOnClickListener {
-            detectInto(editInstagram)
+        btnDetectInstagram.setOnClickListener {
+            detectInto(editInstagram, btnDetectInstagram)
         }
 
         findViewById<Button>(R.id.btn_save).setOnClickListener {
