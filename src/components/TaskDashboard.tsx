@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useTimeTracker } from '@/hooks/useTimeTracker'
 import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 import { ActiveSessionTracker } from '@/components/ActiveSessionTracker'
@@ -20,7 +21,15 @@ interface TaskDashboardProps {
 }
 
 export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const tabFromQuery = searchParams.get('tab')
   const [activeTab, setActiveTab] = useState<'goals' | 'timeline' | 'summary'>(() => {
+    if (tabFromQuery === 'goals' || tabFromQuery === 'timeline' || tabFromQuery === 'summary') {
+      return tabFromQuery
+    }
     if (typeof window === 'undefined') return 'goals'
     try {
       const saved = localStorage.getItem('taskDashboard.activeTab')
@@ -40,6 +49,28 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
       // ignore storage failures
     }
   }, [activeTab])
+
+  useEffect(() => {
+    if (tabFromQuery === 'goals' || tabFromQuery === 'timeline' || tabFromQuery === 'summary') {
+      if (tabFromQuery !== activeTab) setActiveTab(tabFromQuery)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFromQuery])
+
+  const setTab = (tab: 'goals' | 'timeline' | 'summary') => {
+    setActiveTab(tab)
+    const next = new URLSearchParams(searchParams.toString())
+    next.set('tab', tab)
+    router.replace(`${pathname}?${next.toString()}`, { scroll: false })
+  }
+
+  const previewPhone = searchParams.get('preview') === 'phone'
+  const togglePreviewPhone = () => {
+    const next = new URLSearchParams(searchParams.toString())
+    if (previewPhone) next.delete('preview')
+    else next.set('preview', 'phone')
+    router.replace(`${pathname}?${next.toString()}`, { scroll: false })
+  }
   
   const {
     sessions,
@@ -64,7 +95,16 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${previewPhone ? 'max-w-[430px] mx-auto rounded-2xl border border-white/10 p-3 bg-black/40' : ''}`}>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={togglePreviewPhone}
+          className="text-xs px-3 py-1.5 rounded-lg border border-white/15 text-white/70 hover:bg-white/10"
+        >
+          {previewPhone ? 'Exit phone preview' : 'Phone preview'}
+        </button>
+      </div>
       {/* Google Fit Integration */}
       <GoogleFitConnect
         userId={userId}
@@ -88,7 +128,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
       <div className="flex flex-wrap gap-2 border-b border-white/10 pb-2">
         <button
           type="button"
-          onClick={() => setActiveTab('goals')}
+          onClick={() => setTab('goals')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
             activeTab === 'goals'
               ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
@@ -100,7 +140,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab('timeline')}
+          onClick={() => setTab('timeline')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
             activeTab === 'timeline'
               ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
@@ -112,7 +152,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab('summary')}
+          onClick={() => setTab('summary')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
             activeTab === 'summary'
               ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'

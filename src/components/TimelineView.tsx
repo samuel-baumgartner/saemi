@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TimeSession } from '@/types/task'
 import { SessionCard } from './SessionCard'
 import { TimelineGraph } from './TimelineGraph'
@@ -26,8 +26,17 @@ export function TimelineView({
 }: TimelineViewProps) {
   const [selectedDate, setSelectedDate] = useState(getTodayString())
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph')
+  const [isSmallScreen, setIsSmallScreen] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsSmallScreen(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const subjectSuggestions = useSubjectSuggestions(sessions)
+  const effectiveViewMode = isSmallScreen ? 'list' : viewMode
   
   const isToday = selectedDate === getTodayString()
 
@@ -150,21 +159,23 @@ export function TimelineView({
         <div className="flex items-center gap-3">
           {/* View Mode Toggle */}
           <div className="flex items-center bg-black/40 border border-white/10 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('graph')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-                viewMode === 'graph'
-                  ? 'bg-white/20 text-white'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              <BarChart3 size={18} />
-              Graph
-            </button>
+            {!isSmallScreen && (
+              <button
+                onClick={() => setViewMode('graph')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
+                  viewMode === 'graph'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <BarChart3 size={18} />
+                Graph
+              </button>
+            )}
             <button
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-                viewMode === 'list'
+                effectiveViewMode === 'list'
                   ? 'bg-white/20 text-white'
                   : 'text-white/60 hover:text-white'
               }`}
@@ -205,7 +216,7 @@ export function TimelineView({
               : 'No activity tracked on this day'}
           </p>
         </div>
-      ) : viewMode === 'graph' ? (
+      ) : effectiveViewMode === 'graph' ? (
         <TimelineGraph
           sessions={daySessions}
           onSessionClick={(session) => {

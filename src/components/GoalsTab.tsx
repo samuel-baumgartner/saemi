@@ -216,7 +216,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
             Loading your goals…
           </div>
         ) : (
-          <div className="grid min-h-[56vh] grid-cols-1 gap-4 [grid-template-rows:repeat(4,minmax(0,1fr))] sm:min-h-0 sm:gap-5 sm:[grid-template-rows:none]">
+          <div className="grid min-h-[calc(100dvh-24rem)] grid-cols-1 gap-4 [grid-template-rows:repeat(4,minmax(0,1fr))] sm:min-h-0 sm:gap-5 sm:[grid-template-rows:none]">
             {displayGoals.map((g) => {
               const done = minutesTowardGoal(g.id, todaySessions)
               const pct = Math.min(100, (done / g.targetMinutes) * 100)
