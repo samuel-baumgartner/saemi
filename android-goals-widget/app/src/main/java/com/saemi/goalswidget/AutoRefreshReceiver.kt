@@ -11,10 +11,10 @@ class AutoRefreshReceiver : BroadcastReceiver() {
         if (intent?.action != ACTION_TICK) return
 
         val mgr = AppWidgetManager.getInstance(context)
-        val timelineIds = mgr.getAppWidgetIds(ComponentName(context, TimelineWidgetProvider::class.java))
+        val goalIds = mgr.getAppWidgetIds(ComponentName(context, GoalsWidgetProvider::class.java))
 
-        if (timelineIds.isNotEmpty()) {
-            TimelineWidgetProvider.refreshData(context, mgr, timelineIds)
+        if (goalIds.isNotEmpty()) {
+            GoalsWidgetProvider.refreshData(context, mgr, goalIds)
         }
     }
 

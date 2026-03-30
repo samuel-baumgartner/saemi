@@ -25,15 +25,15 @@
         </activity>
 
         <receiver
-            android:name=".TimelineWidgetProvider"
+            android:name=".GoalsWidgetProvider"
             android:exported="true"
-            android:label="@string/timeline_widget_name">
+            android:label="@string/widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/timeline_widget_info" />
+                android:resource="@xml/goals_widget_info" />
         </receiver>
 
         <receiver
@@ -45,7 +45,7 @@
         </receiver>
 
         <service
-            android:name=".TimelineRemoteViewsService"
+            android:name=".GoalsRemoteViewsService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>

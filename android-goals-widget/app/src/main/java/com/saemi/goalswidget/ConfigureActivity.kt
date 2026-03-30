@@ -105,8 +105,8 @@ class ConfigureActivity : Activity() {
             )
             val mgr = AppWidgetManager.getInstance(this)
             if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                TimelineWidgetProvider.bindWidget(this, mgr, widgetId)
-                TimelineWidgetProvider.refreshData(this, mgr, intArrayOf(widgetId))
+            GoalsWidgetProvider.bindWidget(this, mgr, widgetId)
+            GoalsWidgetProvider.refreshData(this, mgr, intArrayOf(widgetId))
                 setResult(
                     RESULT_OK,
                     Intent().putExtra(
@@ -115,7 +115,7 @@ class ConfigureActivity : Activity() {
                     ),
                 )
             } else {
-                TimelineWidgetProvider.updateAllWidgets(this)
+            GoalsWidgetProvider.updateAllWidgets(this)
             }
             finish()
         }

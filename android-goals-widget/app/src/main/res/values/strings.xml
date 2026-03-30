@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Saemi Goals</string>
     <string name="widget_name">Saemi daily goals</string>
-    <string name="timeline_widget_name">Saemi timeline</string>
     <string name="configure_title">Widget setup</string>
     <string name="base_url_hint">Server URL (https://…)</string>
     <string name="token_hint">Widget API token</string>
