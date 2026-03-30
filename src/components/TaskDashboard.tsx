@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTimeTracker } from '@/hooks/useTimeTracker'
 import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 import { ActiveSessionTracker } from '@/components/ActiveSessionTracker'
@@ -21,6 +21,25 @@ interface TaskDashboardProps {
 
 export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
   const [activeTab, setActiveTab] = useState<'goals' | 'timeline' | 'summary'>('goals')
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('taskDashboard.activeTab')
+      if (saved === 'goals' || saved === 'timeline' || saved === 'summary') {
+        setActiveTab(saved)
+      }
+    } catch {
+      // ignore storage failures
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('taskDashboard.activeTab', activeTab)
+    } catch {
+      // ignore storage failures
+    }
+  }, [activeTab])
   
   const {
     sessions,
@@ -68,6 +87,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
       {/* Tab Switcher */}
       <div className="flex flex-wrap gap-2 border-b border-white/10 pb-2">
         <button
+          type="button"
           onClick={() => setActiveTab('goals')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
             activeTab === 'goals'
@@ -79,6 +99,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
           Goals
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('timeline')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
             activeTab === 'timeline'
@@ -90,6 +111,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
           Timeline
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('summary')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
             activeTab === 'summary'
