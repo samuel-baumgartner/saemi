@@ -25,18 +25,6 @@
         </activity>
 
         <receiver
-            android:name=".GoalsWidgetProvider"
-            android:exported="true"
-            android:label="@string/widget_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/goals_widget_info" />
-        </receiver>
-
-        <receiver
             android:name=".TimelineWidgetProvider"
             android:exported="true"
             android:label="@string/timeline_widget_name">
@@ -55,11 +43,6 @@
                 <action android:name="com.saemi.goalswidget.ACTION_AUTO_REFRESH_TICK" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name=".GoalsRemoteViewsService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service
             android:name=".TimelineRemoteViewsService"
