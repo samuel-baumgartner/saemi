@@ -2,11 +2,20 @@
 <resources>
     <string name="app_name">Saemi Goals</string>
     <string name="widget_name">Saemi daily goals</string>
+    <string name="timeline_widget_name">Saemi timeline</string>
     <string name="configure_title">Widget setup</string>
     <string name="base_url_hint">Server URL (https://…)</string>
     <string name="token_hint">Widget API token</string>
     <string name="save">Save</string>
     <string name="refresh">Refresh</string>
+    <string name="usage_access">Usage Access</string>
+    <string name="grant_usage_access">Grant Usage Access</string>
+    <string name="packages_title">Phone tracking (packages)</string>
+    <string name="bunpro_pkg">Bunpro package</string>
+    <string name="anki_pkg">AnkiDroid package</string>
+    <string name="youtube_pkg">YouTube package (unproductive)</string>
+    <string name="instagram_pkg">Instagram package (unproductive)</string>
+    <string name="detect_current_app">Detect current app</string>
     <string name="widget_empty_configure">Open Saemi Goals to set URL and token, then tap Refresh.</string>
     <string name="widget_error">Could not load goals. Tap Refresh.</string>
     <string name="widget_loading">Loading…</string>

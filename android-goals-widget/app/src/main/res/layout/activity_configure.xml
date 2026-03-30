@@ -69,5 +69,155 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/save" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingBottom="8dp"
+            android:text="@string/usage_access"
+            android:textColor="@color/widget_text"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_usage_access"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/grant_usage_access" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingBottom="8dp"
+            android:text="@string/packages_title"
+            android:textColor="@color/widget_text"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edit_bunpro_pkg"
+            android:text="@string/bunpro_pkg"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edit_bunpro_pkg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="com.bunpro…"
+                android:inputType="text"
+                android:textColor="@color/widget_text"
+                android:textColorHint="@color/widget_muted" />
+
+            <Button
+                android:id="@+id/btn_detect_bunpro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/detect_current_app" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edit_anki_pkg"
+            android:text="@string/anki_pkg"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edit_anki_pkg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="com.ichi2.anki"
+                android:inputType="text"
+                android:textColor="@color/widget_text"
+                android:textColorHint="@color/widget_muted" />
+
+            <Button
+                android:id="@+id/btn_detect_anki"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/detect_current_app" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edit_youtube_pkg"
+            android:text="@string/youtube_pkg"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edit_youtube_pkg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="com.google.android.youtube"
+                android:inputType="text"
+                android:textColor="@color/widget_text"
+                android:textColorHint="@color/widget_muted" />
+
+            <Button
+                android:id="@+id/btn_detect_youtube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/detect_current_app" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edit_instagram_pkg"
+            android:text="@string/instagram_pkg"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="22dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edit_instagram_pkg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="com.instagram.android"
+                android:inputType="text"
+                android:textColor="@color/widget_text"
+                android:textColorHint="@color/widget_muted" />
+
+            <Button
+                android:id="@+id/btn_detect_instagram"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/detect_current_app" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

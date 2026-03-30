@@ -12,7 +12,7 @@
         android:layout_weight="1">
 
         <ListView
-            android:id="@+id/goals_list"
+            android:id="@+id/timeline_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:cacheColorHint="@android:color/transparent"
@@ -23,15 +23,16 @@
             android:paddingBottom="4dp" />
 
         <TextView
-            android:id="@+id/empty_view"
+            android:id="@+id/timeline_empty_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
             android:padding="16dp"
-            android:text="@string/widget_empty_configure"
+            android:text="@string/widget_loading"
             android:textColor="@color/widget_muted"
             android:textSize="14sp" />
     </FrameLayout>
 
 </LinearLayout>
+

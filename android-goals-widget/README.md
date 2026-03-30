@@ -1,6 +1,8 @@
-# Saemi daily goals — Android home screen widget
+# Saemi — Android home screen widgets (Goals + Timeline)
 
-Read-only list of your daily goals with the same progress rules as the web app (`minutesTowardGoal` on the server).
+Two widgets:
+- **Goals**: read-only daily goals progress (server uses the same logic as the web app).
+- **Timeline**: a list of recent “sessions” (Bunpro / Anki / Not productive / Other) built from your phone’s foreground app usage.
 
 ## 1. Server configuration
 
@@ -9,7 +11,11 @@ In your Saemi Next.js deployment, set (see `.env.example` in the repo root):
 - **`WIDGET_API_TOKEN`** — long random secret (e.g. `openssl rand -hex 32`).
 - **`WIDGET_USER_ID`** — your Prisma `userId`, i.e. the **same email** you use to sign in with Google at `/personal`.
 
-Redeploy so `GET /api/widget/daily-goals` is available (Bearer token auth).
+Redeploy so these endpoints are available (Bearer token auth):
+- `GET /api/widget/daily-goals`
+- `GET /api/widget/phone-goals`
+- `GET /api/widget/phone-timeline`
+- `POST /api/widget/phone-sessions/sync`
 
 The widget sends your phone’s **local calendar date** as `?date=YYYY-MM-DD` so “today” matches the device, not the server clock.
 
@@ -45,13 +51,29 @@ cd android-goals-widget
 ## 3. Place the widget
 
 1. Long-press the home screen → **Widgets**.
-2. Find **Saemi daily goals** and drag it to the home screen.
+2. Find **Saemi daily goals** and/or **Saemi timeline** and drag them to the home screen.
 3. When prompted, enter:
    - **Server URL** — base URL only, no path. Use the URL you actually open in the browser (if that is `https://www.…`, use that). Apex→www redirects used to drop the auth header in older builds; the app now re-sends `Authorization` after each redirect.
    - **Widget API token** — the same value as `WIDGET_API_TOKEN`.
 4. Tap **Save**. Use **Refresh** on the widget if data does not appear immediately.
 
-You can open the **Saemi Goals** app from the launcher anytime to change URL or token.
+## 4. Enable phone tracking (Usage Access)
+
+To track Bunpro / AnkiDroid / YouTube / Instagram automatically, the app needs **Usage Access**.
+
+1. Open **Saemi Goals** from the app drawer.
+2. Tap **Grant Usage Access**.
+3. Enable **Saemi Goals** in the Usage Access list.
+4. Back in the app, fill package names (or use **Detect current app** while the target app is in foreground):
+   - Bunpro package
+   - AnkiDroid package
+   - YouTube package (unproductive)
+   - Instagram package (unproductive)
+5. Tap **Save**, then hit **Refresh** on the widgets.
+
+Behavior:
+- The app rebuilds **today’s** phone sessions from Usage Events and uploads them right before each widget refresh.
+- When phone + laptop overlap, the phone sessions **override** laptop sessions in the phone widget endpoints (no double-count).
 
 ## Updates
 

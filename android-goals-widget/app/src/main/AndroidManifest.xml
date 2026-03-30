@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -27,15 +30,39 @@
             android:label="@string/widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.saemi.goalswidget.ACTION_REFRESH" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/goals_widget_info" />
         </receiver>
 
+        <receiver
+            android:name=".TimelineWidgetProvider"
+            android:exported="true"
+            android:label="@string/timeline_widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/timeline_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".AutoRefreshReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.saemi.goalswidget.ACTION_AUTO_REFRESH_TICK" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".GoalsRemoteViewsService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".TimelineRemoteViewsService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>

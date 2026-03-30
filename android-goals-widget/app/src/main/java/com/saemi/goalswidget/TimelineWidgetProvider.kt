@@ -10,7 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.RemoteViews
 
-class GoalsWidgetProvider : AppWidgetProvider() {
+class TimelineWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(
         context: Context,
@@ -36,45 +36,34 @@ class GoalsWidgetProvider : AppWidgetProvider() {
 
     companion object {
         fun bindWidget(context: Context, mgr: AppWidgetManager, appWidgetId: Int) {
-            val rv = RemoteViews(context.packageName, R.layout.widget_goals)
+            val rv = RemoteViews(context.packageName, R.layout.widget_timeline)
 
-            val service = Intent(context, GoalsRemoteViewsService::class.java).apply {
+            val service = Intent(context, TimelineRemoteViewsService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                 data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
             }
-            rv.setRemoteAdapter(R.id.goals_list, service)
-            rv.setEmptyView(R.id.goals_list, R.id.empty_view)
+            rv.setRemoteAdapter(R.id.timeline_list, service)
+            rv.setEmptyView(R.id.timeline_list, R.id.timeline_empty_view)
 
-            if (!WidgetPrefs.isConfigured(context)) {
-                rv.setTextViewText(
-                    R.id.empty_view,
-                    context.getString(R.string.widget_empty_configure),
-                )
-            } else {
-                val err = WidgetGoalsCache.getError()
-                val data = WidgetGoalsCache.snapshot()
-                val emptyText = when {
-                    err != null && data.isEmpty() ->
-                        context.getString(R.string.widget_error)
-                    data.isEmpty() ->
-                        context.getString(R.string.widget_loading)
-                    else ->
-                        context.getString(R.string.widget_empty_configure)
-                }
-                rv.setTextViewText(R.id.empty_view, emptyText)
+            val err = TimelineCache.getError()
+            val data = TimelineCache.snapshot()
+            val emptyText = when {
+                !WidgetPrefs.isConfigured(context) ->
+                    context.getString(R.string.widget_empty_configure)
+                err != null && data.isEmpty() ->
+                    context.getString(R.string.widget_error)
+                data.isEmpty() ->
+                    context.getString(R.string.widget_loading)
+                else ->
+                    context.getString(R.string.widget_empty_configure)
             }
+            rv.setTextViewText(R.id.timeline_empty_view, emptyText)
 
             mgr.updateAppWidget(appWidgetId, rv)
         }
 
-        fun refreshData(
-            context: Context,
-            mgr: AppWidgetManager,
-            appWidgetIds: IntArray,
-        ) {
+        fun refreshData(context: Context, mgr: AppWidgetManager, appWidgetIds: IntArray) {
             Thread {
-                // Opportunistically sync phone usage before fetching widget data.
-                // (Requires Usage Access; no-op if not granted.)
                 try {
                     PhoneSync.syncToday(context)
                 } catch (_: Exception) {
@@ -83,22 +72,21 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                 val url = WidgetPrefs.getBaseUrl(context)
                 val token = WidgetPrefs.getToken(context)
                 if (url.isEmpty() || token.isEmpty()) {
-                    WidgetGoalsCache.setData(emptyList())
-                    WidgetGoalsCache.setError(null)
+                    TimelineCache.setData(emptyList())
+                    TimelineCache.setError(null)
                 } else {
-                    WidgetApi.fetchGoals(url, token).fold(
-                        onSuccess = { WidgetGoalsCache.setData(it) },
+                    TimelineApi.fetchTimeline(url, token).fold(
+                        onSuccess = { TimelineCache.setData(it) },
                         onFailure = {
-                            WidgetGoalsCache.setData(emptyList())
-                            WidgetGoalsCache.setError(
-                                it.message ?: context.getString(R.string.widget_error),
-                            )
+                            TimelineCache.setData(emptyList())
+                            TimelineCache.setError(it.message)
                         },
                     )
                 }
+
                 Handler(Looper.getMainLooper()).post {
                     for (id in appWidgetIds) {
-                        mgr.notifyAppWidgetViewDataChanged(id, R.id.goals_list)
+                        mgr.notifyAppWidgetViewDataChanged(id, R.id.timeline_list)
                         bindWidget(context, mgr, id)
                     }
                 }
@@ -108,10 +96,11 @@ class GoalsWidgetProvider : AppWidgetProvider() {
         fun updateAllWidgets(context: Context) {
             val mgr = AppWidgetManager.getInstance(context)
             val ids = mgr.getAppWidgetIds(
-                ComponentName(context, GoalsWidgetProvider::class.java),
+                ComponentName(context, TimelineWidgetProvider::class.java),
             )
             if (ids.isEmpty()) return
             refreshData(context, mgr, ids)
         }
     }
 }
+

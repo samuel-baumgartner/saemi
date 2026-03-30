@@ -119,7 +119,7 @@ export function minutesTowardGoal(
 export function unproductiveMinutesToday(sessions: TimeSession[]): number {
   let sum = 0
   for (const s of sessions) {
-    if (s.source !== 'timechecker') continue
+    if (s.source !== 'timechecker' && s.source !== 'phone') continue
     if (!matchesUnproductiveTimechecker(s.activity)) continue
     sum += sessionDurationMinutes(s)
   }
