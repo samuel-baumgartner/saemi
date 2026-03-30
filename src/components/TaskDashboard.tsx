@@ -20,18 +20,18 @@ interface TaskDashboardProps {
 }
 
 export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'goals' | 'timeline' | 'summary'>('goals')
-
-  useEffect(() => {
+  const [activeTab, setActiveTab] = useState<'goals' | 'timeline' | 'summary'>(() => {
+    if (typeof window === 'undefined') return 'goals'
     try {
       const saved = localStorage.getItem('taskDashboard.activeTab')
       if (saved === 'goals' || saved === 'timeline' || saved === 'summary') {
-        setActiveTab(saved)
+        return saved
       }
     } catch {
       // ignore storage failures
     }
-  }, [])
+    return 'goals'
+  })
 
   useEffect(() => {
     try {

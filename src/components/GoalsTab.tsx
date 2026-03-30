@@ -216,7 +216,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
             Loading your goals…
           </div>
         ) : (
-          <div className="flex min-h-[55vh] flex-col justify-between gap-5 sm:min-h-0">
+          <div className="grid min-h-[56vh] grid-cols-1 gap-4 [grid-template-rows:repeat(4,minmax(0,1fr))] sm:min-h-0 sm:gap-5 sm:[grid-template-rows:none]">
             {displayGoals.map((g) => {
               const done = minutesTowardGoal(g.id, todaySessions)
               const pct = Math.min(100, (done / g.targetMinutes) * 100)
@@ -229,7 +229,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
               return (
                 <div
                   key={g.id}
-                  className="bg-white/5 border border-white/10 rounded-lg p-4"
+                  className="bg-white/5 border border-white/10 rounded-lg p-4 h-full flex flex-col"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4 mb-3">
                     <label className="flex-1 min-w-0 block">
@@ -281,7 +281,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
                       )}
                     </span>
                   </div>
-                  <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
+                  <div className="mt-auto h-3 w-full rounded-full bg-white/10 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         met
