@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
-import { getLocalDateString } from '@/lib/dateUtils'
+import { getServerCalendarDateString } from '@/lib/dateUtils'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 
   const rawDate = request.nextUrl.searchParams.get('date')
   const date =
-    rawDate && DATE_RE.test(rawDate) ? rawDate : getLocalDateString(new Date())
+    rawDate && DATE_RE.test(rawDate) ? rawDate : getServerCalendarDateString()
   const limitRaw = request.nextUrl.searchParams.get('limit')
   const limit =
     limitRaw && /^\d{1,3}$/.test(limitRaw) ? Math.min(120, Math.max(5, Number(limitRaw))) : 40

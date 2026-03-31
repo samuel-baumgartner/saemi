@@ -1,6 +1,9 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 
+/** Refresh a few minutes before Google revokes the access token (typ. ~1h). */
+const ACCESS_TOKEN_REFRESH_BUFFER_MS = 5 * 60 * 1000
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
@@ -34,25 +37,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           ...token,
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
-          accessTokenExpires: account.expires_at ? account.expires_at * 1000 : Date.now() + 3600 * 1000,
+          accessTokenExpires: account.expires_at
+            ? account.expires_at * 1000
+            : Date.now() + 3600 * 1000,
+          error: undefined,
         }
       }
 
-      // Return previous token if the access token has not expired yet
-      if (token.accessTokenExpires && Date.now() < (token.accessTokenExpires as number)) {
+      // Still valid (with buffer): reuse JWT without calling Google's token endpoint
+      const expiresAt = token.accessTokenExpires as number | undefined
+      if (
+        token.accessToken &&
+        expiresAt &&
+        Date.now() < expiresAt - ACCESS_TOKEN_REFRESH_BUFFER_MS
+      ) {
         return token
       }
 
-      // Access token has expired, try to refresh it
+      // Expired / near expiry / missing access: refresh (or mark needs re-login)
       return refreshAccessToken(token)
     },
     async session({ session, token }) {
-      // Make access token available in session
-      if (token.accessToken) {
-        session.accessToken = token.accessToken as string
-      }
       if (token.error) {
         session.error = token.error as string
+      } else {
+        session.error = undefined
+      }
+
+      // Never hand a stale access token to the client after refresh failure
+      if (token.error === 'RefreshAccessTokenError') {
+        session.accessToken = undefined
+      } else if (token.accessToken) {
+        session.accessToken = token.accessToken as string
+      } else {
+        session.accessToken = undefined
       }
       return session
     },
@@ -64,45 +82,82 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 })
 
 /**
- * Takes a token, and returns a new token with updated
- * `accessToken` and `accessTokenExpires`. If an error occurs,
- * returns the old token and an error property
+ * Exchange refresh token for a new access token.
+ * On failure, strips credentials so we never keep using an expired access token.
  */
-async function refreshAccessToken(token: any) {
+async function refreshAccessToken(token: Record<string, unknown>) {
+  const refreshToken = token.refreshToken as string | undefined
+  if (!refreshToken) {
+    console.error('❌ No refresh_token on JWT; Google Fit needs a new sign-in')
+    return {
+      ...token,
+      accessToken: undefined,
+      refreshToken: undefined,
+      accessTokenExpires: undefined,
+      error: 'RefreshAccessTokenError',
+    }
+  }
+
   try {
-    const response = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        grant_type: "refresh_token",
-        refresh_token: token.refreshToken,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
       }),
     })
 
-    const refreshedTokens = await response.json()
+    const refreshed = (await response.json()) as {
+      access_token?: string
+      expires_in?: number
+      refresh_token?: string
+      error?: string
+    }
 
     if (!response.ok) {
-      throw refreshedTokens
+      const revoke = refreshed.error === 'invalid_grant'
+      console.error('❌ Google token refresh HTTP error:', response.status, refreshed)
+      return {
+        ...token,
+        accessToken: undefined,
+        refreshToken: revoke ? undefined : refreshToken,
+        accessTokenExpires: undefined,
+        error: 'RefreshAccessTokenError',
+      }
+    }
+
+    if (!refreshed.access_token || typeof refreshed.expires_in !== 'number') {
+      console.error('❌ Google token refresh: missing access_token or expires_in', refreshed)
+      return {
+        ...token,
+        accessToken: undefined,
+        accessTokenExpires: undefined,
+        error: 'RefreshAccessTokenError',
+      }
     }
 
     console.log('✅ Access token refreshed successfully')
 
     return {
       ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+      accessToken: refreshed.access_token,
+      accessTokenExpires: Date.now() + refreshed.expires_in * 1000,
+      refreshToken: refreshed.refresh_token ?? refreshToken,
+      error: undefined,
     }
   } catch (error) {
-    console.error('❌ Error refreshing access token:', error)
-
+    console.error('❌ Error refreshing access token (network?):', error)
+    // Keep refresh_token so a later retry after connectivity returns may succeed
     return {
       ...token,
-      error: "RefreshAccessTokenError",
+      accessToken: undefined,
+      accessTokenExpires: undefined,
+      error: 'RefreshAccessTokenError',
     }
   }
 }

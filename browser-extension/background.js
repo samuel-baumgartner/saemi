@@ -1,6 +1,14 @@
 const LIMIT_ENDPOINT = 'https://www.samuelbaumgartner.ch/api/limits/status';
 const GRACE_MS = 30 * 1000;
 
+function todayYmdLocal() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 const listeningRegex = /(japanese|nihongo|comprehensible|comprehension|jlpt|日本語|listen(ing)?)/i;
 
 /**
@@ -8,14 +16,24 @@ const listeningRegex = /(japanese|nihongo|comprehensible|comprehension|jlpt|日�
  */
 let lastStatus = null;
 let lastStatusAt = 0;
+let lastStatusForDate = '';
 
 async function fetchLimitStatus() {
+  const today = todayYmdLocal();
   const now = Date.now();
-  if (lastStatus && now - lastStatusAt < 10_000) return lastStatus;
-  const res = await fetch(LIMIT_ENDPOINT, { credentials: 'include' });
+  if (
+    lastStatus &&
+    lastStatusForDate === today &&
+    now - lastStatusAt < 10_000
+  ) {
+    return lastStatus;
+  }
+  const url = `${LIMIT_ENDPOINT}?date=${encodeURIComponent(today)}`;
+  const res = await fetch(url, { credentials: 'include' });
   if (!res.ok) throw new Error('limit status ' + res.status);
   const json = await res.json();
   lastStatus = json;
+  lastStatusForDate = today;
   lastStatusAt = now;
   return json;
 }

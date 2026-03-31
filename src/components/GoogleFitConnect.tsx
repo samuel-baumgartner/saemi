@@ -15,6 +15,7 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSync, setLastSync] = useState<Date | null>(null)
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [tokenHint, setTokenHint] = useState<string | null>(null)
 
   useEffect(() => {
     // Check if user has disabled Google Fit
@@ -49,17 +50,28 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
   const handleSync = async () => {
     setIsSyncing(true)
     setSyncStatus('idle')
+    setTokenHint(null)
 
     try {
-      // 🔄 Get a fresh access token from the server
       console.log('🔄 Fetching fresh access token...')
-      const tokenResponse = await fetch('/api/auth/token')
-      
+      const tokenResponse = await fetch('/api/auth/token', {
+        cache: 'no-store',
+      })
+
+      const tokenBody = await tokenResponse.json().catch(() => ({}))
+
       if (!tokenResponse.ok) {
-        throw new Error('Failed to get fresh token')
+        const msg =
+          typeof tokenBody.error === 'string'
+            ? tokenBody.error
+            : 'Failed to get fresh token'
+        if (tokenBody.code === 'NEEDS_REAUTH') {
+          setTokenHint(msg)
+        }
+        throw new Error(msg)
       }
-      
-      const { accessToken: freshToken } = await tokenResponse.json()
+
+      const { accessToken: freshToken } = tokenBody as { accessToken?: string }
       
       if (!freshToken) {
         throw new Error('Not connected - no access token')
@@ -169,7 +181,13 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
   }
 
   return (
-    <div className="bg-black/40 border border-white/10 rounded-lg p-4">
+    <div className="bg-black/40 border border-white/10 rounded-lg p-4 space-y-3">
+      {tokenHint && (
+        <p className="text-sm text-amber-200/90 bg-amber-950/40 border border-amber-500/30 rounded-lg px-3 py-2">
+          {tokenHint} Use <strong className="text-white">Sign out</strong> in the header,
+          then sign in again once. You should not need to do this often after this update.
+        </p>
+      )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-green-500/20 rounded-lg">

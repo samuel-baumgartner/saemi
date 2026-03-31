@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
-import { getLocalDateString } from '@/lib/dateUtils'
+import { getServerCalendarDateString } from '@/lib/dateUtils'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const dateRaw =
     typeof (body as any)?.date === 'string' ? (body as any).date : null
   const date =
-    dateRaw && DATE_RE.test(dateRaw) ? dateRaw : getLocalDateString(new Date())
+    dateRaw && DATE_RE.test(dateRaw) ? dateRaw : getServerCalendarDateString()
 
   const sessions = (body as any)?.sessions as unknown
   if (!Array.isArray(sessions)) {

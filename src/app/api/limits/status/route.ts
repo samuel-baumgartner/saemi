@@ -3,7 +3,7 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { unproductiveMinutesToday } from '@/lib/goalConfig'
 import { TimeSession } from '@/types/task'
-import { getLocalDateString } from '@/lib/dateUtils'
+import { getServerCalendarDateString } from '@/lib/dateUtils'
 
 const DEFAULT_LIMIT_MINUTES = 120
 
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const date =
     rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
       ? rawDate
-      : getLocalDateString(new Date())
+      : getServerCalendarDateString(new Date())
 
   try {
     const rows = await prisma.timeSession.findMany({

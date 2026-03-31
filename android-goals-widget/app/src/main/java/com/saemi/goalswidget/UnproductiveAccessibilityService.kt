@@ -26,7 +26,10 @@ class UnproductiveAccessibilityService : AccessibilityService() {
         val isTarget = youtubePackages.contains(pkg) || instagramPackages.contains(pkg)
         if (!isTarget) return
 
-        // TODO: optionally poll /api/limits/status and gate by isOverLimit.
+        if (!WidgetPrefs.isConfigured(this)) return
+        val overLimit = LimitStatusCache.shouldBlockNow(this)
+        if (!overLimit) return
+
         launchBlocker()
     }
 

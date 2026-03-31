@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
-import { getLocalDateString } from '@/lib/dateUtils'
+import { getServerCalendarDateString } from '@/lib/dateUtils'
 import { minutesTowardGoal, normalizeStoredGoals } from '@/lib/goalConfig'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
 
   const rawDate = request.nextUrl.searchParams.get('date')
   const date =
-    rawDate && DATE_RE.test(rawDate) ? rawDate : getLocalDateString(new Date())
+    rawDate && DATE_RE.test(rawDate) ? rawDate : getServerCalendarDateString()
 
   try {
     const [goalRow, rows] = await Promise.all([

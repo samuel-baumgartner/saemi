@@ -9,7 +9,7 @@ import {
   minutesTowardGoal,
   unproductiveMinutesToday,
 } from '@/lib/goalConfig'
-import { AlertTriangle, Loader2, RotateCcw, Save } from 'lucide-react'
+import { Loader2, RotateCcw, Save } from 'lucide-react'
 
 interface GoalsTabProps {
   sessions: TimeSession[]
@@ -144,31 +144,13 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
   }
 
   const unproductive = unproductiveMinutesToday(todaySessions)
+  const unproductiveTarget = 120
+  const unproductivePct = Math.min(100, (unproductive / unproductiveTarget) * 100)
+  const unproductiveFmt = formatDoneTarget(unproductive, unproductiveTarget)
+  const unproductiveOver = unproductive >= unproductiveTarget
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border-2 border-amber-500/60 bg-amber-950/40 px-5 py-4 shadow-[0_0_24px_rgba(245,158,11,0.12)]">
-        <div className="flex items-start gap-3">
-          <AlertTriangle
-            className="w-8 h-8 shrink-0 text-amber-400 mt-0.5"
-            aria-hidden
-          />
-          <div>
-            <h2 className="text-lg font-bold text-amber-100 tracking-tight">
-              Unproductive time today
-            </h2>
-            <p className="mt-1 text-3xl font-bold tabular-nums text-amber-50">
-              {unproductive} min
-            </p>
-            <p className="mt-2 text-sm text-amber-200/80 max-w-xl">
-              TimeChecker activities marked as not productive (or distracted).
-              Hold yourself accountable — this total resets at midnight local
-              time.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div>
@@ -216,7 +198,46 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
             Loading your goals…
           </div>
         ) : (
-          <div className="grid min-h-[calc(100dvh-24rem)] grid-cols-1 gap-4 [grid-template-rows:repeat(4,minmax(0,1fr))] sm:min-h-0 sm:gap-5 sm:[grid-template-rows:none]">
+          <div
+            className="grid min-h-[calc(100dvh-24rem)] grid-cols-1 gap-4 sm:min-h-0 sm:gap-5 sm:[grid-template-rows:none]"
+            style={{ gridTemplateRows: `repeat(${displayGoals.length + 1}, minmax(0,1fr))` }}
+          >
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 h-full flex flex-col">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4 mb-3">
+                <div className="flex-1 min-w-0 block">
+                  <span className="text-xs text-white/45 block mb-1">Label</span>
+                  <div className="w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-white text-sm">
+                    Unproductive
+                  </div>
+                </div>
+                <div className="w-full sm:w-36 shrink-0 block">
+                  <span className="text-xs text-white/45 block mb-1">
+                    Target (min/day)
+                  </span>
+                  <div className="w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-white text-sm tabular-nums">
+                    {unproductiveTarget}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end mb-2">
+                <span className="text-sm text-red-300 tabular-nums">
+                  {unproductiveFmt.doneStr}
+                  <span className="text-red-400/70"> / </span>
+                  {unproductiveFmt.targetStr}
+                  {unproductiveOver && (
+                    <span className="ml-2 text-red-400 font-medium">
+                      (+{unproductive - unproductiveTarget} min over)
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="mt-auto h-3 w-full rounded-full bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-red-500 to-rose-500"
+                  style={{ width: `${unproductivePct}%` }}
+                />
+              </div>
+            </div>
             {displayGoals.map((g) => {
               const done = minutesTowardGoal(g.id, todaySessions)
               const pct = Math.min(100, (done / g.targetMinutes) * 100)

@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
-import {
-  minutesTowardGoal,
-  normalizeStoredGoals,
-} from '@/lib/goalConfig'
 import type { TimeSession } from '@/types/task'
+import { unproductiveMinutesToday } from '@/lib/goalConfig'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
 
-function formatProgressLabel(done: number, target: number) {
-  const h = Math.floor(done / 60)
-  const m = done % 60
-  const doneStr = h > 0 ? `${h}h ${m}m` : `${m} min`
-  const tH = Math.floor(target / 60)
-  const tM = target % 60
-  const targetStr =
-    tH > 0 ? `${tH}h${tM > 0 ? ` ${tM}m` : ''}`.trim() : `${target} min`
-  return `${doneStr} / ${targetStr}`
-}
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+const DEFAULT_LIMIT_MINUTES = 120
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -30,8 +19,6 @@ function parseBearerToken(header: string | null): string | null {
   const t = header.slice(7).trim()
   return t.length > 0 ? t : null
 }
-
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
 function toTimeSession(row: {
   id: string
@@ -53,17 +40,9 @@ function toTimeSession(row: {
   }
 }
 
-/**
- * Read-only daily goals + today's progress for the Android home screen widget.
- * Auth: Authorization: Bearer <WIDGET_API_TOKEN>
- * Server env: WIDGET_API_TOKEN, WIDGET_USER_ID (same as Prisma userId / sign-in email)
- *
- * Query: ?date=YYYY-MM-DD (optional; if omitted, uses CALENDAR_TIMEZONE on server, default Asia/Tokyo)
- */
 export async function GET(request: NextRequest) {
   const expected = process.env.WIDGET_API_TOKEN?.trim()
   const userId = process.env.WIDGET_USER_ID?.trim()
-
   if (!expected || !userId) {
     return NextResponse.json(
       { error: 'Widget API is not configured on the server' },
@@ -83,38 +62,28 @@ export async function GET(request: NextRequest) {
       : getServerCalendarDateString(new Date())
 
   try {
-    const [goalRow, sessionRows] = await Promise.all([
-      prisma.userGoalSettings.findUnique({ where: { userId } }),
-      prisma.timeSession.findMany({
-        where: { userId, date },
-        orderBy: { startTime: 'asc' },
-      }),
-    ])
-
-    const goals = normalizeStoredGoals(goalRow?.goalsJson ?? null)
-    const sessions = sessionRows.map(toTimeSession)
-
-    const items = goals.map((g) => {
-      const done = minutesTowardGoal(g.id, sessions)
-      const pct = Math.min(100, Math.round((done / g.targetMinutes) * 100))
-      const met = done >= g.targetMinutes
-      return {
-        id: g.id,
-        label: g.label,
-        targetMinutes: g.targetMinutes,
-        doneMinutes: done,
-        progressPercent: pct,
-        progressLabel: formatProgressLabel(done, g.targetMinutes),
-        met,
-      }
+    const rows = await prisma.timeSession.findMany({
+      where: { userId, date },
+      orderBy: { startTime: 'asc' },
     })
+    const sessions = rows.map(toTimeSession)
+    const minutes = unproductiveMinutesToday(sessions)
+    const limitMinutes = DEFAULT_LIMIT_MINUTES
+    const isOverLimit = minutes >= limitMinutes
 
-    return NextResponse.json({ date, items })
+    return NextResponse.json({
+      date,
+      unproductiveMinutes: minutes,
+      limitMinutes,
+      isOverLimit,
+      remainingMinutes: Math.max(0, limitMinutes - minutes),
+    })
   } catch (e) {
-    console.error('GET /api/widget/daily-goals', e)
+    console.error('GET /api/widget/limits-status', e)
     return NextResponse.json(
-      { error: 'Failed to load widget data' },
+      { error: 'Failed to load limit status' },
       { status: 500 }
     )
   }
 }
+
