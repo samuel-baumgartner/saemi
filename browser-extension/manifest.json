@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Saemi Unproductive Limit",
+  "version": "0.1.0",
+  "description": "Blocks YouTube/Instagram after 2h unproductive time using Saemi limits endpoint.",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.instagram.com/*",
+    "*://samuelbaumgartner.ch/*",
+    "*://www.samuelbaumgartner.ch/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "128": "icon128.png"
+  }
+}

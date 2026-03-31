@@ -6,4 +6,9 @@
         <item name="android:windowBackground">@color/configure_bg</item>
     </style>
     <style name="Theme.SaemiGoalsWidget.Configure" parent="Theme.SaemiGoalsWidget" />
+
+    <style name="Theme.SaemiGoalsWidget.Blocker" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
 </resources>

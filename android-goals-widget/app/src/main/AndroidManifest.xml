@@ -48,5 +48,26 @@
             android:name=".GoalsRemoteViewsService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".UnproductiveAccessibilityService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/unproductive_accessibility_config" />
+        </service>
+
+        <activity
+            android:name=".UnproductiveBlockerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SaemiGoalsWidget.Blocker"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleTask" />
     </application>
 </manifest>
