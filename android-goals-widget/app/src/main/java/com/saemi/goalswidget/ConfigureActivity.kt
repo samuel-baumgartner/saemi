@@ -39,6 +39,15 @@ class ConfigureActivity : Activity() {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
 
+        findViewById<Button>(R.id.btn_listening_grace).setOnClickListener {
+            ListeningGracePrefs.startGrace(this)
+            Toast.makeText(
+                this,
+                getString(R.string.listening_grace_toast),
+                Toast.LENGTH_LONG,
+            ).show()
+        }
+
         val ui = Handler(Looper.getMainLooper())
         fun detectInto(target: EditText, button: Button) {
             if (!UsageAccess.hasUsageAccess(this)) {

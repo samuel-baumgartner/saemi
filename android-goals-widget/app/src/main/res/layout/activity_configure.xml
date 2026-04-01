@@ -73,6 +73,31 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingBottom="6dp"
+            android:text="@string/listening_grace_title"
+            android:textColor="@color/widget_text"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/blocker_hint"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_listening_grace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/listening_grace_button" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:paddingBottom="8dp"
             android:text="@string/usage_access"

@@ -8,8 +8,19 @@ import android.view.accessibility.AccessibilityEvent
 
 class UnproductiveAccessibilityService : AccessibilityService() {
 
-    private val youtubePackages = setOf("com.google.android.youtube")
-    private val instagramPackages = setOf("com.instagram.android")
+    private fun youtubePackages(): Set<String> {
+        val set = linkedSetOf("com.google.android.youtube")
+        val custom = WidgetPrefs.getYoutubePackage(this).trim()
+        if (custom.isNotEmpty()) set.add(custom)
+        return set
+    }
+
+    private fun instagramPackages(): Set<String> {
+        val set = linkedSetOf("com.instagram.android")
+        val custom = WidgetPrefs.getInstagramPackage(this).trim()
+        if (custom.isNotEmpty()) set.add(custom)
+        return set
+    }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -23,12 +34,18 @@ class UnproductiveAccessibilityService : AccessibilityService() {
         if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
 
-        val isTarget = youtubePackages.contains(pkg) || instagramPackages.contains(pkg)
-        if (!isTarget) return
+        val yt = youtubePackages()
+        val ig = instagramPackages()
+        val isYoutube = yt.contains(pkg)
+        val isInstagram = ig.contains(pkg)
+        if (!isYoutube && !isInstagram) return
 
         if (!WidgetPrefs.isConfigured(this)) return
         val overLimit = LimitStatusCache.shouldBlockNow(this)
         if (!overLimit) return
+
+        // Match laptop extension: allow short YouTube window for listening after user taps grace in Saemi.
+        if (isYoutube && ListeningGracePrefs.isActive(this)) return
 
         launchBlocker()
     }

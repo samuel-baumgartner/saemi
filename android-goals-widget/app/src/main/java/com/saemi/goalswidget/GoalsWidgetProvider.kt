@@ -52,6 +52,8 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                 } catch (_: Exception) {
                 }
 
+                LimitStatusCache.prefetch(context)
+
                 val url = WidgetPrefs.getBaseUrl(context)
                 val token = WidgetPrefs.getToken(context)
                 if (url.isEmpty() || token.isEmpty()) {

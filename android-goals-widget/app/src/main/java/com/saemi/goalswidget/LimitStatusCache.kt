@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 object LimitStatusCache {
-    private const val REFRESH_MS = 2 * 60 * 1000L
+    private const val REFRESH_MS = 90 * 1000L
 
     @Volatile private var lastFetchedAtMs: Long = 0L
     @Volatile private var lastKnownOverLimit: Boolean = false
@@ -17,6 +17,40 @@ object LimitStatusCache {
     fun shouldBlockNow(context: Context): Boolean {
         refreshIfStaleAsync(context)
         return lastKnownOverLimit
+    }
+
+    /** Called from widget refresh so limit state stays aligned with the server without opening YouTube. */
+    fun prefetch(context: Context) {
+        val app = context.applicationContext
+        if (!WidgetPrefs.isConfigured(app)) return
+        io.execute {
+            if (!refreshing.compareAndSet(false, true)) return@execute
+            try {
+                applyFetchResult(
+                    LimitStatusApi.fetchStatus(
+                        WidgetPrefs.getBaseUrl(app),
+                        WidgetPrefs.getToken(app),
+                    ),
+                )
+            } finally {
+                refreshing.set(false)
+            }
+        }
+    }
+
+    private fun applyFetchResult(result: Result<LimitStatus>) {
+        if (result.isSuccess) {
+            val s = result.getOrNull()
+            if (s != null) {
+                lastKnownOverLimit = s.isOverLimit
+                lastKnownDate = s.date
+            } else {
+                lastKnownOverLimit = false
+            }
+        } else {
+            lastKnownOverLimit = false
+        }
+        lastFetchedAtMs = System.currentTimeMillis()
     }
 
     private fun refreshIfStaleAsync(context: Context) {
@@ -35,20 +69,7 @@ object LimitStatusCache {
                     return@execute
                 }
 
-                val result = LimitStatusApi.fetchStatus(baseUrl, token)
-                if (result.isSuccess) {
-                    val s = result.getOrNull()
-                    if (s != null) {
-                        lastKnownOverLimit = s.isOverLimit
-                        lastKnownDate = s.date
-                    } else {
-                        lastKnownOverLimit = false
-                    }
-                } else {
-                    // On any failure (e.g. offline), treat as not over limit.
-                    lastKnownOverLimit = false
-                }
-                lastFetchedAtMs = System.currentTimeMillis()
+                applyFetchResult(LimitStatusApi.fetchStatus(baseUrl, token))
             } finally {
                 refreshing.set(false)
             }

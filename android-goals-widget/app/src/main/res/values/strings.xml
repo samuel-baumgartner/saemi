@@ -20,4 +20,9 @@
     <string name="widget_empty_configure">Open Saemi Goals to set URL and token, then tap Refresh.</string>
     <string name="widget_error">Could not load goals. Tap Refresh.</string>
     <string name="widget_loading">Loading…</string>
+
+    <string name="listening_grace_title">Unproductive limit (Accessibility)</string>
+    <string name="listening_grace_button">Allow YouTube 30s (listening)</string>
+    <string name="listening_grace_toast">YouTube allowed for 30 seconds. Open the YouTube app now.</string>
+    <string name="blocker_hint">The blocker watches the YouTube and Instagram apps only (not Chrome). If YouTube works on your laptop browser but feels blocked on the phone, use this button before opening the YouTube app, or watch in Chrome (not covered by the app blocker).</string>
 </resources>
