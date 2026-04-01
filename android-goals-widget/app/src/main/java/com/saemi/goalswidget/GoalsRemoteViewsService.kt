@@ -40,7 +40,6 @@ private class GoalsRemoteViewsFactory(
             R.id.goal_progress_red,
             R.id.goal_progress_met,
             R.id.goal_progress_open,
-            R.id.goal_progress_label,
         )
         return rv
     }

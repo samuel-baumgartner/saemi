@@ -5,8 +5,6 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 object LimitStatusCache {
-    private const val REFRESH_MS = 90 * 1000L
-
     @Volatile private var lastFetchedAtMs: Long = 0L
     @Volatile private var lastKnownOverLimit: Boolean = false
     @Volatile private var lastKnownDate: String = ""
@@ -14,8 +12,19 @@ object LimitStatusCache {
     private val refreshing = AtomicBoolean(false)
     private val io = Executors.newSingleThreadExecutor()
 
-    fun shouldBlockNow(context: Context): Boolean {
-        refreshIfStaleAsync(context)
+    /**
+     * Synchronous fetch for the accessibility blocker (call only from a background thread).
+     * Always hits the network; updates cache; returns whether the user is over unproductive budget.
+     */
+    fun refreshForBlocker(context: Context): Boolean {
+        val app = context.applicationContext
+        val baseUrl = WidgetPrefs.getBaseUrl(app)
+        val token = WidgetPrefs.getToken(app)
+        if (baseUrl.isBlank() || token.isBlank()) {
+            return false
+        }
+        val result = LimitStatusApi.fetchStatus(baseUrl, token)
+        applyFetchResult(result)
         return lastKnownOverLimit
     }
 
@@ -51,29 +60,6 @@ object LimitStatusCache {
             lastKnownOverLimit = false
         }
         lastFetchedAtMs = System.currentTimeMillis()
-    }
-
-    private fun refreshIfStaleAsync(context: Context) {
-        val now = System.currentTimeMillis()
-        if (now - lastFetchedAtMs < REFRESH_MS) return
-        if (!refreshing.compareAndSet(false, true)) return
-
-        val app = context.applicationContext
-        io.execute {
-            try {
-                val baseUrl = WidgetPrefs.getBaseUrl(app)
-                val token = WidgetPrefs.getToken(app)
-                if (baseUrl.isBlank() || token.isBlank()) {
-                    lastKnownOverLimit = false
-                    lastFetchedAtMs = System.currentTimeMillis()
-                    return@execute
-                }
-
-                applyFetchResult(LimitStatusApi.fetchStatus(baseUrl, token))
-            } finally {
-                refreshing.set(false)
-            }
-        }
     }
 }
 

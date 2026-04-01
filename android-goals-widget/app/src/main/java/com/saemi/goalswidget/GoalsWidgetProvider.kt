@@ -82,17 +82,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                         val data = WidgetGoalsCache.snapshot()
 
                         val showEmpty = !configured || data.isEmpty()
-                        rv.setViewVisibility(
-                            R.id.widget_header,
-                            if (showEmpty) View.GONE else View.VISIBLE,
-                        )
-                        if (!showEmpty) {
-                            val d = WidgetGoalsCache.responseDate() ?: ""
-                            rv.setTextViewText(
-                                R.id.widget_subtitle,
-                                context.getString(R.string.widget_subtitle, d),
-                            )
-                        }
 
                         for (i in slotIds.indices) {
                             rv.setViewVisibility(
@@ -116,11 +105,10 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                         fun bindSlot(
                             idx: Int,
                             labelId: Int,
-                            targetId: Int,
+                            summaryId: Int,
                             progressRedId: Int,
                             progressMetId: Int,
                             progressOpenId: Int,
-                            progressLabelId: Int,
                         ) {
                             val item = data.getOrNull(idx) ?: return
                             WidgetGoalBinder.bindRow(
@@ -128,11 +116,10 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                                 rv,
                                 item,
                                 labelId,
-                                targetId,
+                                summaryId,
                                 progressRedId,
                                 progressMetId,
                                 progressOpenId,
-                                progressLabelId,
                             )
                         }
 
@@ -143,7 +130,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                             R.id.goal_progress_1_red,
                             R.id.goal_progress_1_met,
                             R.id.goal_progress_1_open,
-                            R.id.goal_progress_label_1,
                         )
                         bindSlot(
                             1,
@@ -152,7 +138,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                             R.id.goal_progress_2_red,
                             R.id.goal_progress_2_met,
                             R.id.goal_progress_2_open,
-                            R.id.goal_progress_label_2,
                         )
                         bindSlot(
                             2,
@@ -161,7 +146,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                             R.id.goal_progress_3_red,
                             R.id.goal_progress_3_met,
                             R.id.goal_progress_3_open,
-                            R.id.goal_progress_label_3,
                         )
                         bindSlot(
                             3,
@@ -170,7 +154,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                             R.id.goal_progress_4_red,
                             R.id.goal_progress_4_met,
                             R.id.goal_progress_4_open,
-                            R.id.goal_progress_label_4,
                         )
                         bindSlot(
                             4,
@@ -179,7 +162,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                             R.id.goal_progress_5_red,
                             R.id.goal_progress_5_met,
                             R.id.goal_progress_5_open,
-                            R.id.goal_progress_label_5,
                         )
 
                         mgr.updateAppWidget(id, rv)

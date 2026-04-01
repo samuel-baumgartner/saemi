@@ -7,76 +7,35 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/goal_label_5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/widget_text"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/widget_caption_label"
-                android:textColor="@color/widget_caption"
-                android:textSize="11sp" />
-
-            <TextView
-                android:id="@+id/goal_label_5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/widget_field_bg"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="8dp"
-                android:textColor="@color/widget_text"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="88dp"
+        <TextView
+            android:id="@+id/goal_target_5"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="2"
-                android:text="@string/widget_caption_target"
-                android:textColor="@color/widget_caption"
-                android:textSize="10sp" />
-
-            <TextView
-                android:id="@+id/goal_target_5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/widget_field_bg"
-                android:gravity="end"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="8dp"
-                android:textColor="@color/widget_text"
-                android:textSize="14sp" />
-        </LinearLayout>
+            android:layout_marginStart="8dp"
+            android:gravity="end"
+            android:maxLines="2"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/goal_progress_label_5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="end"
-        android:textColor="@color/widget_muted"
-        android:textSize="13sp" />
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="12dp"
-        android:layout_marginTop="6dp">
+        android:layout_height="14dp"
+        android:layout_marginTop="8dp">
 
         <ProgressBar
             android:id="@+id/goal_progress_5_red"

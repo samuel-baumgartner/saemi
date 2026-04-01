@@ -6,33 +6,34 @@ import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
 
 object WidgetGoalBinder {
+    /**
+     * [summaryId] shows read-only progress text (e.g. "1h 4m / 2h"), not an editable target.
+     */
     fun bindRow(
         context: Context,
         rv: RemoteViews,
         item: WidgetGoalLine,
         labelId: Int,
-        targetId: Int,
+        summaryId: Int,
         progressRedId: Int,
         progressMetId: Int,
         progressOpenId: Int,
-        progressLabelId: Int,
     ) {
         rv.setTextViewText(labelId, item.label)
-        rv.setTextViewText(targetId, item.targetMinutes.toString())
+        rv.setTextViewText(summaryId, item.progressLabel)
         rv.setProgressBar(progressRedId, 100, item.progressPercent, false)
         rv.setProgressBar(progressMetId, 100, item.progressPercent, false)
         rv.setProgressBar(progressOpenId, 100, item.progressPercent, false)
-        rv.setTextViewText(progressLabelId, item.progressLabel)
 
         val unproductive = item.id == "unproductive"
-        val labelColor = when {
+        val summaryColor = when {
             unproductive -> ContextCompat.getColor(
                 context,
                 R.color.widget_progress_label_unproductive,
             )
             else -> ContextCompat.getColor(context, R.color.widget_muted)
         }
-        rv.setTextColor(progressLabelId, labelColor)
+        rv.setTextColor(summaryId, summaryColor)
 
         rv.setViewVisibility(
             progressRedId,

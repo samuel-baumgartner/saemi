@@ -4,9 +4,15 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
+import java.util.concurrent.Executors
 
 class UnproductiveAccessibilityService : AccessibilityService() {
+
+    private val worker = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     private fun youtubePackages(): Set<String> {
         val set = linkedSetOf("com.google.android.youtube")
@@ -41,13 +47,22 @@ class UnproductiveAccessibilityService : AccessibilityService() {
         if (!isYoutube && !isInstagram) return
 
         if (!WidgetPrefs.isConfigured(this)) return
-        val overLimit = LimitStatusCache.shouldBlockNow(this)
-        if (!overLimit) return
 
-        // Match laptop extension: allow short YouTube window for listening after user taps grace in Saemi.
-        if (isYoutube && ListeningGracePrefs.isActive(this)) return
+        worker.execute {
+            val overLimit = LimitStatusCache.refreshForBlocker(this)
+            if (!overLimit) return@execute
 
-        launchBlocker()
+            if (isYoutube && ListeningGracePrefs.isActive(this)) return@execute
+
+            if (UsageAccess.hasUsageAccess(this)) {
+                val fg = ForegroundApp.getCurrentForegroundPackage(this, 8_000L)
+                val stillTarget =
+                    fg != null && (yt.contains(fg) || ig.contains(fg))
+                if (!stillTarget) return@execute
+            }
+
+            mainHandler.post { launchBlocker() }
+        }
     }
 
     private fun launchBlocker() {
@@ -55,7 +70,7 @@ class UnproductiveAccessibilityService : AccessibilityService() {
             addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
             )
         }
         startActivity(intent)
@@ -67,5 +82,9 @@ class UnproductiveAccessibilityService : AccessibilityService() {
     override fun onInterrupt() {
         // no-op
     }
-}
 
+    override fun onDestroy() {
+        worker.shutdownNow()
+        super.onDestroy()
+    }
+}
