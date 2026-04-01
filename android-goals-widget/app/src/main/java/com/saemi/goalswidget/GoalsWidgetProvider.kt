@@ -4,9 +4,9 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.RemoteViews
 
 class GoalsWidgetProvider : AppWidgetProvider() {
@@ -34,6 +34,14 @@ class GoalsWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
+        private val slotIds = intArrayOf(
+            R.id.goal_slot_1,
+            R.id.goal_slot_2,
+            R.id.goal_slot_3,
+            R.id.goal_slot_4,
+            R.id.goal_slot_5,
+        )
+
         fun bindWidget(context: Context, mgr: AppWidgetManager, appWidgetId: Int) {
             val rv = RemoteViews(context.packageName, R.layout.widget_goals_static)
             mgr.updateAppWidget(appWidgetId, rv)
@@ -45,8 +53,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
             appWidgetIds: IntArray,
         ) {
             Thread {
-                // Opportunistically sync phone usage before fetching widget data.
-                // (Requires Usage Access; no-op if not granted.)
                 try {
                     PhoneSync.syncToday(context)
                 } catch (_: Exception) {
@@ -57,13 +63,11 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                 val url = WidgetPrefs.getBaseUrl(context)
                 val token = WidgetPrefs.getToken(context)
                 if (url.isEmpty() || token.isEmpty()) {
-                    WidgetGoalsCache.setData(emptyList())
-                    WidgetGoalsCache.setError(null)
+                    WidgetGoalsCache.clearPayload()
                 } else {
                     WidgetApi.fetchGoals(url, token).fold(
-                        onSuccess = { WidgetGoalsCache.setData(it) },
+                        onSuccess = { WidgetGoalsCache.setData(it.date, it.items) },
                         onFailure = {
-                            WidgetGoalsCache.setData(emptyList())
                             WidgetGoalsCache.setError(
                                 it.message ?: context.getString(R.string.widget_error),
                             )
@@ -78,11 +82,29 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                         val data = WidgetGoalsCache.snapshot()
 
                         val showEmpty = !configured || data.isEmpty()
-                        rv.setViewVisibility(R.id.empty_view, if (showEmpty) android.view.View.VISIBLE else android.view.View.GONE)
-                        rv.setViewVisibility(R.id.goal_slot_1, if (showEmpty) android.view.View.GONE else android.view.View.VISIBLE)
-                        rv.setViewVisibility(R.id.goal_slot_2, if (showEmpty) android.view.View.GONE else android.view.View.VISIBLE)
-                        rv.setViewVisibility(R.id.goal_slot_3, if (showEmpty) android.view.View.GONE else android.view.View.VISIBLE)
-                        rv.setViewVisibility(R.id.goal_slot_4, if (showEmpty) android.view.View.GONE else android.view.View.VISIBLE)
+                        rv.setViewVisibility(
+                            R.id.widget_header,
+                            if (showEmpty) View.GONE else View.VISIBLE,
+                        )
+                        if (!showEmpty) {
+                            val d = WidgetGoalsCache.responseDate() ?: ""
+                            rv.setTextViewText(
+                                R.id.widget_subtitle,
+                                context.getString(R.string.widget_subtitle, d),
+                            )
+                        }
+
+                        for (i in slotIds.indices) {
+                            rv.setViewVisibility(
+                                slotIds[i],
+                                if (!showEmpty && i < data.size) View.VISIBLE else View.GONE,
+                            )
+                        }
+
+                        rv.setViewVisibility(
+                            R.id.empty_view,
+                            if (showEmpty) View.VISIBLE else View.GONE,
+                        )
 
                         val emptyText = when {
                             !configured -> context.getString(R.string.widget_empty_configure)
@@ -95,20 +117,70 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                             idx: Int,
                             labelId: Int,
                             targetId: Int,
-                            progressId: Int,
+                            progressRedId: Int,
+                            progressMetId: Int,
+                            progressOpenId: Int,
                             progressLabelId: Int,
                         ) {
                             val item = data.getOrNull(idx) ?: return
-                            rv.setTextViewText(labelId, item.label)
-                            rv.setTextViewText(targetId, item.targetMinutes.toString())
-                            rv.setProgressBar(progressId, 100, item.progressPercent, false)
-                            rv.setTextViewText(progressLabelId, item.progressLabel)
+                            WidgetGoalBinder.bindRow(
+                                context,
+                                rv,
+                                item,
+                                labelId,
+                                targetId,
+                                progressRedId,
+                                progressMetId,
+                                progressOpenId,
+                                progressLabelId,
+                            )
                         }
 
-                        bindSlot(0, R.id.goal_label_1, R.id.goal_target_1, R.id.goal_progress_1, R.id.goal_progress_label_1)
-                        bindSlot(1, R.id.goal_label_2, R.id.goal_target_2, R.id.goal_progress_2, R.id.goal_progress_label_2)
-                        bindSlot(2, R.id.goal_label_3, R.id.goal_target_3, R.id.goal_progress_3, R.id.goal_progress_label_3)
-                        bindSlot(3, R.id.goal_label_4, R.id.goal_target_4, R.id.goal_progress_4, R.id.goal_progress_label_4)
+                        bindSlot(
+                            0,
+                            R.id.goal_label_1,
+                            R.id.goal_target_1,
+                            R.id.goal_progress_1_red,
+                            R.id.goal_progress_1_met,
+                            R.id.goal_progress_1_open,
+                            R.id.goal_progress_label_1,
+                        )
+                        bindSlot(
+                            1,
+                            R.id.goal_label_2,
+                            R.id.goal_target_2,
+                            R.id.goal_progress_2_red,
+                            R.id.goal_progress_2_met,
+                            R.id.goal_progress_2_open,
+                            R.id.goal_progress_label_2,
+                        )
+                        bindSlot(
+                            2,
+                            R.id.goal_label_3,
+                            R.id.goal_target_3,
+                            R.id.goal_progress_3_red,
+                            R.id.goal_progress_3_met,
+                            R.id.goal_progress_3_open,
+                            R.id.goal_progress_label_3,
+                        )
+                        bindSlot(
+                            3,
+                            R.id.goal_label_4,
+                            R.id.goal_target_4,
+                            R.id.goal_progress_4_red,
+                            R.id.goal_progress_4_met,
+                            R.id.goal_progress_4_open,
+                            R.id.goal_progress_label_4,
+                        )
+                        bindSlot(
+                            4,
+                            R.id.goal_label_5,
+                            R.id.goal_target_5,
+                            R.id.goal_progress_5_red,
+                            R.id.goal_progress_5_met,
+                            R.id.goal_progress_5_open,
+                            R.id.goal_progress_label_5,
+                        )
 
                         mgr.updateAppWidget(id, rv)
                     }

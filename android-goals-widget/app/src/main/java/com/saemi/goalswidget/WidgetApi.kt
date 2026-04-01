@@ -13,7 +13,12 @@ object WidgetApi {
         timeZone = TimeZone.getDefault()
     }
 
-    fun fetchGoals(baseUrl: String, token: String): Result<List<WidgetGoalLine>> {
+    data class GoalsPayload(
+        val date: String,
+        val items: List<WidgetGoalLine>,
+    )
+
+    fun fetchGoals(baseUrl: String, token: String): Result<GoalsPayload> {
         val date = dateFmt.format(Date())
         var url = URL(
             "${baseUrl.trim().trimEnd('/')}/api/widget/daily-goals?date=$date",
@@ -50,20 +55,23 @@ object WidgetApi {
                 if (json.has("error") && json.optString("error").isNotEmpty()) {
                     return Result.failure(Exception(json.optString("error")))
                 }
+                val responseDate = json.optString("date").ifEmpty { date }
                 val arr = json.getJSONArray("items")
                 val out = ArrayList<WidgetGoalLine>(arr.length())
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
                     out.add(
                         WidgetGoalLine(
+                            id = o.optString("id", ""),
                             label = o.getString("label"),
                             targetMinutes = o.getInt("targetMinutes"),
                             progressPercent = o.getInt("progressPercent").coerceIn(0, 100),
                             progressLabel = o.getString("progressLabel"),
+                            met = o.optBoolean("met", false),
                         ),
                     )
                 }
-                return Result.success(out)
+                return Result.success(GoalsPayload(responseDate, out))
             }
             Result.failure(Exception("Too many redirects"))
         } catch (e: Exception) {

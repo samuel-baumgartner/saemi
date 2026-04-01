@@ -23,7 +23,7 @@
                 android:textSize="11sp" />
 
             <TextView
-                android:id="@+id/goal_label_1"
+                android:id="@+id/goal_label_5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -51,7 +51,7 @@
                 android:textSize="10sp" />
 
             <TextView
-                android:id="@+id/goal_target_1"
+                android:id="@+id/goal_target_5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -65,7 +65,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/goal_progress_label_1"
+        android:id="@+id/goal_progress_label_5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -79,7 +79,7 @@
         android:layout_marginTop="6dp">
 
         <ProgressBar
-            android:id="@+id/goal_progress_1_red"
+            android:id="@+id/goal_progress_5_red"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -88,7 +88,7 @@
             android:visibility="gone" />
 
         <ProgressBar
-            android:id="@+id/goal_progress_1_met"
+            android:id="@+id/goal_progress_5_met"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -97,7 +97,7 @@
             android:visibility="gone" />
 
         <ProgressBar
-            android:id="@+id/goal_progress_1_open"
+            android:id="@+id/goal_progress_5_open"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

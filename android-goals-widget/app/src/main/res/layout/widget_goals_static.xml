@@ -6,6 +6,31 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <LinearLayout
+        android:id="@+id/widget_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/widget_title"
+            android:textColor="@color/widget_text"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/widget_muted"
+            android:textSize="13sp" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
@@ -20,12 +45,13 @@
         android:id="@+id/goal_slot_1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginTop="0dp"
+        android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp">
+        android:paddingVertical="12dp"
+        android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_1" />
     </LinearLayout>
@@ -34,12 +60,13 @@
         android:id="@+id/goal_slot_2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginTop="8dp"
+        android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp">
+        android:paddingVertical="12dp"
+        android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_2" />
     </LinearLayout>
@@ -48,12 +75,13 @@
         android:id="@+id/goal_slot_3"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginTop="8dp"
+        android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp">
+        android:paddingVertical="12dp"
+        android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_3" />
     </LinearLayout>
@@ -62,14 +90,29 @@
         android:id="@+id/goal_slot_4"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginTop="8dp"
+        android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp">
+        android:paddingVertical="12dp"
+        android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_4" />
     </LinearLayout>
-</LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/goal_slot_5"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:background="@drawable/widget_card_bg"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="12dp"
+        android:visibility="gone">
+
+        <include layout="@layout/widget_goal_row_content_5" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="widget_bg">#FF121212</color>
-    <color name="widget_card">#FF2A2A2A</color>
+    <color name="widget_bg">#FF000000</color>
+    <color name="widget_card">#FF1A1A1A</color>
+    <color name="widget_card_fill">#0DFFFFFF</color>
+    <color name="widget_card_stroke">#1AFFFFFF</color>
     <color name="widget_text">#FFFFFFFF</color>
     <color name="widget_muted">#B3FFFFFF</color>
-    <color name="widget_track">#33FFFFFF</color>
+    <color name="widget_caption">#73FFFFFF</color>
+    <color name="widget_track">#1AFFFFFF</color>
+    <color name="widget_progress_label_unproductive">#FCA5A5</color>
     <color name="configure_bg">#FF121212</color>
 </resources>

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import {
   minutesTowardGoal,
   normalizeStoredGoals,
+  unproductiveMinutesToday,
 } from '@/lib/goalConfig'
 import type { TimeSession } from '@/types/task'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
@@ -94,7 +95,28 @@ export async function GET(request: NextRequest) {
     const goals = normalizeStoredGoals(goalRow?.goalsJson ?? null)
     const sessions = sessionRows.map(toTimeSession)
 
-    const items = goals.map((g) => {
+    const unproductiveTarget = 120
+    const unproductiveDone = unproductiveMinutesToday(sessions)
+    const unproductivePct = Math.min(
+      100,
+      Math.round((unproductiveDone / unproductiveTarget) * 100),
+    )
+    const unproductiveMet = unproductiveDone >= unproductiveTarget
+
+    const unproductiveRow = {
+      id: 'unproductive' as const,
+      label: 'Unproductive',
+      targetMinutes: unproductiveTarget,
+      doneMinutes: unproductiveDone,
+      progressPercent: unproductivePct,
+      progressLabel: formatProgressLabel(
+        unproductiveDone,
+        unproductiveTarget,
+      ),
+      met: unproductiveMet,
+    }
+
+    const goalItems = goals.map((g) => {
       const done = minutesTowardGoal(g.id, sessions)
       const pct = Math.min(100, Math.round((done / g.targetMinutes) * 100))
       const met = done >= g.targetMinutes
@@ -108,6 +130,8 @@ export async function GET(request: NextRequest) {
         met,
       }
     })
+
+    const items = [unproductiveRow, ...goalItems]
 
     return NextResponse.json({ date, items })
   } catch (e) {

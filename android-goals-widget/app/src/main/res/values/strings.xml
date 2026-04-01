@@ -20,6 +20,10 @@
     <string name="widget_empty_configure">Open Saemi Goals to set URL and token, then tap Refresh.</string>
     <string name="widget_error">Could not load goals. Tap Refresh.</string>
     <string name="widget_loading">Loading…</string>
+    <string name="widget_title">Daily goals</string>
+    <string name="widget_subtitle">Progress for today (%1$s).</string>
+    <string name="widget_caption_label">Label</string>
+    <string name="widget_caption_target">Target (min/day)</string>
 
     <string name="listening_grace_title">Unproductive limit (Accessibility)</string>
     <string name="listening_grace_button">Allow YouTube 30s (listening)</string>

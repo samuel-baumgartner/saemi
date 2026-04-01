@@ -31,10 +31,17 @@ private class GoalsRemoteViewsFactory(
         val rv = RemoteViews(context.packageName, R.layout.widget_goal_row)
         if (position !in items.indices) return rv
         val item = items[position]
-        rv.setTextViewText(R.id.goal_label, item.label)
-        rv.setTextViewText(R.id.goal_target, item.targetMinutes.toString())
-        rv.setProgressBar(R.id.goal_progress, 100, item.progressPercent, false)
-        rv.setTextViewText(R.id.goal_progress_label, item.progressLabel)
+        WidgetGoalBinder.bindRow(
+            context,
+            rv,
+            item,
+            R.id.goal_label,
+            R.id.goal_target,
+            R.id.goal_progress_red,
+            R.id.goal_progress_met,
+            R.id.goal_progress_open,
+            R.id.goal_progress_label,
+        )
         return rv
     }
 
