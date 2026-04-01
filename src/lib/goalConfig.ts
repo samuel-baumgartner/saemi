@@ -125,3 +125,47 @@ export function unproductiveMinutesToday(sessions: TimeSession[]): number {
   }
   return sum
 }
+
+/** Max unproductive minutes you can unlock in a day (full “leisure” cap). */
+export const UNPRODUCTIVE_BUDGET_MAX_MIN = 120
+
+/**
+ * Progress toward your daily goal mix: for each goal we count min(time logged, target).
+ * Example: one goal target 2h done fully + others 0, with all targets summing 3h → 2/3 of progress.
+ */
+export function unproductiveBudgetProgressParts(
+  goals: DailyGoalDef[],
+  sessions: TimeSession[]
+): {
+  creditedMinutes: number
+  totalTargetMinutes: number
+  fraction: number
+} {
+  let creditedMinutes = 0
+  let totalTargetMinutes = 0
+  for (const g of goals) {
+    totalTargetMinutes += g.targetMinutes
+    const done = minutesTowardGoal(g.id, sessions)
+    creditedMinutes += Math.min(done, g.targetMinutes)
+  }
+  if (totalTargetMinutes <= 0) {
+    return { creditedMinutes: 0, totalTargetMinutes: 0, fraction: 0 }
+  }
+  return {
+    creditedMinutes,
+    totalTargetMinutes,
+    fraction: creditedMinutes / totalTargetMinutes,
+  }
+}
+
+/**
+ * Today's allowed unproductive minutes: (progress fraction) × UNPRODUCTIVE_BUDGET_MAX_MIN.
+ * Starts at 0; fully weighted by actual time toward each goal vs sum of targets.
+ */
+export function unproductiveBudgetLimitMinutes(
+  goals: DailyGoalDef[],
+  sessions: TimeSession[]
+): number {
+  const { fraction } = unproductiveBudgetProgressParts(goals, sessions)
+  return Math.round(fraction * UNPRODUCTIVE_BUDGET_MAX_MIN)
+}

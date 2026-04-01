@@ -7,6 +7,9 @@ import type { DailyGoalDef } from '@/lib/goalConfig'
 import {
   DEFAULT_DAILY_GOALS,
   minutesTowardGoal,
+  UNPRODUCTIVE_BUDGET_MAX_MIN,
+  unproductiveBudgetLimitMinutes,
+  unproductiveBudgetProgressParts,
   unproductiveMinutesToday,
 } from '@/lib/goalConfig'
 import { Loader2, RotateCcw, Save } from 'lucide-react'
@@ -144,10 +147,25 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
   }
 
   const unproductive = unproductiveMinutesToday(todaySessions)
-  const unproductiveTarget = 120
-  const unproductivePct = Math.min(100, (unproductive / unproductiveTarget) * 100)
+  const budgetProgress = unproductiveBudgetProgressParts(
+    displayGoals,
+    todaySessions
+  )
+  const unproductiveTarget = unproductiveBudgetLimitMinutes(
+    displayGoals,
+    todaySessions
+  )
+  const unproductivePct =
+    unproductiveTarget > 0
+      ? Math.min(100, (unproductive / unproductiveTarget) * 100)
+      : unproductive > 0
+        ? 100
+        : 0
   const unproductiveFmt = formatDoneTarget(unproductive, unproductiveTarget)
-  const unproductiveOver = unproductive >= unproductiveTarget
+  const unproductiveOver =
+    unproductiveTarget > 0
+      ? unproductive >= unproductiveTarget
+      : unproductive > 0
 
   return (
     <div className="space-y-6">
@@ -207,26 +225,42 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
                 <div className="flex-1 min-w-0 block">
                   <span className="text-xs text-white/45 block mb-1">Label</span>
                   <div className="w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-white text-sm">
-                    Unproductive
+                    <span className="block">Unproductive</span>
+                    <span className="block text-[11px] text-white/45 font-normal mt-1 leading-snug">
+                      Leisure budget = your progress through today's goals (time
+                      counted up to each target) divided by the sum of all targets,
+                      times {UNPRODUCTIVE_BUDGET_MAX_MIN} min max. Example: 2h done
+                      of a 2h goal out of 3h total targets → two thirds unlocked.
+                    </span>
                   </div>
                 </div>
                 <div className="w-full sm:w-36 shrink-0 block">
                   <span className="text-xs text-white/45 block mb-1">
-                    Target (min/day)
+                    Budget (min)
                   </span>
                   <div className="w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-white text-sm tabular-nums">
                     {unproductiveTarget}
                   </div>
                 </div>
               </div>
-              <div className="flex justify-end mb-2">
+              <div className="flex flex-col items-end gap-0.5 mb-2">
+                <span className="text-xs text-white/40 tabular-nums">
+                  Goal progress for budget:{' '}
+                  {budgetProgress.totalTargetMinutes > 0
+                    ? `${budgetProgress.creditedMinutes} / ${budgetProgress.totalTargetMinutes} min (${Math.round(budgetProgress.fraction * 100)}%)`
+                    : '—'}
+                </span>
                 <span className="text-sm text-red-300 tabular-nums">
                   {unproductiveFmt.doneStr}
                   <span className="text-red-400/70"> / </span>
                   {unproductiveFmt.targetStr}
                   {unproductiveOver && (
                     <span className="ml-2 text-red-400 font-medium">
-                      (+{unproductive - unproductiveTarget} min over)
+                      (
+                      {unproductiveTarget > 0
+                        ? `+${unproductive - unproductiveTarget} min over`
+                        : `${unproductive} min (no budget yet)`}
+                      )
                     </span>
                   )}
                 </span>

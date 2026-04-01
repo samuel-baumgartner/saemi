@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import type { TimeSession } from '@/types/task'
-import { unproductiveMinutesToday } from '@/lib/goalConfig'
+import {
+  normalizeStoredGoals,
+  unproductiveBudgetLimitMinutes,
+  unproductiveBudgetProgressParts,
+  unproductiveMinutesToday,
+} from '@/lib/goalConfig'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
-const DEFAULT_LIMIT_MINUTES = 120
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -62,14 +66,20 @@ export async function GET(request: NextRequest) {
       : getServerCalendarDateString(new Date())
 
   try {
-    const rows = await prisma.timeSession.findMany({
-      where: { userId, date },
-      orderBy: { startTime: 'asc' },
-    })
+    const [goalRow, rows] = await Promise.all([
+      prisma.userGoalSettings.findUnique({ where: { userId } }),
+      prisma.timeSession.findMany({
+        where: { userId, date },
+        orderBy: { startTime: 'asc' },
+      }),
+    ])
+    const goals = normalizeStoredGoals(goalRow?.goalsJson ?? null)
     const sessions = rows.map(toTimeSession)
     const minutes = unproductiveMinutesToday(sessions)
-    const limitMinutes = DEFAULT_LIMIT_MINUTES
-    const isOverLimit = minutes >= limitMinutes
+    const limitMinutes = unproductiveBudgetLimitMinutes(goals, sessions)
+    const isOverLimit =
+      limitMinutes > 0 ? minutes >= limitMinutes : minutes > 0
+    const budgetProgress = unproductiveBudgetProgressParts(goals, sessions)
 
     return NextResponse.json({
       date,
@@ -77,6 +87,9 @@ export async function GET(request: NextRequest) {
       limitMinutes,
       isOverLimit,
       remainingMinutes: Math.max(0, limitMinutes - minutes),
+      budgetFraction: Math.round(budgetProgress.fraction * 10_000) / 10_000,
+      budgetCreditedMinutes: budgetProgress.creditedMinutes,
+      budgetTotalTargetMinutes: budgetProgress.totalTargetMinutes,
     })
   } catch (e) {
     console.error('GET /api/widget/limits-status', e)
