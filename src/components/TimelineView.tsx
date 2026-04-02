@@ -27,6 +27,7 @@ export function TimelineView({
   const [selectedDate, setSelectedDate] = useState(getTodayString())
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph')
   const [isSmallScreen, setIsSmallScreen] = useState(false)
+  const SHORT_SESSION_MS = 5 * 60 * 1000
 
   useEffect(() => {
     const check = () => setIsSmallScreen(window.innerWidth < 768)
@@ -40,9 +41,28 @@ export function TimelineView({
   
   const isToday = selectedDate === getTodayString()
 
-  const daySessions = sessions
+  const daySessionsAll = sessions
     .filter((s) => s.date === selectedDate)
     .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
+
+  const getSessionDurationMs = (session: TimeSession) => {
+    if (!session.endTime && session.id !== activeSessionId) return 0
+    const endTime = session.endTime ? session.endTime.getTime() : new Date().getTime()
+    return Math.max(0, endTime - session.startTime.getTime())
+  }
+
+  const daySessions = daySessionsAll.filter((session) => {
+    if (!session.endTime && session.id === activeSessionId) return true
+    if (!session.endTime) return false
+    return getSessionDurationMs(session) >= SHORT_SESSION_MS
+  })
+
+  const shortHiddenCount = daySessionsAll.reduce((acc, session) => {
+    if (!session.endTime) return acc
+    return getSessionDurationMs(session) > 0 && getSessionDurationMs(session) < SHORT_SESSION_MS
+      ? acc + 1
+      : acc
+  }, 0)
 
   const navigateDay = (direction: 'prev' | 'next') => {
     const current = new Date(selectedDate + 'T00:00:00')
@@ -80,7 +100,7 @@ export function TimelineView({
   }
 
   const getTotalTime = () => {
-    return daySessions.reduce((total, session) => {
+    return daySessionsAll.reduce((total, session) => {
       if (!session.endTime && session.id !== activeSessionId) {
         return total
       }
@@ -93,7 +113,7 @@ export function TimelineView({
 
   const getWorkTime = () => {
     // Exclude Google Fit health data (sleep and exercise)
-    return daySessions
+    return daySessionsAll
       .filter((session: any) => {
         // Exclude sleep sessions
         if (session.source === 'google-fit' && session.healthDataType === 'sleep') {
@@ -139,7 +159,14 @@ export function TimelineView({
               {formatDate(selectedDate)}
             </h2>
             <p className="text-white/60 text-sm mt-1">
-              {daySessions.length} session{daySessions.length !== 1 ? 's' : ''} •{' '}
+              {daySessions.length} session{daySessions.length !== 1 ? 's' : ''}
+              {shortHiddenCount > 0 ? (
+                <span className="text-white/40">
+                  {' '}
+                  (+{shortHiddenCount} under 5m hidden)
+                </span>
+              ) : null}{' '}
+              •{' '}
               {formatTotalTime(getTotalTime())} total
             </p>
             <p className="text-white/40 text-xs mt-0.5">
