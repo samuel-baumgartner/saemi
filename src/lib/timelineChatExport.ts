@@ -21,6 +21,22 @@ function goalsBlock(goals: DailyGoalDef[]): string[] {
   return ['Goals:', ...goals.map(formatGoalLine), '']
 }
 
+/** How to read Anki / Cursor / listening blocks when pasting into ChatGPT. */
+function chatGptContextBlock(): string[] {
+  return [
+    'Context for interpreting this timeline:',
+    '- Anki and Cursor often alternate in short bursts: while programming in Cursor, I do Anki cards in between, so you will see lots of switching between them.',
+    '- Listening practice (per line or segment) usually follows this loop:',
+    '  1. Listen without subtitles',
+    '  2. Turn on subtitles and replay',
+    '  3. Understand the line',
+    '  4. Subtitles off and replay',
+    '  5. Repeat one line aloud',
+    '  6. Replay one final time without subtitles',
+    '',
+  ]
+}
+
 /** Drop brief phone / laptop check-ins from exports (noise for LLM). */
 const MIN_PHONE_OR_COMPUTER_MS = 2 * 60 * 1000
 
@@ -135,7 +151,12 @@ export function buildDayTimelineExport(
     .filter((s) => includeSessionInChatExport(s, activeSessionId))
     .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
 
-  const lines = [`Day: ${dateYmd}`, '', ...goalsBlock(goals ?? [])]
+  const lines = [
+    `Day: ${dateYmd}`,
+    '',
+    ...goalsBlock(goals ?? []),
+    ...chatGptContextBlock(),
+  ]
 
   if (day.length === 0) {
     lines.push('(no sessions)')
@@ -161,6 +182,7 @@ export function buildMonthTimelineExport(
     `Month (local): ${first.slice(0, 7)} (${first} … ${last})`,
     '',
     ...goalsBlock(goals ?? []),
+    ...chatGptContextBlock(),
   ]
 
   for (const d of allDays) {
