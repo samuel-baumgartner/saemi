@@ -216,23 +216,35 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
     return colors[Math.abs(hash) % colors.length]
   }
 
+  /** Fits the full day in the viewport; avoids a nested vertical scrollbar from overflow-x-auto. */
+  const graphHeightClass =
+    'h-[min(78dvh,54rem)] min-h-[280px] max-h-[960px] sm:min-h-[320px]'
+
   return (
     <div className="bg-black/40 border border-white/10 rounded-lg p-4">
-      <div className="overflow-x-auto">
-        <div className="flex gap-2 min-w-[680px]">
-        <div className="flex flex-col justify-between text-xs text-white/40 w-12 flex-shrink-0">
-          {hours.map((hour) => (
-            <div key={hour} className="h-10 flex items-start">
-              {hour.toString().padStart(2, '0')}:00
-            </div>
-          ))}
-          <div className="h-0 flex items-start">24:00</div>
-        </div>
+      <div className="overflow-x-auto overflow-y-clip">
+        <div className={`flex gap-2 min-w-[680px] ${graphHeightClass}`}>
+          <div className="relative flex h-full w-12 flex-shrink-0 flex-col text-xs text-white/40">
+            {hours.map((hour) => (
+              <div
+                key={hour}
+                className="flex min-h-0 flex-1 items-start leading-none"
+              >
+                {hour.toString().padStart(2, '0')}:00
+              </div>
+            ))}
+            <span className="pointer-events-none absolute bottom-0 left-0 text-[10px] leading-none text-white/40 sm:text-xs">
+              24:00
+            </span>
+          </div>
 
-        <div className="flex-1 relative min-w-0 border-l border-white/10">
-          {hours.map((hour) => (
-            <div key={hour} className="h-10 border-b border-white/5" />
-          ))}
+          <div className="relative flex h-full min-h-0 flex-1 flex-col border-l border-white/10">
+            {hours.map((hour) => (
+              <div
+                key={hour}
+                className="min-h-0 flex-1 border-b border-white/5 last:border-b-0"
+              />
+            ))}
 
           {/* Resolved focus beams (computer + phone, no overlap) */}
           {resolvedFocusBlocks.map((block, index) => {
@@ -345,8 +357,8 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
               </div>
             )
           })()}
+          </div>
         </div>
-      </div>
       </div>
 
       {focusModal && (
