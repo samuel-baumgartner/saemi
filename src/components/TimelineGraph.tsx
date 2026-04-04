@@ -229,7 +229,7 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
           <div className="h-0 flex items-start">24:00</div>
         </div>
 
-        <div className="flex-1 relative border-l border-white/10">
+        <div className="flex-1 relative min-w-0 border-l border-white/10">
           {hours.map((hour) => (
             <div key={hour} className="h-10 border-b border-white/5" />
           ))}
@@ -254,7 +254,7 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
                 key={key}
                 type="button"
                 className={`absolute left-0 right-0 mx-0.5 rounded-lg border-2 transition-all text-left z-[5] antialiased ${beamClass} ${
-                  isHovered ? `z-[6] ring-2 ${ringClass}` : ''
+                  isHovered ? `z-[6] ring-2 ring-inset ${ringClass}` : ''
                 }`}
                 style={position}
                 onMouseEnter={() => setHoveredFocusKey(key)}
@@ -296,11 +296,15 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
             return (
               <div
                 key={session.id}
-                className={`absolute left-0 right-0 mx-1 rounded border-l-4 cursor-pointer transition-all z-[8] ${
+                className={`absolute left-0 right-0 mx-1 rounded border-l-4 cursor-pointer transition-[box-shadow,filter] z-[8] ${
                   isActive
                     ? 'bg-green-500/70 hover:bg-green-500/90 border-green-400 animate-pulse'
                     : getColorForActivity(session.activity)
-                } ${isHovered ? 'z-[9] scale-[1.02]' : ''}`}
+                } ${
+                  isHovered
+                    ? 'z-[9] ring-2 ring-inset ring-white/35 brightness-110 shadow-md shadow-black/40'
+                    : ''
+                }`}
                 style={position}
                 onMouseEnter={() => setHoveredSession(session.id)}
                 onMouseLeave={() => setHoveredSession(null)}
