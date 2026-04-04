@@ -10,6 +10,7 @@ object WidgetPrefs {
     private const val KEY_ANKI_PKG = "anki_pkg"
     private const val KEY_YOUTUBE_PKG = "youtube_pkg"
     private const val KEY_INSTAGRAM_PKG = "instagram_pkg"
+    private const val KEY_GOOGLE_FIT_NUDGE = "google_fit_nudge"
 
     fun getBaseUrl(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -21,6 +22,17 @@ object WidgetPrefs {
 
     fun isConfigured(context: Context): Boolean =
         getBaseUrl(context).isNotEmpty() && getToken(context).isNotEmpty()
+
+    /** Open Google Fit briefly on throttled widget refresh (helps cloud upload). */
+    fun isGoogleFitNudgeEnabled(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getBoolean(KEY_GOOGLE_FIT_NUDGE, false)
+
+    fun setGoogleFitNudgeEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_GOOGLE_FIT_NUDGE, enabled)
+            .apply()
+    }
 
     fun getBunproPackage(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

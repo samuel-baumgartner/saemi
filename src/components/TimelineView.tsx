@@ -5,9 +5,27 @@ import { TimeSession } from '@/types/task'
 import { SessionCard } from './SessionCard'
 import { TimelineGraph } from './TimelineGraph'
 import { ManualSessionForm } from './ManualSessionForm'
-import { ChevronLeft, ChevronRight, Calendar, Clock, List, BarChart3 } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Clock,
+  List,
+  BarChart3,
+  ClipboardCopy,
+} from 'lucide-react'
 import { getTodayString, getLocalDateString } from '@/lib/dateUtils'
 import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
+import {
+  effectiveSessionDurationMs,
+  normalizeStoredGoals,
+  type DailyGoalDef,
+} from '@/lib/goalConfig'
+import {
+  buildDayTimelineExport,
+  buildMonthTimelineExport,
+  copyTextToClipboard,
+} from '@/lib/timelineChatExport'
 
 interface TimelineViewProps {
   sessions: TimeSession[]
@@ -27,7 +45,35 @@ export function TimelineView({
   const [selectedDate, setSelectedDate] = useState(getTodayString())
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph')
   const [isSmallScreen, setIsSmallScreen] = useState(false)
+  const [copyNote, setCopyNote] = useState<{ text: string; ok: boolean } | null>(
+    null
+  )
+  const [exportGoals, setExportGoals] = useState<DailyGoalDef[]>(() =>
+    normalizeStoredGoals(null)
+  )
   const SHORT_SESSION_MS = 5 * 60 * 1000
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const r = await fetch('/api/user/goals')
+        if (!r.ok) throw new Error('goals fetch failed')
+        const data = await r.json()
+        const g = normalizeStoredGoals(data.goals)
+        if (!cancelled) setExportGoals(g)
+      } catch {
+        if (!cancelled) setExportGoals(normalizeStoredGoals(null))
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  /** Drop very short wall-time-only crumbs; duration uses Anki study timers when present. */
+  const hideAsShortSession = (durationMs: number) =>
+    durationMs > 0 && durationMs < SHORT_SESSION_MS
 
   useEffect(() => {
     const check = () => setIsSmallScreen(window.innerWidth < 768)
@@ -38,30 +84,30 @@ export function TimelineView({
 
   const subjectSuggestions = useSubjectSuggestions(sessions)
   const effectiveViewMode = isSmallScreen ? 'list' : viewMode
-  
+
+  const sortedSessionDates = [...new Set(sessions.map((s) => s.date))].sort()
+  const sessionDateRangeHint =
+    sortedSessionDates.length > 0
+      ? `${sortedSessionDates[0]} → ${sortedSessionDates[sortedSessionDates.length - 1]}`
+      : null
+
   const isToday = selectedDate === getTodayString()
 
   const daySessionsAll = sessions
     .filter((s) => s.date === selectedDate)
     .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
 
-  const getSessionDurationMs = (session: TimeSession) => {
-    if (!session.endTime && session.id !== activeSessionId) return 0
-    const endTime = session.endTime ? session.endTime.getTime() : new Date().getTime()
-    return Math.max(0, endTime - session.startTime.getTime())
-  }
-
   const daySessions = daySessionsAll.filter((session) => {
     if (!session.endTime && session.id === activeSessionId) return true
     if (!session.endTime) return false
-    return getSessionDurationMs(session) >= SHORT_SESSION_MS
+    const ms = effectiveSessionDurationMs(session, activeSessionId)
+    return !hideAsShortSession(ms)
   })
 
   const shortHiddenCount = daySessionsAll.reduce((acc, session) => {
     if (!session.endTime) return acc
-    return getSessionDurationMs(session) > 0 && getSessionDurationMs(session) < SHORT_SESSION_MS
-      ? acc + 1
-      : acc
+    const ms = effectiveSessionDurationMs(session, activeSessionId)
+    return hideAsShortSession(ms) ? acc + 1 : acc
   }, 0)
 
   const navigateDay = (direction: 'prev' | 'next') => {
@@ -76,6 +122,11 @@ export function TimelineView({
 
   const goToToday = () => {
     setSelectedDate(getTodayString())
+  }
+
+  const goToLatestSessionDay = () => {
+    if (sortedSessionDates.length === 0) return
+    setSelectedDate(sortedSessionDates[sortedSessionDates.length - 1])
   }
 
   const formatDate = (dateStr: string) => {
@@ -100,15 +151,10 @@ export function TimelineView({
   }
 
   const getTotalTime = () => {
-    return daySessionsAll.reduce((total, session) => {
-      if (!session.endTime && session.id !== activeSessionId) {
-        return total
-      }
-      const endTime = session.endTime
-        ? session.endTime.getTime()
-        : new Date().getTime()
-      return total + (endTime - session.startTime.getTime())
-    }, 0)
+    return daySessionsAll.reduce(
+      (total, session) => total + effectiveSessionDurationMs(session, activeSessionId),
+      0
+    )
   }
 
   const getWorkTime = () => {
@@ -125,21 +171,50 @@ export function TimelineView({
         }
         return true
       })
-      .reduce((total, session) => {
-        if (!session.endTime && session.id !== activeSessionId) {
-          return total
-        }
-        const endTime = session.endTime
-          ? session.endTime.getTime()
-          : new Date().getTime()
-        return total + (endTime - session.startTime.getTime())
-      }, 0)
+      .reduce(
+        (total, session) =>
+          total + effectiveSessionDurationMs(session, activeSessionId),
+        0
+      )
   }
 
   const formatTotalTime = (ms: number) => {
     const hours = Math.floor(ms / (1000 * 60 * 60))
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
     return `${hours}h ${minutes}m`
+  }
+
+  const flashCopy = (text: string, ok: boolean) => {
+    setCopyNote({ text, ok })
+    window.setTimeout(() => setCopyNote(null), 2500)
+  }
+
+  const handleCopyDayForChat = async () => {
+    const text = buildDayTimelineExport(
+      sessions,
+      selectedDate,
+      activeSessionId,
+      exportGoals
+    )
+    const ok = await copyTextToClipboard(text)
+    flashCopy(
+      ok ? 'Day copied — paste into ChatGPT (Cmd+V)' : 'Could not copy (clipboard denied)',
+      ok
+    )
+  }
+
+  const handleCopyMonthForChat = async () => {
+    const text = buildMonthTimelineExport(
+      sessions,
+      selectedDate,
+      activeSessionId,
+      exportGoals
+    )
+    const ok = await copyTextToClipboard(text)
+    flashCopy(
+      ok ? 'Month copied — paste into ChatGPT (Cmd+V)' : 'Could not copy (clipboard denied)',
+      ok
+    )
   }
 
   return (
@@ -183,7 +258,7 @@ export function TimelineView({
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {/* View Mode Toggle */}
           <div className="flex items-center bg-black/40 border border-white/10 rounded-lg p-1">
             {!isSmallScreen && (
@@ -218,6 +293,38 @@ export function TimelineView({
             subjectSuggestions={subjectSuggestions}
           />
 
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleCopyDayForChat}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-400/30 text-violet-100 text-sm transition-colors"
+                title="Raw timeline for this day (overlaps kept). Excludes phone/laptop under 2m."
+              >
+                <ClipboardCopy size={16} />
+                Copy day for ChatGPT
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyMonthForChat}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 border border-violet-400/25 text-violet-200/90 text-sm transition-colors"
+                title="Whole calendar month of the selected day. Same rules as day export."
+              >
+                <ClipboardCopy size={16} />
+                Copy month
+              </button>
+            </div>
+            {copyNote && (
+              <p
+                className={`text-xs max-w-[280px] ${
+                  copyNote.ok ? 'text-emerald-300/90' : 'text-amber-200/90'
+                }`}
+              >
+                {copyNote.text}
+              </p>
+            )}
+          </div>
+
           {!isToday && (
             <button
               onClick={goToToday}
@@ -237,11 +344,37 @@ export function TimelineView({
           <h3 className="text-xl font-semibold text-white mb-2">
             No sessions recorded
           </h3>
-          <p className="text-white/60">
-            {isToday
-              ? 'Start tracking or add a manual entry'
-              : 'No activity tracked on this day'}
+          <p className="text-white/60 max-w-md mx-auto">
+            {sessions.length > 0 ? (
+              <>
+                No entries on <span className="text-white/80">{selectedDate}</span>. The timeline
+                only shows rows for the day you select — sleep and Fit sync are stored on their
+                calendar dates (often not &quot;today&quot;).
+                {sessionDateRangeHint ? (
+                  <>
+                    {' '}
+                    Loaded data spans <span className="text-white/80">{sessionDateRangeHint}</span>
+                    .
+                  </>
+                ) : null}{' '}
+                Use ← → or the button below ({sessions.length} session
+                {sessions.length !== 1 ? 's' : ''} loaded).
+              </>
+            ) : isToday ? (
+              'Start tracking or add a manual entry'
+            ) : (
+              'No activity tracked on this day'
+            )}
           </p>
+          {sessions.length > 0 && sessionDateRangeHint ? (
+            <button
+              type="button"
+              onClick={goToLatestSessionDay}
+              className="mt-4 px-4 py-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-100 text-sm font-medium"
+            >
+              Go to latest day with data
+            </button>
+          ) : null}
         </div>
       ) : effectiveViewMode === 'graph' ? (
         <TimelineGraph

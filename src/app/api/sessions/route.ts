@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
+import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/sessions - Get all sessions for the authenticated user
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.email) {
+    const userId = getDbUserId(session)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -14,7 +16,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
-    let where: any = { userId: session.user.email }
+    let where: any = { userId }
 
     // Add date range filter if provided
     if (startDate && endDate) {
@@ -43,7 +45,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.email) {
+    const userId = getDbUserId(session)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -60,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const newSession = await prisma.timeSession.create({
       data: {
-        userId: session.user.email,
+        userId,
         activity,
         description: description || null,
         startTime: new Date(startTime),

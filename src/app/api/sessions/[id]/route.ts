@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
+import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
 
 // PATCH /api/sessions/[id] - Update a session
@@ -9,7 +10,8 @@ export async function PATCH(
 ) {
   try {
     const session = await auth()
-    if (!session?.user?.email) {
+    const userId = getDbUserId(session)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -21,7 +23,7 @@ export async function PATCH(
     const existingSession = await prisma.timeSession.findFirst({
       where: {
         id,
-        userId: session.user.email,
+        userId,
       },
     })
 
@@ -62,7 +64,8 @@ export async function DELETE(
 ) {
   try {
     const session = await auth()
-    if (!session?.user?.email) {
+    const userId = getDbUserId(session)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -72,7 +75,7 @@ export async function DELETE(
     const existingSession = await prisma.timeSession.findFirst({
       where: {
         id,
-        userId: session.user.email,
+        userId,
       },
     })
 

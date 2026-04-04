@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { BookOpen, RefreshCw, Unplug, CheckCircle2, AlertCircle, ExternalLink, Settings } from 'lucide-react'
 import { AnkiConnectService, getAnkiConnected, storeAnkiConnected } from '@/lib/anki'
-import { getLocalDateString } from '@/lib/dateUtils'
+import { fetchAnkiSessionsForUser } from '@/lib/ankiClientSync'
 import { AnkiSessionGapDialog } from './AnkiSessionGapDialog'
 
 interface AnkiConnectProps {
@@ -117,19 +117,15 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
     setImportDays(days)
 
     try {
-      const service = new AnkiConnectService()
+      const { sessions: ankiSessions, connectOk } =
+        await fetchAnkiSessionsForUser(userId)
 
-      // Fetch reviews based on configured time range
-      const endDate = new Date()
-      const startDate = new Date()
-      startDate.setDate(startDate.getDate() - days)
+      if (!connectOk) {
+        throw new Error('Could not connect to AnkiConnect')
+      }
 
-      console.log(`📚 Fetching Anki reviews from last ${days} days:`, startDate, 'to', endDate)
-
-      const reviews = await service.getReviews(startDate, endDate)
-      
-      if (reviews.length === 0) {
-        console.log('No Anki reviews found in date range')
+      if (ankiSessions.length === 0) {
+        console.log('No Anki reviews to import in range')
         setSyncStatus('success')
         const now = new Date()
         setLastSync(now)
@@ -137,33 +133,9 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
         return
       }
 
-      // Group reviews into study sessions with configured gap
-      const studySessions = AnkiConnectService.convertToStudySessions(reviews, gapMinutes)
-
-      console.log(`Found ${studySessions.length} Anki study sessions`)
-
-      // Convert to TimeSession format
-      const ankiSessions = studySessions.map((session, index) => ({
-        id: `anki-${session.startTime.getTime()}-${index}`,
-        activity: '📚 Anki Study',
-        description: `${session.cards} cards reviewed`,
-        startTime: session.startTime.toISOString(),
-        endTime: session.endTime.toISOString(),
-        date: getLocalDateString(session.startTime),
-        source: 'anki',
-        healthData: {
-          type: 'study',
-          details: {
-            cards: session.cards,
-            deck: session.deck,
-          },
-        },
-      }))
-
-      // Notify parent component
+      console.log(`Found ${ankiSessions.length} Anki study sessions`)
       onSync(ankiSessions)
 
-      // Update last sync time
       const now = new Date()
       setLastSync(now)
       localStorage.setItem(`anki_last_sync_${userId}`, now.toISOString())

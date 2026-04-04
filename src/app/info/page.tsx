@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
 import {
   aggregateFocusByActivity,
@@ -9,11 +10,10 @@ import { redirect } from 'next/navigation'
 
 export default async function InfoPage() {
   const session = await auth()
-  if (!session?.user?.email) {
+  const userId = getDbUserId(session)
+  if (!userId) {
     redirect('/personal')
   }
-
-  const userId = session.user.email
   const now = new Date()
   const hourAgo = new Date(now.getTime() - 60 * 60 * 1000)
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)

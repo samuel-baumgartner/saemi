@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
+import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
 
 // POST /api/sessions/sync - Sync health sessions (replaces old health data)
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.email) {
+    const userId = getDbUserId(session)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -26,8 +28,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    const userId = session.user.email
 
     // Determine the source from the first session
     const source = sessions[0]?.source || 'google-fit'

@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import { getDbUserId } from '@/lib/authDbUser'
 import { getWidgetDailyGoalsPayload } from '@/lib/widgetDailyGoalsPayload'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
 import Link from 'next/link'
@@ -56,7 +57,7 @@ function ProgressBar({
 
 export default async function WidgetPreviewPage() {
   const session = await auth()
-  const userId = session?.user?.email || session?.user?.id
+  const userId = getDbUserId(session) || session?.user?.email || session?.user?.id
   const today = getServerCalendarDateString(new Date())
 
   let date = today

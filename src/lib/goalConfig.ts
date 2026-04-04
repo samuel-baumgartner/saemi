@@ -65,11 +65,32 @@ export const UNPRODUCTIVE_ACTIVITY_MARKERS = [
   'distracted',
 ] as const
 
+/**
+ * Wall-clock span, or “now” when this session id is the active tracker session.
+ */
+export function effectiveSessionDurationMs(
+  s: TimeSession,
+  activeSessionId?: string | null
+): number {
+  const isActive = !s.endTime && activeSessionId === s.id
+  if (!s.endTime && !isActive) return 0
+
+  const wallMs = s.endTime
+    ? Math.max(0, s.endTime.getTime() - s.startTime.getTime())
+    : Math.max(0, Date.now() - s.startTime.getTime())
+
+  if (s.source === 'anki') {
+    const raw = s.healthData?.details?.studyTimeMs
+    const study =
+      raw != null && Number.isFinite(Number(raw)) ? Number(raw) : null
+    if (study != null && study > 0) return study
+  }
+
+  return wallMs
+}
+
 export function sessionDurationMinutes(s: TimeSession): number {
-  if (!s.endTime) return 0
-  return Math.floor(
-    (s.endTime.getTime() - s.startTime.getTime()) / 60000
-  )
+  return Math.floor(effectiveSessionDurationMs(s) / 60000)
 }
 
 export function matchesListeningGoal(activity: string): boolean {
@@ -101,19 +122,19 @@ export function minutesTowardGoal(
   goalId: string,
   sessions: TimeSession[]
 ): number {
-  let sum = 0
+  let sumMs = 0
   for (const s of sessions) {
-    const m = sessionDurationMinutes(s)
-    if (m <= 0) continue
+    const ms = effectiveSessionDurationMs(s)
+    if (ms <= 0) continue
     const { activity, source } = s
     let hit = false
     if (goalId === 'listening' && matchesListeningGoal(activity)) hit = true
     if (goalId === 'anki' && matchesAnkiGoal(activity, source)) hit = true
     if (goalId === 'grammar' && matchesGrammarGoal(activity)) hit = true
     if (goalId === 'cursor' && matchesCursorGoal(activity)) hit = true
-    if (hit) sum += m
+    if (hit) sumMs += ms
   }
-  return sum
+  return Math.max(0, Math.round(sumMs / 60000))
 }
 
 export function unproductiveMinutesToday(sessions: TimeSession[]): number {

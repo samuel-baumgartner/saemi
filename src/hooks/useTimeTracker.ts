@@ -4,6 +4,22 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { TimeSession } from '@/types/task'
 import { getLocalDateString } from '@/lib/dateUtils'
 
+function sessionFromApiRow(session: any): TimeSession {
+  const healthFromDb =
+    session.healthDataType != null || session.healthDataDetails != null
+      ? {
+          type: session.healthDataType ?? undefined,
+          details: session.healthDataDetails ?? undefined,
+        }
+      : session.healthData
+  return {
+    ...session,
+    startTime: new Date(session.startTime),
+    endTime: session.endTime ? new Date(session.endTime) : null,
+    ...(healthFromDb ? { healthData: healthFromDb } : {}),
+  } as TimeSession
+}
+
 export function useTimeTracker() {
   const [sessions, setSessions] = useState<TimeSession[]>([])
   const [activeSession, setActiveSession] = useState<TimeSession | null>(null)
@@ -16,11 +32,7 @@ export function useTimeTracker() {
 
       const data = await response.json()
 
-      const sessionsWithDates = data.map((session: any) => ({
-        ...session,
-        startTime: new Date(session.startTime),
-        endTime: session.endTime ? new Date(session.endTime) : null,
-      }))
+      const sessionsWithDates = data.map(sessionFromApiRow)
 
       setSessions(sessionsWithDates)
 
@@ -83,11 +95,7 @@ export function useTimeTracker() {
       if (!response.ok) throw new Error('Failed to create session')
 
       const created = await response.json()
-      const sessionWithDates = {
-        ...created,
-        startTime: new Date(created.startTime),
-        endTime: created.endTime ? new Date(created.endTime) : null,
-      }
+      const sessionWithDates = sessionFromApiRow(created)
 
       setSessions((prev) => [...prev, sessionWithDates])
       setActiveSession(sessionWithDates)
@@ -113,11 +121,7 @@ export function useTimeTracker() {
       if (!response.ok) throw new Error('Failed to stop session')
 
       const updated = await response.json()
-      const sessionWithDates = {
-        ...updated,
-        startTime: new Date(updated.startTime),
-        endTime: new Date(updated.endTime),
-      }
+      const sessionWithDates = sessionFromApiRow(updated)
 
       setSessions((prev) =>
         prev.map((session) =>
@@ -156,11 +160,7 @@ export function useTimeTracker() {
       if (!response.ok) throw new Error('Failed to create session')
 
       const created = await response.json()
-      const sessionWithDates = {
-        ...created,
-        startTime: new Date(created.startTime),
-        endTime: new Date(created.endTime),
-      }
+      const sessionWithDates = sessionFromApiRow(created)
 
       setSessions((prev) => [...prev, sessionWithDates])
       return sessionWithDates
@@ -210,11 +210,7 @@ export function useTimeTracker() {
       if (!response.ok) throw new Error('Failed to update session')
 
       const updated = await response.json()
-      const sessionWithDates = {
-        ...updated,
-        startTime: new Date(updated.startTime),
-        endTime: updated.endTime ? new Date(updated.endTime) : null,
-      }
+      const sessionWithDates = sessionFromApiRow(updated)
 
       setSessions((prev) =>
         prev.map((session) => (session.id === id ? sessionWithDates : session))
@@ -272,6 +268,7 @@ export function useTimeTracker() {
     sessions,
     activeSession,
     isLoading,
+    loadSessions,
     startSession,
     stopSession,
     addManualSession,

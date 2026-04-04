@@ -1,4 +1,5 @@
 import { auth, signOut } from '@/auth'
+import { getDbUserId } from '@/lib/authDbUser'
 import { TaskDashboard } from '@/components/TaskDashboard'
 import { LogOut, Home } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -70,8 +71,8 @@ export default async function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <TaskDashboard 
-          userId={session.user.email || session.user.id || ''} 
+        <TaskDashboard
+          userId={getDbUserId(session) || session.user.email || session.user.id || ''}
           accessToken={session.accessToken}
         />
       </main>

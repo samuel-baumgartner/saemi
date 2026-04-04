@@ -19,12 +19,15 @@ function parseBearerToken(header: string | null): string | null {
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
 type SessionRow = {
+  id: string
   activity: string
   description: string | null
   startTime: Date
   endTime: Date | null
   date: string
   source: string
+  healthDataType?: string | null
+  healthDataDetails?: unknown | null
 }
 
 type Interval = { start: number; end: number }
@@ -63,13 +66,15 @@ function subtractIntervals(base: Interval, cuts: Interval[]): Interval[] {
 function effectiveSessionsForDate(rows: SessionRow[]): SessionRow[] {
   const phone = rows.filter((r) => r.source === 'phone' && r.endTime)
   const other = rows.filter((r) => r.source !== 'phone' && r.endTime)
+  const anki = other.filter((r) => r.source === 'anki')
+  const otherNonAnki = other.filter((r) => r.source !== 'anki')
 
   const phoneCuts = mergeIntervals(
     phone.map((r) => ({ start: r.startTime.getTime(), end: r.endTime!.getTime() }))
   )
 
   const fragments: SessionRow[] = []
-  for (const r of other) {
+  for (const r of otherNonAnki) {
     const base = { start: r.startTime.getTime(), end: r.endTime!.getTime() }
     const parts = subtractIntervals(base, phoneCuts)
     for (const p of parts) {
@@ -81,7 +86,7 @@ function effectiveSessionsForDate(rows: SessionRow[]): SessionRow[] {
     }
   }
 
-  return [...phone, ...fragments].sort(
+  return [...phone, ...fragments, ...anki].sort(
     (a, b) => a.startTime.getTime() - b.startTime.getTime()
   )
 }
@@ -130,12 +135,15 @@ export async function GET(request: NextRequest) {
       prisma.timeSession.findMany({
         where: { userId, date },
         select: {
+          id: true,
           activity: true,
           description: true,
           startTime: true,
           endTime: true,
           date: true,
           source: true,
+          healthDataType: true,
+          healthDataDetails: true,
         },
         orderBy: { startTime: 'asc' },
       }),
@@ -145,8 +153,28 @@ export async function GET(request: NextRequest) {
     const goalsAll = normalizeStoredGoals(goalRow?.goalsJson ?? null)
     const goals = goalsAll.filter((g) => g.id !== 'listening')
 
+    const forGoals = effective.map((r) => {
+      const healthData =
+        r.healthDataType != null || r.healthDataDetails != null
+          ? ({
+              type: r.healthDataType,
+              details: r.healthDataDetails ?? undefined,
+            } as const)
+          : undefined
+      return {
+        id: r.id,
+        activity: r.activity,
+        description: r.description ?? undefined,
+        startTime: r.startTime,
+        endTime: r.endTime ?? undefined,
+        date: r.date,
+        source: r.source,
+        ...(healthData ? { healthData } : {}),
+      }
+    })
+
     const items = goals.map((g) => {
-      const done = minutesTowardGoal(g.id, effective as any)
+      const done = minutesTowardGoal(g.id, forGoals as any)
       const pct = Math.min(100, Math.round((done / g.targetMinutes) * 100))
       const met = done >= g.targetMinutes
       return {

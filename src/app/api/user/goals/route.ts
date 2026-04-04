@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { auth } from '@/auth'
+import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
 import {
   DEFAULT_DAILY_GOALS,
@@ -11,11 +12,10 @@ import {
 export async function GET() {
   try {
     const session = await auth()
-    if (!session?.user?.email) {
+    const userId = getDbUserId(session)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    const userId = session.user.email
     const row = await prisma.userGoalSettings.findUnique({
       where: { userId },
     })
@@ -34,7 +34,8 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.email) {
+    const userId = getDbUserId(session)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -47,7 +48,6 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const userId = session.user.email
     const json = sanitized as unknown as Prisma.InputJsonValue
     await prisma.userGoalSettings.upsert({
       where: { userId },

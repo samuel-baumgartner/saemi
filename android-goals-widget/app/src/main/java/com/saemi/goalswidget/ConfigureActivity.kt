@@ -9,6 +9,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Switch
 import android.widget.Toast
 
 class ConfigureActivity : Activity() {
@@ -34,6 +35,9 @@ class ConfigureActivity : Activity() {
         editAnki.setText(WidgetPrefs.getAnkiPackage(this))
         editYoutube.setText(WidgetPrefs.getYoutubePackage(this))
         editInstagram.setText(WidgetPrefs.getInstagramPackage(this))
+
+        val switchGoogleFitNudge = findViewById<Switch>(R.id.switch_google_fit_nudge)
+        switchGoogleFitNudge.isChecked = WidgetPrefs.isGoogleFitNudgeEnabled(this)
 
         findViewById<Button>(R.id.btn_usage_access).setOnClickListener {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
@@ -112,6 +116,7 @@ class ConfigureActivity : Activity() {
                 editYoutube.text.toString(),
                 editInstagram.text.toString(),
             )
+            WidgetPrefs.setGoogleFitNudgeEnabled(this, switchGoogleFitNudge.isChecked)
             val mgr = AppWidgetManager.getInstance(this)
             if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
             GoalsWidgetProvider.bindWidget(this, mgr, widgetId)

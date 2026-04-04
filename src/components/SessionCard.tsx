@@ -1,6 +1,7 @@
 'use client'
 
 import { TimeSession } from '@/types/task'
+import { effectiveSessionDurationMs } from '@/lib/goalConfig'
 import { Trash2, Edit2, Check, Clock } from 'lucide-react'
 import { useState } from 'react'
 
@@ -40,13 +41,8 @@ export function SessionCard({
     })
   }
 
-  const getDuration = () => {
-    if (!session.endTime) {
-      const now = new Date()
-      return now.getTime() - session.startTime.getTime()
-    }
-    return session.endTime.getTime() - session.startTime.getTime()
-  }
+  const getDuration = () =>
+    effectiveSessionDurationMs(session, isActive ? session.id : undefined)
 
   const formatDuration = (ms: number) => {
     const seconds = Math.floor(ms / 1000)

@@ -57,12 +57,28 @@
             android:id="@+id/edit_token"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="12dp"
             android:hint="paste token"
             android:importantForAutofill="no"
             android:inputType="textPassword|textVisiblePassword"
             android:textColor="@color/widget_text"
             android:textColorHint="@color/widget_muted" />
+
+        <Switch
+            android:id="@+id/switch_google_fit_nudge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/google_fit_nudge_title"
+            android:textColor="@color/widget_text" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/google_fit_nudge_summary"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btn_save"

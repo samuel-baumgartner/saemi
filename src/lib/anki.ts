@@ -12,11 +12,21 @@ export interface AnkiStudySession {
   startTime: Date
   endTime: Date
   cards: number
+  /** Sum of Anki per-review timers (`timeTaken`); matches Anki “study time” stats. */
+  studyTimeMs: number
   deck?: string
 }
 
+const ANKI_CONNECT_DIRECT = 'http://127.0.0.1:8765'
+
 export class AnkiConnectService {
-  private readonly ankiUrl = 'http://localhost:8765'
+  /**
+   * Browser: same-origin API proxy (AnkiConnect does not allow cross-origin fetch).
+   * Server: call Anki directly if this class is ever used in Node.
+   */
+  private get ankiUrl(): string {
+    return typeof window !== 'undefined' ? '/api/anki-connect' : ANKI_CONNECT_DIRECT
+  }
 
   /**
    * Test connection to AnkiConnect
@@ -193,6 +203,7 @@ export class AnkiConnectService {
           startTime: reviewDate,
           endTime: reviewDate,
           cards: 1,
+          studyTimeMs: Math.max(0, review.timeTaken || 0),
         }
       } else {
         const timeSinceLastReview = review.reviewTime - currentSession.endTime.getTime()
@@ -201,6 +212,7 @@ export class AnkiConnectService {
           // Continue current session
           currentSession.endTime = reviewDate
           currentSession.cards++
+          currentSession.studyTimeMs += Math.max(0, review.timeTaken || 0)
         } else {
           // Save current session and start new one
           sessions.push(currentSession)
@@ -208,6 +220,7 @@ export class AnkiConnectService {
             startTime: reviewDate,
             endTime: reviewDate,
             cards: 1,
+            studyTimeMs: Math.max(0, review.timeTaken || 0),
           }
         }
       }
@@ -221,11 +234,12 @@ export class AnkiConnectService {
     console.log('📚 Anki Study Sessions Created:', {
       totalSessions: sessions.length,
       totalReviews: reviews.length,
-      sessions: sessions.map(s => ({
+      sessions: sessions.map((s) => ({
         start: s.startTime.toLocaleString(),
         end: s.endTime.toLocaleString(),
         cards: s.cards,
-        duration: `${Math.round((s.endTime.getTime() - s.startTime.getTime()) / 60000)}min`,
+        studyMin: `${Math.round(s.studyTimeMs / 60000)}min`,
+        wallMin: `${Math.round((s.endTime.getTime() - s.startTime.getTime()) / 60000)}min`,
       })),
     })
     

@@ -21,7 +21,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             'https://www.googleapis.com/auth/fitness.heart_rate.read',
           ].join(' '),
           access_type: 'offline', // Get refresh token
-          prompt: 'consent', // Force consent screen to get all scopes
+          // consent: ensure refresh token / scopes; select_account: always show Google account picker
+          // (otherwise Google often reuses the browser’s default session, e.g. personal Gmail)
+          prompt: 'consent select_account',
         },
       },
     }),
@@ -30,8 +32,42 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: '/personal',
   },
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user, profile }) {
       // Initial sign in
+      if (account?.provider === 'google' && user?.email) {
+        const primaryEmail = user.email.trim()
+        try {
+          const { mergeLegacyTimelineSourcesIntoPrimaryEmail } = await import(
+            '@/lib/timelineUserReassign'
+          )
+          const profileEmail =
+            profile &&
+            typeof profile === 'object' &&
+            'email' in profile &&
+            typeof (profile as { email?: unknown }).email === 'string'
+              ? (profile as { email: string }).email
+              : undefined
+          await mergeLegacyTimelineSourcesIntoPrimaryEmail({
+            primaryEmail,
+            userEmail: user.email,
+            profileEmail,
+          })
+        } catch (e) {
+          console.error('Timeline legacy merge on Google sign-in failed:', e)
+        }
+
+        return {
+          ...token,
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+          accessTokenExpires: account.expires_at
+            ? account.expires_at * 1000
+            : Date.now() + 3600 * 1000,
+          dbUserId: primaryEmail,
+          error: undefined,
+        }
+      }
+
       if (account) {
         return {
           ...token,
@@ -58,6 +94,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return refreshAccessToken(token)
     },
     async session({ session, token }) {
+      const db = token.dbUserId as string | undefined
+      session.dbUserId = db?.trim() || session.user?.email || undefined
+
       if (token.error) {
         session.error = token.error as string
       } else {

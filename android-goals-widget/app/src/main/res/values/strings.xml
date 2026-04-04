@@ -24,4 +24,7 @@
     <string name="listening_grace_button">Allow YouTube 30s (listening)</string>
     <string name="listening_grace_toast">YouTube allowed for 30 seconds. Open the YouTube app now.</string>
     <string name="blocker_hint">The blocker watches the YouTube and Instagram apps only (not Chrome). If YouTube works on your laptop browser but feels blocked on the phone, use this button before opening the YouTube app, or watch in Chrome (not covered by the app blocker).</string>
+
+    <string name="google_fit_nudge_title">Google Fit upload nudge</string>
+    <string name="google_fit_nudge_summary">When enabled: at most once every 4 hours, briefly open Google Fit so data can sync to Google — after each home-screen widget refresh (then return home), and ~1s before the YouTube/Instagram blocker if that fires. Requires Google Fit installed. Not a guarantee; there is no official background sync API.</string>
 </resources>

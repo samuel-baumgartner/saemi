@@ -236,14 +236,14 @@ export class GoogleFitService {
         )
         sessions.push(...splitSessions)
       } else {
-        // Single day session
+        // Single day session — bucket by wake time so “which day?” matches morning
         sessions.push({
           id: `sleep-${sleep.id}`,
           activity: '💤 Sleep',
           description: this.formatSleepDescription(sleep),
           startTime: sleep.startTime,
           endTime: sleep.endTime,
-          date: getLocalDateString(sleep.startTime),
+          date: getLocalDateString(sleep.endTime),
           source: 'google-fit',
           healthData: {
             type: 'sleep',

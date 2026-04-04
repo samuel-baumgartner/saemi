@@ -17,21 +17,44 @@ interface TimelineGraphProps {
 type FocusSource = 'timechecker' | 'phone'
 type FocusBlock = { source: FocusSource; start: Date; end: Date }
 
+const DAY_MS = 24 * 60 * 60 * 1000
+const MIN_BAR_HEIGHT_PCT = (20 * 1000 / DAY_MS) * 100 // ~20s of the day column
+
+function msIntoLocalDay(d: Date): number {
+  const z = new Date(d)
+  z.setHours(0, 0, 0, 0)
+  return d.getTime() - z.getTime()
+}
+
+/** Full-ms positioning (old code used only clock minutes, which broke short sessions). */
 function getRangePosition(start: Date, end: Date) {
-  const startPercent =
-    ((start.getHours() * 60 + start.getMinutes()) / (24 * 60)) * 100
-  const endPercent =
-    ((end.getHours() * 60 + end.getMinutes()) / (24 * 60)) * 100
-  const height = endPercent - startPercent
+  const startMs = msIntoLocalDay(start)
+  const rawDur = Math.max(0, end.getTime() - start.getTime())
+  const topPct = (startMs / DAY_MS) * 100
+  const heightPct = Math.min((rawDur / DAY_MS) * 100, 100 - topPct)
   return {
-    top: `${startPercent}%`,
-    height: `${Math.max(height, 0.6)}%`,
+    top: `${topPct}%`,
+    height: `${Math.max(heightPct, MIN_BAR_HEIGHT_PCT)}%`,
   }
 }
 
+/** Anki bars use summed review timers so height matches goals / Anki stats. */
 function getSessionPosition(session: TimeSession) {
   const end = session.endTime ?? new Date()
-  return getRangePosition(session.startTime, end)
+  const startMs = msIntoLocalDay(session.startTime)
+  let durMs = Math.max(0, end.getTime() - session.startTime.getTime())
+  if (session.source === 'anki') {
+    const st = session.healthData?.details?.studyTimeMs
+    if (st != null && Number.isFinite(Number(st)) && Number(st) > 0) {
+      durMs = Number(st)
+    }
+  }
+  const topPct = (startMs / DAY_MS) * 100
+  const heightPct = Math.min((durMs / DAY_MS) * 100, 100 - topPct)
+  return {
+    top: `${topPct}%`,
+    height: `${Math.max(heightPct, MIN_BAR_HEIGHT_PCT)}%`,
+  }
 }
 
 function resolveFocusBlocksNoOverlap(
@@ -153,15 +176,25 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
 
   const getDuration = (session: TimeSession) => {
     const end = session.endTime || new Date()
-    const ms = end.getTime() - session.startTime.getTime()
+    let ms = end.getTime() - session.startTime.getTime()
+    if (session.source === 'anki') {
+      const st = session.healthData?.details?.studyTimeMs
+      if (st != null && Number.isFinite(Number(st)) && Number(st) > 0) {
+        ms = Number(st)
+      }
+    }
     const minutes = Math.floor(ms / 60000)
     const hrs = Math.floor(minutes / 60)
     const mins = minutes % 60
+    const secs = Math.floor((ms % 60000) / 1000)
 
     if (hrs > 0) {
       return `${hrs}h ${mins}m`
     }
-    return `${mins}m`
+    if (minutes > 0) {
+      return `${mins}m`
+    }
+    return secs > 0 ? `${secs}s` : '0s'
   }
 
   const getColorForActivity = (activity: string) => {

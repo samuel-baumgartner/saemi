@@ -7,13 +7,10 @@ import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 import { ActiveSessionTracker } from '@/components/ActiveSessionTracker'
 import { TimelineView } from '@/components/TimelineView'
 import { GoogleFitConnect } from '@/components/GoogleFitConnect'
-import { AnkiConnect } from '@/components/AnkiConnect'
 import SummaryView from '@/components/SummaryView'
 import { GoalsTab } from '@/components/GoalsTab'
+import { RecoverTimelineData } from '@/components/RecoverTimelineData'
 import { Calendar, BarChart3, Target } from 'lucide-react'
-
-/** Set to `true` to show AnkiConnect sync UI again. */
-const SHOW_ANKI_SYNC = false
 
 interface TaskDashboardProps {
   userId: string
@@ -76,6 +73,7 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
     sessions,
     activeSession,
     isLoading,
+    loadSessions,
     startSession,
     stopSession,
     addManualSession,
@@ -105,16 +103,16 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
           {previewPhone ? 'Exit phone preview' : 'Phone preview'}
         </button>
       </div>
+      {!isLoading && sessions.length === 0 && (
+        <RecoverTimelineData currentEmail={userId} onRecovered={loadSessions} />
+      )}
+
       {/* Google Fit Integration */}
       <GoogleFitConnect
         userId={userId}
         accessToken={accessToken}
         onSync={syncHealthSessions}
       />
-
-      {SHOW_ANKI_SYNC && (
-        <AnkiConnect userId={userId} onSync={syncHealthSessions} />
-      )}
 
       {/* Active Session Tracker */}
       <ActiveSessionTracker

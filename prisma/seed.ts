@@ -3,8 +3,8 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Replace this with your actual Google account email
-  const userId = 'samuel.baumgartner@ebmnet.ch'
+  // Canonical timeline user id = primary Google email (see getDbUserId / auth merge)
+  const userId = 'sbaumgartn12@gmail.com'
 
   console.log('🌱 Seeding database with past sessions...')
 

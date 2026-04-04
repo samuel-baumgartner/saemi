@@ -61,7 +61,9 @@ class UnproductiveAccessibilityService : AccessibilityService() {
                 if (!stillTarget) return@execute
             }
 
-            mainHandler.post { launchBlocker() }
+            mainHandler.post {
+                GoogleFitRefresh.maybePrimeFitThenRun(this) { launchBlocker() }
+            }
         }
     }
 

@@ -36,7 +36,16 @@ function toTimeSession(row: {
   endTime: Date | null
   date: string
   source: string
+  healthDataType?: string | null
+  healthDataDetails?: unknown | null
 }): TimeSession {
+  const healthData =
+    row.healthDataType != null || row.healthDataDetails != null
+      ? ({
+          type: row.healthDataType,
+          details: row.healthDataDetails ?? undefined,
+        } as TimeSession['healthData'])
+      : undefined
   return {
     id: row.id,
     activity: row.activity,
@@ -45,6 +54,7 @@ function toTimeSession(row: {
     endTime: row.endTime ?? undefined,
     date: row.date,
     source: row.source as TimeSession['source'],
+    ...(healthData ? { healthData } : {}),
   }
 }
 
