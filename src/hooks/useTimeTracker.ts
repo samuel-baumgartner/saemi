@@ -2,9 +2,24 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { TimeSession } from '@/types/task'
+import type { HealthSyncSession } from '@/lib/ankiClientSync'
 import { getLocalDateString } from '@/lib/dateUtils'
 
-function sessionFromApiRow(session: any): TimeSession {
+/** Row shape from GET /api/sessions (Prisma JSON + ISO date strings). */
+type TimeSessionApiRow = {
+  id: string
+  activity: string
+  description?: string | null
+  startTime: string | Date
+  endTime?: string | Date | null
+  date: string
+  source?: TimeSession['source']
+  healthData?: TimeSession['healthData']
+  healthDataType?: string | null
+  healthDataDetails?: unknown
+}
+
+function sessionFromApiRow(session: TimeSessionApiRow): TimeSession {
   const healthFromDb =
     session.healthDataType != null || session.healthDataDetails != null
       ? {
@@ -27,16 +42,16 @@ export function useTimeTracker() {
 
   const loadSessions = useCallback(async () => {
     try {
-      const response = await fetch('/api/sessions')
+      const response = await fetch('/api/sessions', { cache: 'no-store' })
       if (!response.ok) throw new Error('Failed to fetch sessions')
 
-      const data = await response.json()
+      const data = (await response.json()) as TimeSessionApiRow[]
 
       const sessionsWithDates = data.map(sessionFromApiRow)
 
       setSessions(sessionsWithDates)
 
-      const active = sessionsWithDates.find((s: TimeSession) => !s.endTime)
+      const active = sessionsWithDates.find((s) => !s.endTime)
       setActiveSession(active ?? null)
     } catch (error) {
       console.error('Failed to load sessions:', error)
@@ -170,7 +185,7 @@ export function useTimeTracker() {
     }
   }
 
-  const syncHealthSessions = async (healthSessions: TimeSession[]) => {
+  const syncHealthSessions = async (healthSessions: HealthSyncSession[]) => {
     try {
       console.log('📤 Sending sessions to sync:', {
         count: healthSessions.length,

@@ -3,6 +3,8 @@ import { Prisma } from '@prisma/client'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 import {
   DEFAULT_DAILY_GOALS,
   normalizeStoredGoals,

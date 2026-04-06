@@ -8,7 +8,8 @@ export interface TimeSession {
   source?: 'manual' | 'tracked' | 'google-fit' | 'anki' | 'timechecker' | 'phone'  // where the data came from
   healthData?: {
     type: 'sleep' | 'workout' | 'activity' | 'study'
-    details?: any  // specific health metrics
+    /** Arbitrary JSON-compatible metrics (e.g. study timers). */
+    details?: Record<string, unknown>
   }
 }
 

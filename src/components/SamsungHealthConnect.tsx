@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { Activity, RefreshCw, Unplug, CheckCircle2, AlertCircle } from 'lucide-react'
-import { GoogleFitService, getGoogleFitToken, storeGoogleFitToken, removeGoogleFitToken } from '@/lib/googleFit'
+import { GoogleFitService, getGoogleFitToken, removeGoogleFitToken } from '@/lib/googleFit'
 import { signIn } from 'next-auth/react'
+import type { HealthSyncSession } from '@/lib/ankiClientSync'
 
 interface GoogleFitConnectProps {
   userId: string
-  onSync: (sessions: any[]) => void
+  onSync: (sessions: HealthSyncSession[]) => void
 }
 
 export function GoogleFitConnect({ userId, onSync }: GoogleFitConnectProps) {

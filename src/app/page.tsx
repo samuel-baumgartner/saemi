@@ -25,7 +25,7 @@ function ModelPreloader() {
       try {
         // Preload the GLB model
         useGLTF.preload('/Kugel_rerender6.glb');
-      } catch (error) {
+      } catch {
         // Silently fail if preload doesn't work
         console.debug('Model preload initiated');
       }

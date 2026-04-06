@@ -1,6 +1,15 @@
 import { SleepData, WorkoutData, TimeSession } from '@/types/task'
 import { getLocalDateString } from './dateUtils'
 
+/** Google Fit `/sessions` list API item (subset of fields used here). */
+type GoogleFitSessionJson = {
+  id: string
+  activityType: number
+  startTimeMillis: string
+  endTimeMillis: string
+  description?: string
+}
+
 // Google Fit API integration
 // Documentation: https://developers.google.com/fit
 
@@ -52,9 +61,9 @@ export class GoogleFitService {
       })
       
       // Convert Google Fit sessions to our SleepData format
-      const sleepSessions = (data.session || [])
-        .filter((session: any) => session.activityType === 72) // Sleep activity
-        .map((session: any) => {
+      const sleepSessions = ((data.session ?? []) as GoogleFitSessionJson[])
+        .filter((session) => session.activityType === 72) // Sleep activity
+        .map((session) => {
           const startTime = new Date(parseInt(session.startTimeMillis))
           const endTime = new Date(parseInt(session.endTimeMillis))
           const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 60000) // minutes
@@ -106,14 +115,17 @@ export class GoogleFitService {
       console.log('📦 Raw Google Fit workout response:', {
         totalSessions: data.session?.length || 0,
         hasSession: !!data.session,
-        activityTypes: data.session?.map((s: any) => s.activityType).join(', ') || 'none',
+        activityTypes:
+          (data.session as GoogleFitSessionJson[] | undefined)
+            ?.map((s) => s.activityType)
+            .join(', ') || 'none',
         firstSession: data.session?.[0]
       })
 
       // Convert Google Fit sessions to our WorkoutData format
-      const workoutSessions = (data.session || [])
-        .filter((session: any) => session.activityType !== 72) // Exclude sleep
-        .map((session: any) => {
+      const workoutSessions = ((data.session ?? []) as GoogleFitSessionJson[])
+        .filter((session) => session.activityType !== 72) // Exclude sleep
+        .map((session) => {
           const startTime = new Date(parseInt(session.startTimeMillis))
           const endTime = new Date(parseInt(session.endTimeMillis))
           const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 60000)
@@ -172,7 +184,7 @@ export class GoogleFitService {
     startTime: Date,
     endTime: Date,
     source: 'manual' | 'tracked' | 'google-fit' | 'anki',
-    healthData: any
+    healthData: NonNullable<TimeSession['healthData']>
   ): TimeSession[] {
     const sessions: TimeSession[] = []
     const currentStart = new Date(startTime)
@@ -231,7 +243,7 @@ export class GoogleFitService {
           'google-fit',
           {
             type: 'sleep',
-            details: sleep,
+            details: sleep as unknown as Record<string, unknown>,
           }
         )
         sessions.push(...splitSessions)
@@ -247,7 +259,7 @@ export class GoogleFitService {
           source: 'google-fit',
           healthData: {
             type: 'sleep',
-            details: sleep,
+            details: sleep as unknown as Record<string, unknown>,
           },
         })
       }
@@ -266,7 +278,7 @@ export class GoogleFitService {
           'google-fit',
           {
             type: 'workout',
-            details: workout,
+            details: workout as unknown as Record<string, unknown>,
           }
         )
         sessions.push(...splitSessions)
@@ -281,7 +293,7 @@ export class GoogleFitService {
           source: 'google-fit',
           healthData: {
             type: 'workout',
-            details: workout,
+            details: workout as unknown as Record<string, unknown>,
           },
         })
       }

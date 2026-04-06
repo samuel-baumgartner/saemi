@@ -1,6 +1,5 @@
-import { auth, signIn, signOut } from '@/auth'
-import { TaskDashboard } from '@/components/TaskDashboard'
-import { LogOut, User } from 'lucide-react'
+import { auth, signIn } from '@/auth'
+import { User } from 'lucide-react'
 import { redirect } from 'next/navigation'
 
 export default async function PersonalPage() {

@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
-import { minutesTowardGoal, normalizeStoredGoals } from '@/lib/goalConfig'
+import {
+  minutesTowardGoal,
+  normalizeStoredGoals,
+} from '@/lib/goalConfig'
+import type { TimeSession } from '@/types/task'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -174,7 +178,7 @@ export async function GET(request: NextRequest) {
     })
 
     const items = goals.map((g) => {
-      const done = minutesTowardGoal(g.id, forGoals as any)
+      const done = minutesTowardGoal(g.id, forGoals as TimeSession[])
       const pct = Math.min(100, Math.round((done / g.targetMinutes) * 100))
       const met = done >= g.targetMinutes
       return {

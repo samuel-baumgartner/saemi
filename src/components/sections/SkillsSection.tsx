@@ -37,7 +37,7 @@ const spotlightColors: Record<string, string> = {
 };
 
 // Icon components for each skill category
-const SkillIcon = ({ skillId, color }: { skillId: string; color: string }) => {
+const SkillIcon = ({ skillId }: { skillId: string; color?: string }) => {
   const iconSize = 40;
   const iconColor = iconColors[skillId] || iconColors.programming;
   

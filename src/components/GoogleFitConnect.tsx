@@ -4,46 +4,39 @@ import { useState, useEffect } from 'react'
 import { Activity, RefreshCw, Unplug, CheckCircle2, AlertCircle } from 'lucide-react'
 import { GoogleFitService } from '@/lib/googleFit'
 import { fetchAnkiSessionsForUser } from '@/lib/ankiClientSync'
+import type { HealthSyncSession } from '@/lib/ankiClientSync'
 
 interface GoogleFitConnectProps {
   userId: string
-  accessToken?: string
-  onSync: (sessions: any[]) => void | Promise<void>
+  onSync: (sessions: HealthSyncSession[]) => void | Promise<void>
 }
 
-export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConnectProps) {
-  const [isConnected, setIsConnected] = useState(false)
+export function GoogleFitConnect({ userId, onSync }: GoogleFitConnectProps) {
+  const [isDisabled, setIsDisabled] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSync, setLastSync] = useState<Date | null>(null)
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [tokenHint, setTokenHint] = useState<string | null>(null)
 
   useEffect(() => {
-    // Check if user has disabled Google Fit
-    const isDisabled = localStorage.getItem(`google_fit_disabled_${userId}`) === 'true'
-    
-    // Check if Google Fit is connected (use session access token)
-    setIsConnected(!!accessToken && !isDisabled)
+    setIsDisabled(localStorage.getItem(`google_fit_disabled_${userId}`) === 'true')
 
-    // Load last sync time
     const lastSyncStr = localStorage.getItem(`google_fit_last_sync_${userId}`)
     if (lastSyncStr) {
       setLastSync(new Date(lastSyncStr))
     }
-  }, [userId, accessToken])
+  }, [userId])
 
   const handleConnect = () => {
-    // Re-enable Google Fit
     localStorage.removeItem(`google_fit_disabled_${userId}`)
-    setIsConnected(true)
+    setIsDisabled(false)
   }
 
   const handleDisconnect = () => {
     if (confirm('Disconnect Google Fit? Your health data will stop syncing (you can reconnect anytime).')) {
-      // Mark as disabled
       localStorage.setItem(`google_fit_disabled_${userId}`, 'true')
       localStorage.removeItem(`google_fit_last_sync_${userId}`)
-      setIsConnected(false)
+      setIsDisabled(true)
       setLastSync(null)
     }
   }
@@ -137,7 +130,7 @@ export function GoogleFitConnect({ userId, accessToken, onSync }: GoogleFitConne
     }
   }
 
-  if (!isConnected) {
+  if (isDisabled) {
     return (
       <div className="bg-gradient-to-r from-blue-500/10 to-green-500/10 border border-blue-500/30 rounded-lg p-6">
         <div className="flex items-start gap-4">

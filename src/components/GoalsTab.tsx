@@ -59,7 +59,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
       setError(null)
     }
     try {
-      const r = await fetch('/api/user/goals')
+      const r = await fetch('/api/user/goals', { cache: 'no-store' })
       if (!r.ok) throw new Error('Failed to load goals')
       const data = await r.json()
       const g = data.goals as DailyGoalDef[]

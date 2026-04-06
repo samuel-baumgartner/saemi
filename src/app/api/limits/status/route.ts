@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
+import type { TimeSession as DbTimeSession } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 import {
   normalizeStoredGoals,
   unproductiveBudgetLimitMinutes,
@@ -35,18 +38,22 @@ export async function GET(request: NextRequest) {
 
     const goals = normalizeStoredGoals(goalRow?.goalsJson ?? null)
 
-    const sessions: TimeSession[] = rows.map((r: any) => ({
+    const sessions: TimeSession[] = rows.map((r: DbTimeSession) => ({
       id: r.id,
       activity: r.activity,
       description: r.description ?? undefined,
       startTime: r.startTime,
       endTime: r.endTime ?? undefined,
       date: r.date,
-      source: r.source,
+      source: r.source as TimeSession['source'],
       healthData: r.healthDataType
         ? {
-            type: r.healthDataType,
-            details: r.healthDataDetails ?? undefined,
+            type: r.healthDataType as NonNullable<
+              TimeSession['healthData']
+            >['type'],
+            details: (r.healthDataDetails ?? undefined) as
+              | Record<string, unknown>
+              | undefined,
           }
         : undefined,
     }))

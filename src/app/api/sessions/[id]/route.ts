@@ -3,7 +3,7 @@ import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
 
-// PATCH /api/sessions/[id] - Update a session
+export const dynamic = 'force-dynamic'
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

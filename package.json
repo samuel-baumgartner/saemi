@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "prisma generate --no-engine && prisma migrate deploy && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "postinstall": "prisma generate --no-engine",
     "seed": "tsx prisma/seed.ts"
   },

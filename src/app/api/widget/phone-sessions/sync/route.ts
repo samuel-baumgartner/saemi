@@ -18,6 +18,10 @@ function parseBearerToken(header: string | null): string | null {
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return v !== null && typeof v === 'object'
+}
+
 type IncomingPhoneSession = {
   activity: string
   description?: string | null
@@ -65,12 +69,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const dateRaw =
-    typeof (body as any)?.date === 'string' ? (body as any).date : null
+  if (!isRecord(body)) {
+    return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
+  }
+
+  const dateRaw = typeof body.date === 'string' ? body.date : null
   const date =
     dateRaw && DATE_RE.test(dateRaw) ? dateRaw : getServerCalendarDateString()
 
-  const sessions = (body as any)?.sessions as unknown
+  const sessions = body.sessions
   if (!Array.isArray(sessions)) {
     return NextResponse.json(
       { error: 'Invalid body: expected { sessions: [...] }' },
@@ -79,19 +86,19 @@ export async function POST(request: NextRequest) {
   }
 
   for (const s of sessions) {
-    if (!s || typeof s !== 'object') {
+    if (!isRecord(s)) {
       return NextResponse.json(
         { error: 'Each session must be an object' },
         { status: 400 }
       )
     }
-    if (!(s as any).activity || typeof (s as any).activity !== 'string') {
+    if (!s.activity || typeof s.activity !== 'string') {
       return NextResponse.json(
         { error: 'Each session needs activity (string)' },
         { status: 400 }
       )
     }
-    if (!(s as any).startTime || typeof (s as any).startTime !== 'string') {
+    if (!s.startTime || typeof s.startTime !== 'string') {
       return NextResponse.json(
         { error: 'Each session needs startTime (ISO string)' },
         { status: 400 }

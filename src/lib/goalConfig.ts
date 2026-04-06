@@ -80,7 +80,7 @@ export function effectiveSessionDurationMs(
     : Math.max(0, Date.now() - s.startTime.getTime())
 
   if (s.source === 'anki') {
-    const raw = s.healthData?.details?.studyTimeMs
+    const raw = s.healthData?.details?.['studyTimeMs']
     const study =
       raw != null && Number.isFinite(Number(raw)) ? Number(raw) : null
     if (study != null && study > 0) return study

@@ -73,7 +73,6 @@ export default async function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <TaskDashboard
           userId={getDbUserId(session) || session.user.email || session.user.id || ''}
-          accessToken={session.accessToken}
         />
       </main>
     </div>

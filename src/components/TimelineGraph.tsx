@@ -44,7 +44,7 @@ function getSessionPosition(session: TimeSession) {
   const startMs = msIntoLocalDay(session.startTime)
   let durMs = Math.max(0, end.getTime() - session.startTime.getTime())
   if (session.source === 'anki') {
-    const st = session.healthData?.details?.studyTimeMs
+    const st = session.healthData?.details?.['studyTimeMs']
     if (st != null && Number.isFinite(Number(st)) && Number(st) > 0) {
       durMs = Number(st)
     }
@@ -178,7 +178,7 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
     const end = session.endTime || new Date()
     let ms = end.getTime() - session.startTime.getTime()
     if (session.source === 'anki') {
-      const st = session.healthData?.details?.studyTimeMs
+      const st = session.healthData?.details?.['studyTimeMs']
       if (st != null && Number.isFinite(Number(st)) && Number(st) > 0) {
         ms = Number(st)
       }

@@ -1,3 +1,4 @@
+import type { TimeSession } from '@/types/task'
 import { AnkiConnectService } from '@/lib/anki'
 import { getLocalDateString } from '@/lib/dateUtils'
 
@@ -21,6 +22,9 @@ export type AnkiSyncPayload = {
     }
   }
 }
+
+/** POST /api/sessions/sync accepts Google Fit rows, Anki payloads, etc. */
+export type HealthSyncSession = TimeSession | AnkiSyncPayload
 
 export type AnkiFetchResult = {
   sessions: AnkiSyncPayload[]

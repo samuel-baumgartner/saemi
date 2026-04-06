@@ -1,22 +1,10 @@
 import React from 'react';
-import { ProjectSection, FeatureItem, TechStackItem } from '@/types';
+import { FeatureItem, TechStackItem } from '@/types';
 
 export const createSectionHeader = (
   title: string,
-  gradient: string = 'from-blue-500 to-purple-500'
+  _gradient: string = 'from-blue-500 to-purple-500'
 ): React.ReactNode => {
-  // Map gradient strings to darker, more visible versions
-  const darkGradientMap: Record<string, string> = {
-    'from-blue-500 to-purple-500': 'from-blue-700 to-purple-700',
-    'from-green-500 to-emerald-500': 'from-green-700 to-emerald-700',
-    'from-purple-500 to-pink-500': 'from-purple-700 to-pink-700',
-    'from-indigo-500 to-blue-500': 'from-indigo-700 to-blue-700',
-    'from-blue-500 to-cyan-500': 'from-blue-700 to-cyan-700',
-    'from-orange-500 to-red-500': 'from-orange-700 to-red-700',
-    'from-red-500 to-pink-500': 'from-red-700 to-pink-700',
-  };
-  const darkGradient = darkGradientMap[gradient] || 'from-gray-800 to-gray-900';
-  
   return (
     <h4 className="text-3xl md:text-4xl font-extrabold mb-3">
       <span className="text-gray-900">
@@ -163,8 +151,8 @@ export const createHighlightedSection = (
   title: string,
   content: React.ReactNode,
   gradient: string = 'from-blue-500 to-cyan-500',
-  bgColor: string = 'bg-blue-50',
-  borderColor: string = 'border-blue-100'
+  _bgColor: string = 'bg-blue-50',
+  _borderColor: string = 'border-blue-100'
 ): React.ReactNode => (
   <div className="space-y-5">
     {createSectionHeader(title, gradient)}

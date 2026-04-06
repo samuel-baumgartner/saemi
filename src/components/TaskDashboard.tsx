@@ -14,10 +14,9 @@ import { Calendar, BarChart3, Target } from 'lucide-react'
 
 interface TaskDashboardProps {
   userId: string
-  accessToken?: string
 }
 
-export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
+export function TaskDashboard({ userId }: TaskDashboardProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -110,7 +109,6 @@ export function TaskDashboard({ userId, accessToken }: TaskDashboardProps) {
       {/* Google Fit Integration */}
       <GoogleFitConnect
         userId={userId}
-        accessToken={accessToken}
         onSync={syncHealthSessions}
       />
 

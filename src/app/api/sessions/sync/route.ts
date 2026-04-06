@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
-// POST /api/sessions/sync - Sync health sessions (replaces old health data)
+export const dynamic = 'force-dynamic'
+
+/** Client shape for sync payload (matches what the client sends today). */
+type SyncSessionInput = {
+  activity: string
+  description?: string | null
+  startTime: string
+  endTime?: string | null
+  date: string
+  source?: string
+  healthData?: { type?: string; details?: unknown }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
@@ -43,7 +56,7 @@ export async function POST(request: NextRequest) {
     console.log(`🗑️  Deleted old ${source} sessions`)
 
     // Create new sessions
-    const sessionsToCreate = sessions.map((s: any) => ({
+    const sessionsToCreate = sessions.map((s: SyncSessionInput) => ({
       userId,
       activity: s.activity,
       description: s.description || null,
@@ -52,7 +65,10 @@ export async function POST(request: NextRequest) {
       date: s.date,
       source: s.source || 'google-fit',
       healthDataType: s.healthData?.type || null,
-      healthDataDetails: s.healthData?.details || null,
+      healthDataDetails:
+        s.healthData?.details !== undefined && s.healthData?.details !== null
+          ? (s.healthData.details as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
     }))
 
     console.log('💾 Saving to database:')

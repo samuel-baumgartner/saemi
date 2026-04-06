@@ -5,10 +5,11 @@ import { BookOpen, RefreshCw, Unplug, CheckCircle2, AlertCircle, ExternalLink, S
 import { AnkiConnectService, getAnkiConnected, storeAnkiConnected } from '@/lib/anki'
 import { fetchAnkiSessionsForUser } from '@/lib/ankiClientSync'
 import { AnkiSessionGapDialog } from './AnkiSessionGapDialog'
+import type { HealthSyncSession } from '@/lib/ankiClientSync'
 
 interface AnkiConnectProps {
   userId: string
-  onSync: (sessions: any[]) => void
+  onSync: (sessions: HealthSyncSession[]) => void
 }
 
 export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
@@ -65,10 +66,12 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
       } else {
         throw new Error('Could not connect to AnkiConnect')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('AnkiConnect test failed:', error)
       setIsConnected(false)
-      setErrorMessage(error.message || 'Connection failed')
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Connection failed'
+      )
       storeAnkiConnected(userId, false)
     } finally {
       setIsTesting(false)
@@ -141,9 +144,11 @@ export function AnkiConnect({ userId, onSync }: AnkiConnectProps) {
       localStorage.setItem(`anki_last_sync_${userId}`, now.toISOString())
 
       setSyncStatus('success')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Anki sync failed:', error)
-      setErrorMessage(error.message || 'Sync failed')
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Sync failed'
+      )
       setSyncStatus('error')
     } finally {
       setIsSyncing(false)

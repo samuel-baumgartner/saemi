@@ -57,7 +57,7 @@ export function TimelineView({
     let cancelled = false
     ;(async () => {
       try {
-        const r = await fetch('/api/user/goals')
+        const r = await fetch('/api/user/goals', { cache: 'no-store' })
         if (!r.ok) throw new Error('goals fetch failed')
         const data = await r.json()
         const g = normalizeStoredGoals(data.goals)
@@ -160,13 +160,13 @@ export function TimelineView({
   const getWorkTime = () => {
     // Exclude Google Fit health data (sleep and exercise)
     return daySessionsAll
-      .filter((session: any) => {
+      .filter((session) => {
         // Exclude sleep sessions
-        if (session.source === 'google-fit' && session.healthDataType === 'sleep') {
+        if (session.source === 'google-fit' && session.healthData?.type === 'sleep') {
           return false
         }
         // Exclude workout/exercise sessions
-        if (session.source === 'google-fit' && session.healthDataType === 'workout') {
+        if (session.source === 'google-fit' && session.healthData?.type === 'workout') {
           return false
         }
         return true
