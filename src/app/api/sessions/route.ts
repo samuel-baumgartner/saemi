@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
+import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
@@ -11,10 +12,12 @@ const NO_CACHE_HEADERS = { 'Cache-Control': 'no-store, max-age=0' } as const
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    const userId = getDbUserId(session)
-    if (!userId) {
+    const sessionUserId = getDbUserId(session)
+    if (!sessionUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const userId = resolveSessionsOwnerUserId(sessionUserId)
 
     const { searchParams } = new URL(request.url)
     const startDate = searchParams.get('startDate')
@@ -50,10 +53,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    const userId = getDbUserId(session)
-    if (!userId) {
+    const sessionUserId = getDbUserId(session)
+    if (!sessionUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const userId = resolveSessionsOwnerUserId(sessionUserId)
 
     const body = await request.json()
     const {

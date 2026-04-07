@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
 import { getDailyGoalsPayloadForUser } from '@/lib/widgetDailyGoalsShared'
+import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +19,7 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = process.env.WIDGET_USER_ID?.trim() || sessionUserId
+    const userId = resolveSessionsOwnerUserId(sessionUserId)
 
     const { date: d, items } = await getDailyGoalsPayloadForUser(userId, null)
     return NextResponse.json({ date: d, items })

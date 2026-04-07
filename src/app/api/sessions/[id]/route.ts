@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
+import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -10,10 +11,12 @@ export async function PATCH(
 ) {
   try {
     const session = await auth()
-    const userId = getDbUserId(session)
-    if (!userId) {
+    const sessionUserId = getDbUserId(session)
+    if (!sessionUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const userId = resolveSessionsOwnerUserId(sessionUserId)
 
     const { id } = await params
     const body = await request.json()
@@ -64,10 +67,12 @@ export async function DELETE(
 ) {
   try {
     const session = await auth()
-    const userId = getDbUserId(session)
-    if (!userId) {
+    const sessionUserId = getDbUserId(session)
+    if (!sessionUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const userId = resolveSessionsOwnerUserId(sessionUserId)
 
     const { id } = await params
 
