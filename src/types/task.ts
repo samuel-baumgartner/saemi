@@ -13,6 +13,9 @@ export interface TimeSession {
   }
 }
 
+/** Payload accepted by POST /api/sessions/sync (e.g. Google Fit). */
+export type HealthSyncSession = TimeSession
+
 export interface User {
   id: string
   name?: string | null

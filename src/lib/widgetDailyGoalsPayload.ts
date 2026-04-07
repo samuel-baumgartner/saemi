@@ -58,17 +58,30 @@ function toTimeSession(row: {
   }
 }
 
+export type WidgetDailyGoalsOptions = {
+  /** When set, open session duration matches TimeChecker / Goals web (wall clock for active id). */
+  activeSessionId?: string | null
+}
+
 /**
  * Same payload as GET /api/widget/daily-goals (for Android widget + web preview).
+ * Optional {@link WidgetDailyGoalsOptions.activeSessionId} aligns in-progress
+ * sessions with the logged-in web app.
  */
 export async function getWidgetDailyGoalsPayload(
   userId: string,
   date: string,
+  options?: WidgetDailyGoalsOptions,
 ): Promise<{ date: string; items: WidgetGoalItem[] }> {
+  const activeSessionId = options?.activeSessionId ?? null
+
+  /** Matches legacy rows + env typos: Google email casing can differ from WIDGET_USER_ID. */
+  const userIdMatch = { userId: { equals: userId, mode: 'insensitive' as const } }
+
   const [goalRow, sessionRows] = await Promise.all([
-    prisma.userGoalSettings.findUnique({ where: { userId } }),
+    prisma.userGoalSettings.findFirst({ where: userIdMatch }),
     prisma.timeSession.findMany({
-      where: { userId, date },
+      where: { ...userIdMatch, date },
       orderBy: { startTime: 'asc' },
     }),
   ])
@@ -76,8 +89,12 @@ export async function getWidgetDailyGoalsPayload(
   const goals = normalizeStoredGoals(goalRow?.goalsJson ?? null)
   const sessions = sessionRows.map(toTimeSession)
 
-  const unproductiveBudget = unproductiveBudgetLimitMinutes(goals, sessions)
-  const unproductiveDone = unproductiveMinutesToday(sessions)
+  const unproductiveBudget = unproductiveBudgetLimitMinutes(
+    goals,
+    sessions,
+    activeSessionId,
+  )
+  const unproductiveDone = unproductiveMinutesToday(sessions, activeSessionId)
   const unproductivePct =
     unproductiveBudget > 0
       ? Math.min(
@@ -103,7 +120,7 @@ export async function getWidgetDailyGoalsPayload(
   }
 
   const goalItems = goals.map((g) => {
-    const done = minutesTowardGoal(g.id, sessions)
+    const done = minutesTowardGoal(g.id, sessions, activeSessionId)
     const pct = Math.min(100, Math.round((done / g.targetMinutes) * 100))
     const met = done >= g.targetMinutes
     return {

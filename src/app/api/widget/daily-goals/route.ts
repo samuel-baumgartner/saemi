@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
-import { getWidgetDailyGoalsPayload } from '@/lib/widgetDailyGoalsPayload'
-import { getServerCalendarDateString } from '@/lib/dateUtils'
+import { getDailyGoalsPayloadForUser } from '@/lib/widgetDailyGoalsShared'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -14,8 +13,6 @@ function parseBearerToken(header: string | null): string | null {
   const t = header.slice(7).trim()
   return t.length > 0 ? t : null
 }
-
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
 /**
  * Read-only daily goals + today's progress for the Android home screen widget.
@@ -41,13 +38,9 @@ export async function GET(request: NextRequest) {
   }
 
   const rawDate = request.nextUrl.searchParams.get('date')
-  const date =
-    rawDate && DATE_RE.test(rawDate)
-      ? rawDate
-      : getServerCalendarDateString(new Date())
 
   try {
-    const { date: d, items } = await getWidgetDailyGoalsPayload(userId, date)
+    const { date: d, items } = await getDailyGoalsPayloadForUser(userId, rawDate)
     return NextResponse.json({ date: d, items })
   } catch (e) {
     console.error('GET /api/widget/daily-goals', e)

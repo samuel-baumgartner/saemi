@@ -2,20 +2,22 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { TimeSession } from '@/types/task'
-import { getTodayString } from '@/lib/dateUtils'
+import { getCalendarTodayString } from '@/lib/dateUtils'
 import type { DailyGoalDef } from '@/lib/goalConfig'
 import {
   DEFAULT_DAILY_GOALS,
-  minutesTowardGoal,
   UNPRODUCTIVE_BUDGET_MAX_MIN,
-  unproductiveBudgetLimitMinutes,
-  unproductiveBudgetProgressParts,
-  unproductiveMinutesToday,
+  unproductiveBudgetLimitMinutesFromDones,
+  unproductiveBudgetProgressPartsFromDones,
 } from '@/lib/goalConfig'
+import type { WidgetGoalItem } from '@/lib/widgetDailyGoalsPayload'
 import { Loader2, RotateCcw, Save } from 'lucide-react'
 
 interface GoalsTabProps {
+  /** Used only to refetch server progress when sessions change (same DB as widget). */
   sessions: TimeSession[]
+  /** Kept for Timeline parity; goal progress uses the same rules as the phone widget (no active-session bonus). */
+  activeSessionId?: string | null
 }
 
 function cloneGoals(g: DailyGoalDef[]) {
@@ -43,15 +45,31 @@ function formatDoneTarget(done: number, target: number) {
   return { doneStr, targetStr }
 }
 
-export function GoalsTab({ sessions }: GoalsTabProps) {
-  const todayStr = getTodayString()
-  const todaySessions = sessions.filter((s) => s.date === todayStr)
+export function GoalsTab({
+  sessions,
+  activeSessionId: _activeSessionId = null,
+}: GoalsTabProps) {
+  const todayStr = getCalendarTodayString()
+  const sessionsSig = useMemo(
+    () =>
+      sessions
+        .map((s) => `${s.id}:${s.date}:${s.endTime?.getTime() ?? 0}`)
+        .join('|'),
+    [sessions]
+  )
 
   const [goals, setGoals] = useState<DailyGoalDef[] | null>(null)
   const [draft, setDraft] = useState<DailyGoalDef[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const [progressPayload, setProgressPayload] = useState<{
+    date: string
+    items: WidgetGoalItem[]
+  } | null>(null)
+  const [progressLoading, setProgressLoading] = useState(true)
+  const [progressError, setProgressError] = useState<string | null>(null)
 
   const load = useCallback(async (silent = false) => {
     if (!silent) {
@@ -82,6 +100,43 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
     load(false)
   }, [load])
 
+  const loadProgress = useCallback(async () => {
+    setProgressError(null)
+    try {
+      const r = await fetch('/api/user/goals/today', {
+        cache: 'no-store',
+      })
+      if (!r.ok) throw new Error('Failed to load progress')
+      const data = (await r.json()) as {
+        date: string
+        items: WidgetGoalItem[]
+      }
+      setProgressPayload({ date: data.date, items: data.items })
+    } catch {
+      setProgressError('Could not load today’s progress.')
+      setProgressPayload(null)
+    } finally {
+      setProgressLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void loadProgress()
+  }, [loadProgress, sessionsSig])
+
+  const doneByGoalId = useMemo(() => {
+    if (!progressPayload) return null
+    const m: Record<string, number> = {}
+    for (const it of progressPayload.items) {
+      if (it.id !== 'unproductive') m[it.id] = it.doneMinutes
+    }
+    return m
+  }, [progressPayload])
+
+  const unproductiveRow = progressPayload?.items.find(
+    (i) => i.id === 'unproductive'
+  )
+
   const displayGoals = draft ?? goals ?? DEFAULT_DAILY_GOALS
 
   const dirty = useMemo(() => {
@@ -96,6 +151,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
   useEffect(() => {
     const scheduleRefetch = () => {
       if (document.visibilityState !== 'visible') return
+      void loadProgress()
       if (dirtyRef.current) return
       if (goalsDebounceRef.current) clearTimeout(goalsDebounceRef.current)
       goalsDebounceRef.current = setTimeout(() => {
@@ -111,7 +167,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
       document.removeEventListener('visibilitychange', scheduleRefetch)
       window.removeEventListener('focus', scheduleRefetch)
     }
-  }, [load])
+  }, [load, loadProgress])
 
   const updateDraft = (id: string, patch: Partial<DailyGoalDef>) => {
     setDraft((d) => {
@@ -135,6 +191,7 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
       const g = data.goals as DailyGoalDef[]
       setGoals(cloneGoals(g))
       setDraft(cloneGoals(g))
+      void loadProgress()
     } catch {
       setError('Could not save goals. Try again.')
     } finally {
@@ -146,15 +203,15 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
     setDraft(cloneGoals(DEFAULT_DAILY_GOALS))
   }
 
-  const unproductive = unproductiveMinutesToday(todaySessions)
-  const budgetProgress = unproductiveBudgetProgressParts(
-    displayGoals,
-    todaySessions
-  )
-  const unproductiveTarget = unproductiveBudgetLimitMinutes(
-    displayGoals,
-    todaySessions
-  )
+  const progressReady = progressPayload != null
+
+  const budgetProgress = progressReady
+    ? unproductiveBudgetProgressPartsFromDones(displayGoals, doneByGoalId ?? {})
+    : { creditedMinutes: 0, totalTargetMinutes: 0, fraction: 0 }
+  const unproductiveTarget = progressReady
+    ? unproductiveBudgetLimitMinutesFromDones(displayGoals, doneByGoalId ?? {})
+    : 0
+  const unproductive = progressReady ? (unproductiveRow?.doneMinutes ?? 0) : 0
   const unproductivePct =
     unproductiveTarget > 0
       ? Math.min(100, (unproductive / unproductiveTarget) * 100)
@@ -174,8 +231,8 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
           <div>
             <h3 className="text-lg font-semibold text-white">Daily goals</h3>
             <p className="text-sm text-white/50 mt-1">
-              Edit labels and targets (minutes per day). Progress for today (
-              {todayStr}).
+              Edit labels and targets (minutes per day). Progress for calendar day{' '}
+              {progressPayload?.date ?? todayStr} (same rules as the phone widget).
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -210,6 +267,12 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
           </p>
         )}
 
+        {progressError && (
+          <p className="text-sm text-amber-300/90 mb-4 bg-amber-950/30 border border-amber-500/25 rounded-lg px-3 py-2">
+            {progressError}
+          </p>
+        )}
+
         {loading ? (
           <div className="flex items-center gap-2 text-white/50 py-8">
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -239,22 +302,34 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
                     Budget (min)
                   </span>
                   <div className="w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-white text-sm tabular-nums">
-                    {unproductiveTarget}
+                    {progressReady ? unproductiveTarget : '—'}
                   </div>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-0.5 mb-2">
                 <span className="text-xs text-white/40 tabular-nums">
                   Goal progress for budget:{' '}
-                  {budgetProgress.totalTargetMinutes > 0
+                  {progressReady && budgetProgress.totalTargetMinutes > 0
                     ? `${budgetProgress.creditedMinutes} / ${budgetProgress.totalTargetMinutes} min (${Math.round(budgetProgress.fraction * 100)}%)`
-                    : '—'}
+                    : progressReady
+                      ? '—'
+                      : progressLoading
+                        ? '…'
+                        : '—'}
                 </span>
                 <span className="text-sm text-red-300 tabular-nums">
-                  {unproductiveFmt.doneStr}
-                  <span className="text-red-400/70"> / </span>
-                  {unproductiveFmt.targetStr}
-                  {unproductiveOver && (
+                  {progressReady ? (
+                    <>
+                      {unproductiveFmt.doneStr}
+                      <span className="text-red-400/70"> / </span>
+                      {unproductiveFmt.targetStr}
+                    </>
+                  ) : (
+                    <span className="text-white/40">
+                      {progressLoading ? '…' : '—'}
+                    </span>
+                  )}
+                  {progressReady && unproductiveOver && (
                     <span className="ml-2 text-red-400 font-medium">
                       (
                       {unproductiveTarget > 0
@@ -273,13 +348,18 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
               </div>
             </div>
             {displayGoals.map((g) => {
-              const done = minutesTowardGoal(g.id, todaySessions)
-              const pct = Math.min(100, (done / g.targetMinutes) * 100)
-              const { doneStr, targetStr } = formatDoneTarget(
-                done,
-                g.targetMinutes
-              )
-              const met = done >= g.targetMinutes
+              const done = progressReady
+                ? (doneByGoalId?.[g.id] ?? 0)
+                : null
+              const pct =
+                done == null
+                  ? 0
+                  : Math.min(100, (done / g.targetMinutes) * 100)
+              const { doneStr, targetStr } =
+                done == null
+                  ? { doneStr: '', targetStr: '' }
+                  : formatDoneTarget(done, g.targetMinutes)
+              const met = done != null && done >= g.targetMinutes
 
               return (
                 <div
@@ -324,10 +404,18 @@ export function GoalsTab({ sessions }: GoalsTabProps) {
                   </div>
                   <div className="flex justify-end mb-2">
                     <span className="text-sm text-white/70 tabular-nums">
-                      {doneStr}
-                      <span className="text-white/40"> / </span>
-                      {targetStr}
-                      {met && (
+                      {done == null ? (
+                        <span className="text-white/40">
+                          {progressLoading ? '…' : '—'}
+                        </span>
+                      ) : (
+                        <>
+                          {doneStr}
+                          <span className="text-white/40"> / </span>
+                          {targetStr}
+                        </>
+                      )}
+                      {progressReady && met && (
                         <span className="ml-2 text-emerald-400 font-medium">
                           {done > g.targetMinutes
                             ? `(+${done - g.targetMinutes} min over)`

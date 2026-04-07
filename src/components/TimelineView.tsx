@@ -14,7 +14,11 @@ import {
   BarChart3,
   ClipboardCopy,
 } from 'lucide-react'
-import { getTodayString, getLocalDateString } from '@/lib/dateUtils'
+import {
+  getCalendarTodayString,
+  getCalendarYesterdayString,
+  getLocalDateString,
+} from '@/lib/dateUtils'
 import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 import {
   effectiveSessionDurationMs,
@@ -42,7 +46,7 @@ export function TimelineView({
   onAddManual,
   activeSessionId,
 }: TimelineViewProps) {
-  const [selectedDate, setSelectedDate] = useState(getTodayString())
+  const [selectedDate, setSelectedDate] = useState(getCalendarTodayString())
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph')
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [copyNote, setCopyNote] = useState<{ text: string; ok: boolean } | null>(
@@ -91,7 +95,7 @@ export function TimelineView({
       ? `${sortedSessionDates[0]} → ${sortedSessionDates[sortedSessionDates.length - 1]}`
       : null
 
-  const isToday = selectedDate === getTodayString()
+  const isToday = selectedDate === getCalendarTodayString()
 
   const daySessionsAll = sessions
     .filter((s) => s.date === selectedDate)
@@ -121,7 +125,7 @@ export function TimelineView({
   }
 
   const goToToday = () => {
-    setSelectedDate(getTodayString())
+    setSelectedDate(getCalendarTodayString())
   }
 
   const goToLatestSessionDay = () => {
@@ -131,14 +135,11 @@ export function TimelineView({
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00')
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
 
-    if (dateStr === getTodayString()) {
+    if (dateStr === getCalendarTodayString()) {
       return 'Today'
     }
-    if (dateStr === getLocalDateString(yesterday)) {
+    if (dateStr === getCalendarYesterdayString()) {
       return 'Yesterday'
     }
 

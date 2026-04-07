@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Activity, RefreshCw, Unplug, CheckCircle2, AlertCircle } from 'lucide-react'
 import { GoogleFitService } from '@/lib/googleFit'
-import { fetchAnkiSessionsForUser } from '@/lib/ankiClientSync'
-import type { HealthSyncSession } from '@/lib/ankiClientSync'
+import type { HealthSyncSession } from '@/types/task'
 
 interface GoogleFitConnectProps {
   userId: string
@@ -106,15 +105,6 @@ export function GoogleFitConnect({ userId, onSync }: GoogleFitConnectProps) {
 
       await onSync(healthSessions)
 
-      const { sessions: ankiSessions, connectOk: ankiOk } =
-        await fetchAnkiSessionsForUser(userId)
-      if (ankiSessions.length > 0) {
-        await onSync(ankiSessions)
-      }
-      if (ankiOk) {
-        localStorage.setItem(`anki_last_sync_${userId}`, new Date().toISOString())
-      }
-
       // Update last sync time
       const now = new Date()
       setLastSync(now)
@@ -207,8 +197,7 @@ export function GoogleFitConnect({ userId, onSync }: GoogleFitConnectProps) {
               </p>
             )}
             <p className="text-xs text-white/45 mt-1 max-w-xl">
-              Sync Now also updates Anki when Anki Desktop is open with AnkiConnect
-              (same Wi‑Fi / this machine).
+              Imports sleep and workout sessions from Google Fit for the selected range.
             </p>
           </div>
         </div>

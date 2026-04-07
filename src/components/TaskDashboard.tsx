@@ -162,7 +162,10 @@ export function TaskDashboard({ userId }: TaskDashboardProps) {
 
       {/* Content based on active tab */}
       {activeTab === 'goals' ? (
-        <GoalsTab sessions={sessions} />
+        <GoalsTab
+          sessions={sessions}
+          activeSessionId={activeSession?.id ?? null}
+        />
       ) : activeTab === 'timeline' ? (
         <TimelineView
           sessions={sessions}

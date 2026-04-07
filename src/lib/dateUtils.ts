@@ -23,13 +23,48 @@ export function formatDateYmdInTimeZone(date: Date, timeZone: string): string {
   }).format(date)
 }
 
+/** Default IANA zone for stored session `date` and widgets (must match server). */
+const DEFAULT_CALENDAR_TZ = 'Asia/Tokyo'
+
+function calendarTimeZone(): string {
+  if (typeof process === 'undefined') return DEFAULT_CALENDAR_TZ
+  const p = process.env
+  return (
+    p.CALENDAR_TIMEZONE?.trim() ||
+    p.NEXT_PUBLIC_CALENDAR_TIMEZONE?.trim() ||
+    DEFAULT_CALENDAR_TZ
+  )
+}
+
+/**
+ * Calendar YYYY-MM-DD for an instant in the same timezone as server/widget/phone sync.
+ * Set `NEXT_PUBLIC_CALENDAR_TIMEZONE` on the client to match `CALENDAR_TIMEZONE` on the server.
+ */
+export function formatDateYmdInCalendarTz(date: Date): string {
+  return formatDateYmdInTimeZone(date, calendarTimeZone())
+}
+
 /**
  * Default calendar day for API routes when the client does not pass `?date=`.
  * Set `CALENDAR_TIMEZONE` (e.g. Asia/Tokyo). Defaults to Asia/Tokyo if unset.
  */
 export function getServerCalendarDateString(date: Date = new Date()): string {
-  const tz = process.env.CALENDAR_TIMEZONE?.trim() || 'Asia/Tokyo'
-  return formatDateYmdInTimeZone(date, tz)
+  return formatDateYmdInCalendarTz(date)
+}
+
+/**
+ * "Today" for goals, timeline default, and new sessions — aligns web UI with phone widgets
+ * and `/api/widget/*` (which use {@link getServerCalendarDateString}).
+ */
+export function getCalendarTodayString(): string {
+  return formatDateYmdInCalendarTz(new Date())
+}
+
+/** Previous calendar day in {@link calendarTimeZone} (for labels like "Yesterday"). */
+export function getCalendarYesterdayString(): string {
+  const tz = calendarTimeZone()
+  const y = new Date(Date.now() - 24 * 60 * 60 * 1000)
+  return formatDateYmdInTimeZone(y, tz)
 }
 
 /**

@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
-import { getWidgetDailyGoalsPayload } from '@/lib/widgetDailyGoalsPayload'
+import { getDailyGoalsPayloadForUser } from '@/lib/widgetDailyGoalsShared'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
 import Link from 'next/link'
 
@@ -65,7 +65,7 @@ export default async function WidgetPreviewPage() {
 
   if (userId) {
     try {
-      const payload = await getWidgetDailyGoalsPayload(userId, today)
+      const payload = await getDailyGoalsPayloadForUser(userId, today)
       date = payload.date
       items = payload.items
     } catch {

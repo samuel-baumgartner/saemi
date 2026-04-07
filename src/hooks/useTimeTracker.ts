@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { TimeSession } from '@/types/task'
-import type { HealthSyncSession } from '@/lib/ankiClientSync'
-import { getLocalDateString } from '@/lib/dateUtils'
+import type { HealthSyncSession } from '@/types/task'
+import { formatDateYmdInCalendarTz } from '@/lib/dateUtils'
 
 /** Row shape from GET /api/sessions (Prisma JSON + ISO date strings). */
 type TimeSessionApiRow = {
@@ -96,7 +96,7 @@ export function useTimeTracker() {
       description,
       startTime: now,
       endTime: undefined,
-      date: getLocalDateString(now),
+      date: formatDateYmdInCalendarTz(now),
       source: 'tracked',
     }
 
@@ -161,7 +161,7 @@ export function useTimeTracker() {
       description,
       startTime,
       endTime,
-      date: getLocalDateString(startTime),
+      date: formatDateYmdInCalendarTz(startTime),
       source: 'manual',
     }
 
