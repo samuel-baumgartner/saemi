@@ -6,6 +6,8 @@ export interface TimeSession {
   endTime?: Date  // null if currently active
   date: string    // YYYY-MM-DD format for grouping by day
   source?: 'manual' | 'tracked' | 'google-fit' | 'anki' | 'timechecker' | 'phone'  // where the data came from
+  /** Web edit on a phone-synced row; kept across phone widget re-sync. */
+  userOverridden?: boolean
   healthData?: {
     type: 'sleep' | 'workout' | 'activity' | 'study'
     /** Arbitrary JSON-compatible metrics (e.g. study timers). */

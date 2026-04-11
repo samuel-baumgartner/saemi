@@ -3,13 +3,14 @@
 import { TimeSession } from '@/types/task'
 import { effectiveSessionDurationMs } from '@/lib/goalConfig'
 import { Trash2, Edit2, Check, Clock } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface SessionCardProps {
   session: TimeSession
-  onUpdate: (id: string, updates: Partial<TimeSession>) => void
+  onUpdate: (id: string, updates: Partial<TimeSession>) => void | Promise<void>
   onDelete: (id: string) => void
   isActive?: boolean
+  onAfterSave?: () => void
 }
 
 export function SessionCard({
@@ -17,6 +18,7 @@ export function SessionCard({
   onUpdate,
   onDelete,
   isActive = false,
+  onAfterSave,
 }: SessionCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editActivity, setEditActivity] = useState(session.activity)
@@ -33,6 +35,14 @@ export function SessionCard({
   const [editEndTime, setEditEndTime] = useState(
     session.endTime ? dateToTimeString(session.endTime) : ''
   )
+
+  useEffect(() => {
+    if (isEditing) return
+    setEditActivity(session.activity)
+    setEditDescription(session.description || '')
+    setEditStartTime(dateToTimeString(session.startTime))
+    setEditEndTime(session.endTime ? dateToTimeString(session.endTime) : '')
+  }, [session, isEditing])
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -58,26 +68,27 @@ export function SessionCard({
     return `${seconds}s`
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Convert time strings back to Date objects
     const [startHours, startMinutes] = editStartTime.split(':').map(Number)
     const newStartTime = new Date(session.startTime)
     newStartTime.setHours(startHours, startMinutes, 0, 0)
-    
+
     let newEndTime: Date | undefined = undefined
     if (editEndTime) {
       const [endHours, endMinutes] = editEndTime.split(':').map(Number)
       newEndTime = new Date(session.endTime || session.startTime)
       newEndTime.setHours(endHours, endMinutes, 0, 0)
     }
-    
-    onUpdate(session.id, {
+
+    await onUpdate(session.id, {
       activity: editActivity,
       description: editDescription,
       startTime: newStartTime,
       endTime: newEndTime,
     })
     setIsEditing(false)
+    onAfterSave?.()
   }
 
   return (
@@ -129,9 +140,19 @@ export function SessionCard({
             </div>
           ) : (
             <>
-              <h4 className="font-semibold text-white text-lg mb-1 truncate">
-                {session.activity}
-              </h4>
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h4 className="font-semibold text-white text-lg truncate">
+                  {session.activity}
+                </h4>
+                {session.source === 'phone' && session.userOverridden ? (
+                  <span
+                    className="shrink-0 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-400/40 text-amber-200/90 bg-amber-500/10"
+                    title="Edited on web; kept when the phone widget re-syncs"
+                  >
+                    Web override
+                  </span>
+                ) : null}
+              </div>
               {session.description && (
                 <p className="text-white/60 text-sm mb-2">{session.description}</p>
               )}

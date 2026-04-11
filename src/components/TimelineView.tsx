@@ -13,6 +13,7 @@ import {
   List,
   BarChart3,
   ClipboardCopy,
+  X,
 } from 'lucide-react'
 import {
   getCalendarTodayString,
@@ -33,8 +34,8 @@ import {
 
 interface TimelineViewProps {
   sessions: TimeSession[]
-  onUpdate: (id: string, updates: Partial<TimeSession>) => void
-  onDelete: (id: string) => void
+  onUpdate: (id: string, updates: Partial<TimeSession>) => void | Promise<void>
+  onDelete: (id: string) => void | Promise<void>
   onAddManual: (activity: string, startTime: Date, endTime: Date, description?: string) => void
   activeSessionId?: string
 }
@@ -52,6 +53,7 @@ export function TimelineView({
   const [copyNote, setCopyNote] = useState<{ text: string; ok: boolean } | null>(
     null
   )
+  const [graphEditSession, setGraphEditSession] = useState<TimeSession | null>(null)
   const [exportGoals, setExportGoals] = useState<DailyGoalDef[]>(() =>
     normalizeStoredGoals(null)
   )
@@ -380,10 +382,7 @@ export function TimelineView({
       ) : effectiveViewMode === 'graph' ? (
         <TimelineGraph
           sessions={daySessions}
-          onSessionClick={(session) => {
-            // Could open edit modal here
-            console.log('Clicked session:', session)
-          }}
+          onSessionClick={(session) => setGraphEditSession(session)}
         />
       ) : (
         <div className="space-y-3">
@@ -398,6 +397,50 @@ export function TimelineView({
           ))}
         </div>
       )}
+
+      {graphEditSession ? (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          role="presentation"
+          onClick={() => setGraphEditSession(null)}
+        >
+          <div
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-white/15 bg-zinc-950 p-4 shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="graph-edit-session-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h3 id="graph-edit-session-title" className="text-lg font-semibold text-white">
+                Edit session
+              </h3>
+              <button
+                type="button"
+                onClick={() => setGraphEditSession(null)}
+                className="p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white"
+                aria-label="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-xs text-white/50 mb-3">
+              Phone rows you save here stay as you set them when the widget syncs again.
+            </p>
+            <SessionCard
+              key={graphEditSession.id}
+              session={graphEditSession}
+              onUpdate={onUpdate}
+              onDelete={async (id) => {
+                await onDelete(id)
+                setGraphEditSession(null)
+              }}
+              isActive={graphEditSession.id === activeSessionId}
+              onAfterSave={() => setGraphEditSession(null)}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

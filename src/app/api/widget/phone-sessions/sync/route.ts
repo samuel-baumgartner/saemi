@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
+import { incomingPhoneSessionMatchesLockedRow } from '@/lib/phoneSessionUserOverride'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -43,8 +44,10 @@ type IncomingPhoneSession = {
  *   { date?: "YYYY-MM-DD", sessions: IncomingPhoneSession[] }
  *
  * Behavior:
- * - Deletes existing sessions for that user/date where source === "phone"
- * - Inserts the provided sessions as source === "phone"
+ * - Deletes phone sessions for that user/date where userOverridden is false.
+ * - Keeps phone rows the user edited on the web (userOverridden true).
+ * - Inserts each incoming session unless it matches a kept row’s start/end (same
+ *   interval), so web edits stay the source of truth and are not duplicated.
  */
 export async function POST(request: NextRequest) {
   const expected = process.env.WIDGET_API_TOKEN?.trim()
@@ -108,35 +111,65 @@ export async function POST(request: NextRequest) {
 
   try {
     await prisma.timeSession.deleteMany({
-      where: { userId, date, source: 'phone' },
+      where: { userId, date, source: 'phone', userOverridden: false },
+    })
+
+    const lockedRows = await prisma.timeSession.findMany({
+      where: { userId, date, source: 'phone', userOverridden: true },
+      select: { startTime: true, endTime: true },
     })
 
     if (sessions.length === 0) {
       return NextResponse.json({ success: true, count: 0, date })
     }
 
-    const rows = (sessions as IncomingPhoneSession[]).map((s) => {
-      const jsonDetails =
-        s.healthData?.details !== undefined && s.healthData?.details !== null
-          ? (s.healthData.details as Prisma.InputJsonValue)
-          : undefined
-      return {
-        userId,
-        activity: String(s.activity).slice(0, 200),
-        description:
-          typeof s.description === 'string'
-            ? s.description.slice(0, 500)
-            : s.description === null
-              ? null
-              : null,
-        startTime: new Date(s.startTime),
-        endTime: s.endTime ? new Date(s.endTime) : null,
-        date: (s.date && DATE_RE.test(s.date) ? s.date : date) as string,
-        source: 'phone',
-        healthDataType: s.healthData?.type ? String(s.healthData.type) : null,
-        healthDataDetails: jsonDetails,
-      }
-    })
+    const incoming = sessions as IncomingPhoneSession[]
+
+    const rows = incoming
+      .map((s) => {
+        const rowDate =
+          s.date && DATE_RE.test(s.date) ? s.date : (date as string)
+        const jsonDetails =
+          s.healthData?.details !== undefined && s.healthData?.details !== null
+            ? (s.healthData.details as Prisma.InputJsonValue)
+            : undefined
+        return {
+          userId,
+          activity: String(s.activity).slice(0, 200),
+          description:
+            typeof s.description === 'string'
+              ? s.description.slice(0, 500)
+              : s.description === null
+                ? null
+                : null,
+          startTime: new Date(s.startTime),
+          endTime: s.endTime ? new Date(s.endTime) : null,
+          date: rowDate,
+          source: 'phone' as const,
+          healthDataType: s.healthData?.type ? String(s.healthData.type) : null,
+          healthDataDetails: jsonDetails,
+          userOverridden: false,
+        }
+      })
+      .filter((row) => {
+        for (const L of lockedRows) {
+          if (
+            incomingPhoneSessionMatchesLockedRow(
+              row.startTime,
+              row.endTime,
+              L.startTime,
+              L.endTime
+            )
+          ) {
+            return false
+          }
+        }
+        return true
+      })
+
+    if (rows.length === 0) {
+      return NextResponse.json({ success: true, count: 0, date })
+    }
 
     const created = await prisma.timeSession.createMany({ data: rows })
     return NextResponse.json({

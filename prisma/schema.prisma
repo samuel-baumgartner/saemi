@@ -23,6 +23,8 @@ model TimeSession {
   // Health data (stored as JSON)
   healthDataType String? // 'sleep', 'workout', 'activity'
   healthDataDetails Json? // detailed metrics
+  // Web-edited phone row: kept on widget re-sync; see phone-sessions/sync.
+  userOverridden Boolean @default(false)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

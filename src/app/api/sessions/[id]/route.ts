@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
 import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -19,8 +20,14 @@ export async function PATCH(
     const userId = resolveSessionsOwnerUserId(sessionUserId)
 
     const { id } = await params
-    const body = await request.json()
-    const { activity, description, startTime, endTime, healthData } = body
+    const body = (await request.json()) as Record<string, unknown>
+    const { activity, description, startTime, endTime, healthData } = body as {
+      activity?: string
+      description?: string | null
+      startTime?: string
+      endTime?: string | null
+      healthData?: { type?: string; details?: unknown }
+    }
 
     // Verify the session belongs to the user
     const existingSession = await prisma.timeSession.findFirst({
@@ -34,20 +41,33 @@ export async function PATCH(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
+    const locksPhoneRow =
+      existingSession.source === 'phone' &&
+      ('activity' in body ||
+        'description' in body ||
+        'startTime' in body ||
+        'endTime' in body)
+
+    const data: Prisma.TimeSessionUpdateInput = {
+      ...(activity && { activity }),
+      ...(description !== undefined && { description }),
+      ...(startTime && { startTime: new Date(startTime) }),
+      ...(endTime !== undefined && {
+        endTime: endTime ? new Date(endTime) : null,
+      }),
+      ...(healthData && {
+        healthDataType: healthData.type ?? null,
+        healthDataDetails:
+          healthData.details === undefined || healthData.details === null
+            ? undefined
+            : (healthData.details as Prisma.InputJsonValue),
+      }),
+      ...(locksPhoneRow ? { userOverridden: true } : {}),
+    }
+
     const updatedSession = await prisma.timeSession.update({
       where: { id },
-      data: {
-        ...(activity && { activity }),
-        ...(description !== undefined && { description }),
-        ...(startTime && { startTime: new Date(startTime) }),
-        ...(endTime !== undefined && {
-          endTime: endTime ? new Date(endTime) : null,
-        }),
-        ...(healthData && {
-          healthDataType: healthData.type,
-          healthDataDetails: healthData.details,
-        }),
-      },
+      data,
     })
 
     return NextResponse.json(updatedSession)

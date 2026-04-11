@@ -14,6 +14,7 @@ type TimeSessionApiRow = {
   endTime?: string | Date | null
   date: string
   source?: TimeSession['source']
+  userOverridden?: boolean
   healthData?: TimeSession['healthData']
   healthDataType?: string | null
   healthDataDetails?: unknown

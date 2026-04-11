@@ -36,18 +36,19 @@ function toTaskSession(r: {
 }): TimeSession {
   return {
     id: r.id,
-    userId: r.userId,
     activity: r.activity,
-    description: r.description,
+    description: r.description ?? undefined,
     startTime: r.startTime,
-    endTime: r.endTime,
+    endTime: r.endTime ?? undefined,
     date: r.date,
     source: r.source as TimeSession['source'],
     healthData:
       r.healthDataType != null || r.healthDataDetails != null
         ? {
-            type: r.healthDataType ?? undefined,
-            details: r.healthDataDetails ?? undefined,
+            type: r.healthDataType as NonNullable<
+              TimeSession['healthData']
+            >['type'],
+            details: r.healthDataDetails as Record<string, unknown> | undefined,
           }
         : undefined,
   }
