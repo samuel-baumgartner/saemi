@@ -16,6 +16,7 @@ data class PhoneSession(
     val startMs: Long,
     val endMs: Long,
     val date: String,
+    val description: String? = null,
 )
 
 object PhoneUsageTracker {
@@ -57,13 +58,23 @@ object PhoneUsageTracker {
             val s = curStart ?: return
             if (ts <= s) return
             val cat = PhoneClassifier.categoryForPackage(p, bunproPkg, ankiPkg, youtubePkg, instagramPkg)
+            var activity = cat.activityLabel
+            var description: String? = null
+            if (cat == PhoneCategory.Unproductive &&
+                PhoneClassifier.isYoutubePackage(p, youtubePkg) &&
+                YoutubeListeningTitleLog.hasListeningMatchBetween(context, s, ts)
+            ) {
+                activity = "Listening · YouTube"
+                description = YoutubeListeningTitleLog.bestTitleInRange(context, s, ts)?.take(500)
+            }
             val day = dayFmt.format(Date(s))
             raw.add(
                 PhoneSession(
-                    activity = cat.activityLabel,
+                    activity = activity,
                     startMs = s,
                     endMs = ts,
                     date = day,
+                    description = description,
                 ),
             )
         }
@@ -101,6 +112,7 @@ object PhoneUsageTracker {
             val last = merged.lastOrNull()
             if (last != null &&
                 last.activity == s.activity &&
+                last.description == s.description &&
                 s.startMs <= last.endMs + gapMs &&
                 last.date == s.date
             ) {
@@ -115,13 +127,14 @@ object PhoneUsageTracker {
     fun toJsonPayload(date: String, sessions: List<PhoneSession>): JSONObject {
         val arr = JSONArray()
         for (s in sessions) {
-            arr.put(
-                JSONObject()
-                    .put("activity", s.activity)
-                    .put("startTime", iso(Date(s.startMs)))
-                    .put("endTime", iso(Date(s.endMs)))
-                    .put("date", s.date),
-            )
+            val o = JSONObject()
+                .put("activity", s.activity)
+                .put("startTime", iso(Date(s.startMs)))
+                .put("endTime", iso(Date(s.endMs)))
+                .put("date", s.date)
+            val d = s.description?.trim().orEmpty()
+            if (d.isNotEmpty()) o.put("description", d)
+            arr.put(o)
         }
         return JSONObject()
             .put("date", date)

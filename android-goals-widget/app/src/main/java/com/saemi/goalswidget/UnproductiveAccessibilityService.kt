@@ -46,6 +46,15 @@ class UnproductiveAccessibilityService : AccessibilityService() {
         val isInstagram = ig.contains(pkg)
         if (!isYoutube && !isInstagram) return
 
+        if (isYoutube && WidgetPrefs.isConfigured(this)) {
+            val raw = YoutubeListeningHeuristics.titleFromAccessibilityEvent(event)
+            val normalized = YoutubeListeningHeuristics.normalizeYoutubeTitleText(raw)
+            if (normalized.isNotEmpty() && YoutubeListeningHeuristics.looksLikeListeningTitle(normalized)) {
+                YoutubeListeningTitleLog.recordMatch(this, System.currentTimeMillis(), normalized)
+                ListeningGracePrefs.startGrace(this)
+            }
+        }
+
         if (!WidgetPrefs.isConfigured(this)) return
 
         worker.execute {

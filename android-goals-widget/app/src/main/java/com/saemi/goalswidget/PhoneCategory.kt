@@ -6,4 +6,3 @@ enum class PhoneCategory(val activityLabel: String) {
     Unproductive("Not productive"),
     Other("Other"),
 }
-

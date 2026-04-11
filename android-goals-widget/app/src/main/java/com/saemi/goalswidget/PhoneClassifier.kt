@@ -23,5 +23,11 @@ object PhoneClassifier {
 
         return PhoneCategory.Other
     }
+
+    fun isYoutubePackage(pkg: String, youtubePkgFromPrefs: String): Boolean {
+        val p = pkg.trim()
+        if (youtubePkgFromPrefs.isNotBlank() && p == youtubePkgFromPrefs.trim()) return true
+        return p == "com.google.android.youtube" || p == "com.google.android.youtube.tv"
+    }
 }
 
