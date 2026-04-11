@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
+import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 import type { TimeSession as DbTimeSession } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
@@ -16,10 +17,12 @@ import { getServerCalendarDateString } from '@/lib/dateUtils'
 
 export async function GET(request: NextRequest) {
   const session = await auth()
-  const userId = getDbUserId(session)
-  if (!userId) {
+  const sessionUserId = getDbUserId(session)
+  if (!sessionUserId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const userId = resolveSessionsOwnerUserId(sessionUserId)
   const { searchParams } = new URL(request.url)
   const rawDate = searchParams.get('date')
   const date =
