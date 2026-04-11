@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
-import { incomingPhoneSessionMatchesLockedRow } from '@/lib/phoneSessionUserOverride'
+import { incomingPhoneSessionSuppressedByLockedRow } from '@/lib/phoneSessionUserOverride'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -46,8 +46,8 @@ type IncomingPhoneSession = {
  * Behavior:
  * - Deletes phone sessions for that user/date where userOverridden is false.
  * - Keeps phone rows the user edited on the web (userOverridden true).
- * - Inserts each incoming session unless it matches a kept row’s start/end (same
- *   interval), so web edits stay the source of truth and are not duplicated.
+ * - Inserts each incoming session unless it matches or substantially overlaps a
+ *   kept row’s interval (web-edited times can differ from the phone by ~1 minute).
  */
 export async function POST(request: NextRequest) {
   const expected = process.env.WIDGET_API_TOKEN?.trim()
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       .filter((row) => {
         for (const L of lockedRows) {
           if (
-            incomingPhoneSessionMatchesLockedRow(
+            incomingPhoneSessionSuppressedByLockedRow(
               row.startTime,
               row.endTime,
               L.startTime,
