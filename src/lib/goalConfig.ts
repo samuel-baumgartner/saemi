@@ -15,7 +15,7 @@ export const DEFAULT_DAILY_GOALS: DailyGoalDef[] = [
   { id: 'listening', label: 'Listening', targetMinutes: 120 },
   { id: 'anki', label: 'Anki', targetMinutes: 60 },
   { id: 'grammar', label: 'Grammar', targetMinutes: 30 },
-  { id: 'cursor', label: 'Cursor', targetMinutes: 60 },
+  { id: 'startup', label: 'StartUp', targetMinutes: 60 },
 ]
 
 function clampTargetMinutes(n: number, fallback: number): number {
@@ -39,7 +39,10 @@ export function normalizeStoredGoals(stored: unknown): DailyGoalDef[] {
     byId.set(id, x as Record<string, unknown>)
   }
   return DEFAULT_DAILY_GOALS.map((def) => {
-    const s = byId.get(def.id)
+    let s = byId.get(def.id)
+    if (!s && def.id === 'startup' && byId.has('cursor')) {
+      s = byId.get('cursor')
+    }
     if (!s) return { ...def }
     const t = clampTargetMinutes(
       Number(s.targetMinutes),
@@ -160,6 +163,87 @@ export function matchesCursorGoal(text: string): boolean {
   return /\bcursor\b/i.test(text.trim())
 }
 
+/**
+ * Substrings matched in {@link sessionTextForGoalMatching} for **timechecker**
+ * sessions only, counting toward {@link DEFAULT_DAILY_GOALS} `startup`.
+ *
+ * Recommended set (expand as needed): work / startup tools and obvious
+ * productivity surfaces — LinkedIn, ChatGPT, Notion, docs, issue trackers, design,
+ * comms, deploy dashboards, API clients, etc.
+ */
+const PRODUCTIVE_COMPUTER_SUBSTRINGS: readonly string[] = [
+  'linkedin',
+  'chatgpt',
+  'openai',
+  'notion',
+  'figma',
+  'linear.app',
+  'linear', // product / issue tracker titles (rare false positives)
+  'slack',
+  'github',
+  'gitlab',
+  'vscode',
+  'visual studio code',
+  'google docs',
+  'docs.google',
+  'sheets.google',
+  'meet.google',
+  'zoom',
+  'loom',
+  'miro',
+  'confluence',
+  'jira',
+  'asana',
+  'trello',
+  'vercel',
+  'netlify',
+  'railway',
+  'render.com',
+  'postman',
+  'insomnia',
+  'excalidraw',
+  'cal.com',
+  'granola',
+  'superhuman',
+  'mail.google',
+  'outlook',
+  '1password',
+  'stripe',
+  'hubspot',
+  'salesforce',
+  'airtable',
+  'clickup',
+  'monday.com',
+  'productboard',
+  'canva',
+  'webflow',
+  'framer',
+]
+
+function escapeForAlternation(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const PRODUCTIVE_COMPUTER_REGEX = new RegExp(
+  PRODUCTIVE_COMPUTER_SUBSTRINGS.map(escapeForAlternation).join('|'),
+  'i',
+)
+
+/** True when window title / URL blob looks like intentional work (timechecker only in callers). */
+export function matchesProductiveComputerActivity(text: string): boolean {
+  if (!text.trim()) return false
+  return PRODUCTIVE_COMPUTER_REGEX.test(text)
+}
+
+/** StartUp goal: Cursor (any source) plus timechecker sessions matching productive tools. */
+export function matchesStartupGoal(s: TimeSession, matchText: string): boolean {
+  if (matchesCursorGoal(matchText)) return true
+  if (s.source === 'timechecker' && matchesProductiveComputerActivity(matchText)) {
+    return true
+  }
+  return false
+}
+
 export function matchesUnproductiveTimechecker(activity: string): boolean {
   const a = activity.trim().toLowerCase()
   return UNPRODUCTIVE_ACTIVITY_MARKERS.some((m) => a.includes(m))
@@ -179,7 +263,9 @@ export function minutesTowardGoal(
     if (goalId === 'listening' && matchesListeningGoal(matchText)) hit = true
     if (goalId === 'anki' && matchesAnkiGoalSession(s)) hit = true
     if (goalId === 'grammar' && matchesGrammarGoal(matchText)) hit = true
-    if (goalId === 'cursor' && matchesCursorGoal(matchText)) hit = true
+    if (goalId === 'startup' && matchesStartupGoal(s, matchText)) hit = true
+    // Legacy stored goal id until users re-save goals.
+    if (goalId === 'cursor' && matchesStartupGoal(s, matchText)) hit = true
     if (hit) sumMs += ms
   }
   return Math.max(0, Math.round(sumMs / 60000))

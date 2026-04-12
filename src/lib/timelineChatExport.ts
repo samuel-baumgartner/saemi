@@ -21,11 +21,11 @@ function goalsBlock(goals: DailyGoalDef[]): string[] {
   return ['Goals:', ...goals.map(formatGoalLine), '']
 }
 
-/** How to read Anki / Cursor / listening blocks when pasting into ChatGPT. */
+/** How to read Anki / StartUp (Cursor + productive apps) / listening blocks when pasting into ChatGPT. */
 function chatGptContextBlock(): string[] {
   return [
     'Context for interpreting this timeline:',
-    '- Anki and Cursor often alternate in short bursts: while programming in Cursor, I do Anki cards in between, so you will see lots of switching between them.',
+    '- Anki and the editor (Cursor, etc.) often alternate in short bursts: while programming, I do Anki cards in between, so you will see lots of switching between them.',
     '- Listening practice (per line or segment) usually follows this loop:',
     '  1. Listen without subtitles',
     '  2. Turn on subtitles and replay',
