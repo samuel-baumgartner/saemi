@@ -60,10 +60,15 @@ object WidgetApi {
                 val out = ArrayList<WidgetGoalLine>(arr.length())
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
+                    val id = o.optString("id", "")
+                    var label = o.getString("label")
+                    if (id == "cursor" || (id == "startup" && label.trim().equals("Cursor", ignoreCase = true))) {
+                        label = "StartUp"
+                    }
                     out.add(
                         WidgetGoalLine(
-                            id = o.optString("id", ""),
-                            label = o.getString("label"),
+                            id = id,
+                            label = label,
                             targetMinutes = o.getInt("targetMinutes"),
                             progressPercent = o.getInt("progressPercent").coerceIn(0, 100),
                             progressLabel = o.getString("progressLabel"),

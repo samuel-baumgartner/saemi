@@ -2,16 +2,22 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { TimeSession } from '@/types/task'
-import { getCalendarTodayString } from '@/lib/dateUtils'
+import {
+  formatCalendarWeekRangeLabel,
+  getCalendarTodayString,
+  getCalendarWeekDateStringsContaining,
+} from '@/lib/dateUtils'
 import type { DailyGoalDef } from '@/lib/goalConfig'
 import {
   DEFAULT_DAILY_GOALS,
   UNPRODUCTIVE_BUDGET_MAX_MIN,
   unproductiveBudgetLimitMinutesFromDones,
   unproductiveBudgetProgressPartsFromDones,
+  weeklyGoalRollups,
+  weeklyGoalsMetCount,
 } from '@/lib/goalConfig'
 import type { WidgetGoalItem } from '@/lib/widgetDailyGoalsPayload'
-import { Loader2, RotateCcw, Save } from 'lucide-react'
+import { CalendarRange, Loader2, RotateCcw, Save } from 'lucide-react'
 
 interface GoalsTabProps {
   /** Used only to refetch server progress when sessions change (same DB as widget). */
@@ -47,7 +53,7 @@ function formatDoneTarget(done: number, target: number) {
 
 export function GoalsTab({
   sessions,
-  activeSessionId: _activeSessionId = null,
+  activeSessionId = null,
 }: GoalsTabProps) {
   const todayStr = getCalendarTodayString()
   const sessionsSig = useMemo(
@@ -139,6 +145,38 @@ export function GoalsTab({
 
   const displayGoals = draft ?? goals ?? DEFAULT_DAILY_GOALS
 
+  const weekDayStrings = useMemo(
+    () => getCalendarWeekDateStringsContaining(todayStr),
+    [todayStr]
+  )
+  const weekDaySet = useMemo(() => new Set(weekDayStrings), [weekDayStrings])
+  const weekRangeLabel = useMemo(
+    () => formatCalendarWeekRangeLabel(weekDayStrings),
+    [weekDayStrings]
+  )
+
+  const weeklyRollups = useMemo(
+    () =>
+      weeklyGoalRollups(displayGoals, sessions, weekDaySet, activeSessionId),
+    [displayGoals, sessions, weekDaySet, activeSessionId, sessionsSig]
+  )
+
+  const weeklyMetCount = useMemo(
+    () => weeklyGoalsMetCount(weeklyRollups),
+    [weeklyRollups]
+  )
+
+  const weeklyOverallPct = useMemo(() => {
+    let num = 0
+    let den = 0
+    for (const r of weeklyRollups) {
+      den += r.weekTargetMinutes
+      num += Math.min(r.weekDoneMinutes, r.weekTargetMinutes)
+    }
+    if (den <= 0) return null
+    return Math.round((num / den) * 100)
+  }, [weeklyRollups])
+
   const dirty = useMemo(() => {
     if (!draft || !goals) return false
     return !goalsEqual(draft, goals)
@@ -226,6 +264,91 @@ export function GoalsTab({
 
   return (
     <div className="space-y-6">
+      <section
+        className="rounded-xl border border-indigo-500/20 bg-gradient-to-br from-indigo-950/35 via-black/30 to-black/40 p-4 sm:p-5"
+        aria-label="Weekly goals summary"
+      >
+        <div className="flex flex-wrap items-start gap-3 mb-2">
+          <CalendarRange className="w-5 h-5 text-indigo-300 shrink-0 mt-0.5" />
+          <div className="min-w-0 flex-1">
+            <h3 className="text-base font-semibold text-white">
+              This week <span className="text-white/50 font-normal">(Mon–Sun)</span>
+            </h3>
+            <p className="text-sm text-indigo-200/80 mt-0.5">{weekRangeLabel}</p>
+            <p className="text-xs text-white/45 mt-2 leading-relaxed">
+              Progress sums the same rules as daily goals, across calendar days in
+              your configured timezone. Each bar compares this week&apos;s total to{' '}
+              <span className="text-white/60">7×</span> that goal&apos;s daily target
+              (minutes).
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm mb-4">
+          <span className="text-white/90">
+            <span className="font-semibold text-emerald-300 tabular-nums">
+              {weeklyMetCount}
+            </span>
+            <span className="text-white/50"> / </span>
+            <span className="tabular-nums">{weeklyRollups.length}</span>
+            <span className="text-white/55"> goals met</span>
+          </span>
+          {weeklyOverallPct != null && (
+            <span className="text-white/55">
+              Overall{' '}
+              <span className="text-white font-medium tabular-nums">
+                {weeklyOverallPct}%
+              </span>{' '}
+              of weekly targets
+              <span className="text-white/40"> (capped per goal)</span>
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {weeklyRollups.map((r) => {
+            const { doneStr, targetStr } = formatDoneTarget(
+              r.weekDoneMinutes,
+              r.weekTargetMinutes
+            )
+            return (
+              <div
+                key={r.goalId}
+                className="rounded-lg border border-white/10 bg-black/25 px-3 py-3 flex flex-col gap-2"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium text-white truncate">
+                    {r.label}
+                  </span>
+                  {r.met ? (
+                    <span className="shrink-0 text-[11px] uppercase tracking-wide text-emerald-300/95 border border-emerald-500/30 rounded px-1.5 py-0.5">
+                      Met
+                    </span>
+                  ) : (
+                    <span className="shrink-0 text-[11px] uppercase tracking-wide text-white/35 border border-white/10 rounded px-1.5 py-0.5">
+                      Open
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-white/55 tabular-nums text-right">
+                  {doneStr}
+                  <span className="text-white/35"> / </span>
+                  {targetStr}
+                </div>
+                <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      r.met
+                        ? 'bg-gradient-to-r from-emerald-500 to-cyan-500'
+                        : 'bg-gradient-to-r from-indigo-500 to-violet-500'
+                    }`}
+                    style={{ width: `${r.progressPercent}%` }}
+                  />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div>

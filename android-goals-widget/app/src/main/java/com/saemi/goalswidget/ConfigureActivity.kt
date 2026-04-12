@@ -119,8 +119,8 @@ class ConfigureActivity : Activity() {
             WidgetPrefs.setGoogleFitNudgeEnabled(this, switchGoogleFitNudge.isChecked)
             val mgr = AppWidgetManager.getInstance(this)
             if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-            GoalsWidgetProvider.bindWidget(this, mgr, widgetId)
-            GoalsWidgetProvider.refreshData(this, mgr, intArrayOf(widgetId))
+                GoalsWidgetProvider.bindWidget(this, mgr, widgetId)
+                GoalsWidgetProvider.refreshData(this, mgr, intArrayOf(widgetId))
                 setResult(
                     RESULT_OK,
                     Intent().putExtra(
@@ -129,9 +129,16 @@ class ConfigureActivity : Activity() {
                     ),
                 )
             } else {
-            GoalsWidgetProvider.updateAllWidgets(this)
+                GoalsWidgetProvider.updateAllWidgets(this)
             }
             finish()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (WidgetPrefs.isConfigured(this)) {
+            GoalsWidgetProvider.updateAllWidgets(this)
         }
     }
 

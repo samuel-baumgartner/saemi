@@ -14,7 +14,7 @@ const MAX_LABEL_LENGTH = 100
 export const DEFAULT_DAILY_GOALS: DailyGoalDef[] = [
   { id: 'listening', label: 'Listening', targetMinutes: 120 },
   { id: 'anki', label: 'Anki', targetMinutes: 60 },
-  { id: 'grammar', label: 'Grammar', targetMinutes: 30 },
+  { id: 'grammar', label: 'Grammar', targetMinutes: 10 },
   { id: 'startup', label: 'StartUp', targetMinutes: 60 },
 ]
 
@@ -40,7 +40,9 @@ export function normalizeStoredGoals(stored: unknown): DailyGoalDef[] {
   }
   return DEFAULT_DAILY_GOALS.map((def) => {
     let s = byId.get(def.id)
-    if (!s && def.id === 'startup' && byId.has('cursor')) {
+    const mergedFromCursor =
+      !s && def.id === 'startup' && byId.has('cursor')
+    if (mergedFromCursor) {
       s = byId.get('cursor')
     }
     if (!s) return { ...def }
@@ -49,10 +51,16 @@ export function normalizeStoredGoals(stored: unknown): DailyGoalDef[] {
       def.targetMinutes
     )
     const rawL = s.label
-    const label =
+    let label =
       typeof rawL === 'string' && rawL.trim()
         ? rawL.trim().slice(0, MAX_LABEL_LENGTH)
         : def.label
+    if (def.id === 'startup' && mergedFromCursor) {
+      const L = label.trim().toLowerCase()
+      if (L.length === 0 || L === 'cursor') {
+        label = def.label
+      }
+    }
     return { id: def.id, label, targetMinutes: t }
   })
 }
@@ -269,6 +277,83 @@ export function minutesTowardGoal(
     if (hit) sumMs += ms
   }
   return Math.max(0, Math.round(sumMs / 60000))
+}
+
+/** Seven-day target from a per-day minute target (Mon–Sun). */
+export function weeklyTargetMinutesFromDaily(dailyTargetMinutes: number): number {
+  return Math.max(0, dailyTargetMinutes) * 7
+}
+
+/**
+ * Like {@link minutesTowardGoal}, but only sessions whose `date` is in `datesYmd`
+ * (calendar days in your configured timezone).
+ */
+export function minutesTowardGoalOnDates(
+  goalId: string,
+  sessions: TimeSession[],
+  datesYmd: ReadonlySet<string>,
+  activeSessionId?: string | null
+): number {
+  let sumMs = 0
+  for (const s of sessions) {
+    if (!datesYmd.has(s.date)) continue
+    const ms = effectiveSessionDurationMs(s, activeSessionId)
+    if (ms <= 0) continue
+    const matchText = sessionTextForGoalMatching(s)
+    let hit = false
+    if (goalId === 'listening' && matchesListeningGoal(matchText)) hit = true
+    if (goalId === 'anki' && matchesAnkiGoalSession(s)) hit = true
+    if (goalId === 'grammar' && matchesGrammarGoal(matchText)) hit = true
+    if (goalId === 'startup' && matchesStartupGoal(s, matchText)) hit = true
+    if (goalId === 'cursor' && matchesStartupGoal(s, matchText)) hit = true
+    if (hit) sumMs += ms
+  }
+  return Math.max(0, Math.round(sumMs / 60000))
+}
+
+export type WeeklyGoalRollup = {
+  goalId: string
+  label: string
+  dailyTargetMinutes: number
+  weekTargetMinutes: number
+  weekDoneMinutes: number
+  met: boolean
+  progressPercent: number
+}
+
+export function weeklyGoalRollups(
+  goals: DailyGoalDef[],
+  sessions: TimeSession[],
+  weekDatesYmd: ReadonlySet<string>,
+  activeSessionId?: string | null
+): WeeklyGoalRollup[] {
+  return goals.map((g) => {
+    const weekDoneMinutes = minutesTowardGoalOnDates(
+      g.id,
+      sessions,
+      weekDatesYmd,
+      activeSessionId
+    )
+    const weekTargetMinutes = weeklyTargetMinutesFromDaily(g.targetMinutes)
+    const met = weekTargetMinutes > 0 && weekDoneMinutes >= weekTargetMinutes
+    const progressPercent =
+      weekTargetMinutes > 0
+        ? Math.min(100, Math.round((weekDoneMinutes / weekTargetMinutes) * 100))
+        : 0
+    return {
+      goalId: g.id,
+      label: g.label,
+      dailyTargetMinutes: g.targetMinutes,
+      weekTargetMinutes,
+      weekDoneMinutes,
+      met,
+      progressPercent,
+    }
+  })
+}
+
+export function weeklyGoalsMetCount(rollups: WeeklyGoalRollup[]): number {
+  return rollups.filter((r) => r.met).length
 }
 
 export function unproductiveMinutesToday(
