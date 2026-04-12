@@ -226,6 +226,7 @@ const PRODUCTIVE_COMPUTER_SUBSTRINGS: readonly string[] = [
   'canva',
   'webflow',
   'framer',
+  'gemini',
 ]
 
 function escapeForAlternation(s: string): string {
