@@ -78,16 +78,14 @@ export default async function InfoPage() {
         </h2>
         <p className="text-white/55 text-sm leading-relaxed mb-2">
           The <strong className="text-white/80">StartUp</strong> daily goal counts
-          TimeChecker sessions when the desktop client sets{' '}
+          TimeChecker rows when the desktop client sets{' '}
           <code className="text-cyan-200/90">healthData.details.saemiGoals</code> to{' '}
-          <code className="text-cyan-200/90">[&quot;startup&quot;]</code>. Configure
-          which <strong className="text-white/80">rule ids</strong> from{' '}
-          <code className="text-cyan-200/90">config.json</code> in{' '}
-          <code className="text-cyan-200/90">sync.json</code> as{' '}
-          <code className="text-cyan-200/90">startup_rule_ids</code> (see{' '}
-          <code className="text-cyan-200/90">sync.example.json</code> in the TimeChecker
-          repo). Sessions whose text still matches “Cursor” also count (e.g. rule
-          label Cursor).
+          <code className="text-cyan-200/90">[&quot;startup&quot;]</code>.{' '}
+          <code className="text-cyan-200/90">sync.json</code> →{' '}
+          <code className="text-cyan-200/90">startup_rule_ids</code> marks whole rules
+          (e.g. Cursor). Generic browser rules use title matching on the computer so
+          not every Chrome minute counts — see the TimeChecker README. Sessions whose
+          text still matches “Cursor” also count (e.g. rule label Cursor).
         </p>
         <p className="text-white/55 text-sm leading-relaxed mb-2">
           Optional: if your tracker puts tab title or URL inside{' '}
