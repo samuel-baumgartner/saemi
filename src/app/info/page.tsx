@@ -72,6 +72,24 @@ export default async function InfoPage() {
         TimeChecker uploads and recent focus totals (source: timechecker).
       </p>
 
+      <section className="mb-10 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+        <h2 className="text-base font-semibold mb-2 text-cyan-300">
+          TimeChecker payload (browser / StartUp)
+        </h2>
+        <p className="text-white/55 text-sm leading-relaxed mb-2">
+          For browser windows, the web app only sees what you send. Put the{' '}
+          <strong className="text-white/80">tab or window title</strong> and/or{' '}
+          <strong className="text-white/80">page URL</strong> inside{' '}
+          <code className="text-cyan-200/90">healthData.details</code> (any nesting is
+          fine). On each sync we copy those strings into{' '}
+          <code className="text-cyan-200/90">description</code> so they stay visible on
+          the timeline and count toward goals (e.g. GitHub, localhost, dev ports).
+        </p>
+        <p className="text-white/45 text-xs font-mono break-all">
+          Example keys we scan: title, windowTitle, tabTitle, url, href, pageUrl…
+        </p>
+      </section>
+
       <section className="mb-10">
         <h2 className="text-lg font-semibold mb-3 text-cyan-300">
           Last hour

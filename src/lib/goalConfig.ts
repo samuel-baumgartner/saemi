@@ -1,4 +1,8 @@
 import type { TimeSession } from '@/types/task'
+import {
+  hasLocalDevStartupSignals,
+  isBrowserProcessName,
+} from '@/lib/timecheckerSessionDetails'
 
 export interface DailyGoalDef {
   id: string
@@ -244,10 +248,16 @@ export function matchesProductiveComputerActivity(text: string): boolean {
   return PRODUCTIVE_COMPUTER_REGEX.test(text)
 }
 
-/** StartUp goal: Cursor (any source) plus timechecker sessions matching productive tools. */
+/**
+ * StartUp goal: Cursor (any source), or timechecker sessions that look like work:
+ * known SaaS/tool strings, or **browser + local dev URL / common dev ports** (Chrome
+ * often reports only the process name unless details include the tab URL/title).
+ */
 export function matchesStartupGoal(s: TimeSession, matchText: string): boolean {
   if (matchesCursorGoal(matchText)) return true
-  if (s.source === 'timechecker' && matchesProductiveComputerActivity(matchText)) {
+  if (s.source !== 'timechecker') return false
+  if (matchesProductiveComputerActivity(matchText)) return true
+  if (isBrowserProcessName(s.activity) && hasLocalDevStartupSignals(matchText)) {
     return true
   }
   return false

@@ -2,6 +2,7 @@ import { timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { mergeTimecheckerDescription } from '@/lib/timecheckerSessionDetails'
 
 const SOURCE = 'timechecker'
 
@@ -90,7 +91,10 @@ export async function POST(request: NextRequest) {
     const rows = sessions.map((s) => ({
       userId: userEmail,
       activity: s.activity,
-      description: s.description ?? null,
+      description: mergeTimecheckerDescription(
+        s.description,
+        s.healthData?.details
+      ),
       startTime: new Date(s.startTime),
       endTime: s.endTime ? new Date(s.endTime) : null,
       date: s.date,
