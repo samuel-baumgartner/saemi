@@ -76,39 +76,43 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    await prisma.timeSession.deleteMany({
-      where: {
-        userId: userEmail,
-        source: SOURCE,
-      },
+    const rows =
+      sessions.length === 0
+        ? []
+        : sessions.map((s) => ({
+            userId: userEmail,
+            activity: s.activity,
+            description: mergeTimecheckerDescription(
+              s.description,
+              s.healthData?.details
+            ),
+            startTime: new Date(s.startTime),
+            endTime: s.endTime ? new Date(s.endTime) : null,
+            date: s.date,
+            source: SOURCE,
+            healthDataType: s.healthData?.type ?? null,
+            healthDataDetails:
+              s.healthData?.details !== undefined && s.healthData?.details !== null
+                ? (s.healthData.details as Prisma.InputJsonValue)
+                : undefined,
+          }))
+
+    // Replace timechecker rows atomically: if insert fails, do NOT leave prior data deleted.
+    const created = await prisma.$transaction(async (tx) => {
+      await tx.timeSession.deleteMany({
+        where: { userId: userEmail, source: SOURCE },
+      })
+      if (rows.length === 0) {
+        return { count: 0 }
+      }
+      return tx.timeSession.createMany({ data: rows })
     })
 
     if (sessions.length === 0) {
       await logSync(userEmail, 0, 'ok_empty')
-      return NextResponse.json({ success: true, count: 0 })
+    } else {
+      await logSync(userEmail, created.count, 'ok')
     }
-
-    const rows = sessions.map((s) => ({
-      userId: userEmail,
-      activity: s.activity,
-      description: mergeTimecheckerDescription(
-        s.description,
-        s.healthData?.details
-      ),
-      startTime: new Date(s.startTime),
-      endTime: s.endTime ? new Date(s.endTime) : null,
-      date: s.date,
-      source: SOURCE,
-      healthDataType: s.healthData?.type ?? null,
-      healthDataDetails:
-        s.healthData?.details !== undefined && s.healthData?.details !== null
-          ? (s.healthData.details as Prisma.InputJsonValue)
-          : undefined,
-    }))
-
-    const created = await prisma.timeSession.createMany({ data: rows })
-
-    await logSync(userEmail, created.count, 'ok')
 
     return NextResponse.json({ success: true, count: created.count })
   } catch (error) {

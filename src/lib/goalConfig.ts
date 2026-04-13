@@ -1,8 +1,4 @@
 import type { TimeSession } from '@/types/task'
-import {
-  hasLocalDevStartupSignals,
-  isBrowserProcessName,
-} from '@/lib/timecheckerSessionDetails'
 
 export interface DailyGoalDef {
   id: string
@@ -176,90 +172,39 @@ export function matchesCursorGoal(text: string): boolean {
 }
 
 /**
- * Substrings matched in {@link sessionTextForGoalMatching} for **timechecker**
- * sessions only, counting toward {@link DEFAULT_DAILY_GOALS} `startup`.
- *
- * Recommended set (expand as needed): work / startup tools and obvious
- * productivity surfaces — LinkedIn, ChatGPT, Notion, docs, issue trackers, design,
- * comms, deploy dashboards, API clients, etc.
+ * True when a TimeChecker row’s `healthData.details` includes `saemiGoals`
+ * (or `saemiGoal`) set on the computer — see `startup_rule_ids` in
+ * `~/.config/timechecker/sync.json`.
  */
-const PRODUCTIVE_COMPUTER_SUBSTRINGS: readonly string[] = [
-  'linkedin',
-  'chatgpt',
-  'openai',
-  'notion',
-  'figma',
-  'linear.app',
-  'linear', // product / issue tracker titles (rare false positives)
-  'slack',
-  'github',
-  'gitlab',
-  'vscode',
-  'visual studio code',
-  'google docs',
-  'docs.google',
-  'sheets.google',
-  'meet.google',
-  'zoom',
-  'loom',
-  'miro',
-  'confluence',
-  'jira',
-  'asana',
-  'trello',
-  'vercel',
-  'netlify',
-  'railway',
-  'render.com',
-  'postman',
-  'insomnia',
-  'excalidraw',
-  'cal.com',
-  'granola',
-  'superhuman',
-  'mail.google',
-  'outlook',
-  '1password',
-  'stripe',
-  'hubspot',
-  'salesforce',
-  'airtable',
-  'clickup',
-  'monday.com',
-  'productboard',
-  'canva',
-  'webflow',
-  'framer',
-  'gemini',
-]
-
-function escapeForAlternation(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-const PRODUCTIVE_COMPUTER_REGEX = new RegExp(
-  PRODUCTIVE_COMPUTER_SUBSTRINGS.map(escapeForAlternation).join('|'),
-  'i',
-)
-
-/** True when window title / URL blob looks like intentional work (timechecker only in callers). */
-export function matchesProductiveComputerActivity(text: string): boolean {
-  if (!text.trim()) return false
-  return PRODUCTIVE_COMPUTER_REGEX.test(text)
+export function timecheckerSessionClaimsSaemiGoal(
+  s: TimeSession,
+  goalId: string
+): boolean {
+  if (s.source !== 'timechecker') return false
+  const raw = s.healthData?.details
+  if (raw == null || typeof raw !== 'object') return false
+  const d = raw as Record<string, unknown>
+  const want = goalId.trim().toLowerCase()
+  if (!want) return false
+  const single = d.saemiGoal
+  if (typeof single === 'string' && single.trim().toLowerCase() === want) {
+    return true
+  }
+  const arr = d.saemiGoals
+  if (!Array.isArray(arr)) return false
+  return arr.some(
+    (x) => typeof x === 'string' && x.trim().toLowerCase() === want
+  )
 }
 
 /**
- * StartUp goal: Cursor (any source), or timechecker sessions that look like work:
- * known SaaS/tool strings, or **browser + local dev URL / common dev ports** (Chrome
- * often reports only the process name unless details include the tab URL/title).
+ * StartUp goal: **TimeChecker** rows tagged with `saemiGoals: ["startup"]` on the
+ * computer, or any session whose text still matches Cursor (e.g. rule label
+ * “Cursor”, or a manual session).
  */
 export function matchesStartupGoal(s: TimeSession, matchText: string): boolean {
   if (matchesCursorGoal(matchText)) return true
-  if (s.source !== 'timechecker') return false
-  if (matchesProductiveComputerActivity(matchText)) return true
-  if (isBrowserProcessName(s.activity) && hasLocalDevStartupSignals(matchText)) {
-    return true
-  }
+  if (timecheckerSessionClaimsSaemiGoal(s, 'startup')) return true
   return false
 }
 

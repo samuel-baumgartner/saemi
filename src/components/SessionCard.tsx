@@ -13,6 +13,52 @@ interface SessionCardProps {
   onAfterSave?: () => void
 }
 
+function sourceBadge(session: TimeSession): { label: string; className: string } {
+  switch (session.source) {
+    case 'timechecker':
+      return {
+        label: 'Laptop · TimeChecker',
+        className:
+          'border-cyan-500/35 text-cyan-200/90 bg-cyan-500/10',
+      }
+    case 'phone':
+      return {
+        label: 'Phone',
+        className:
+          'border-violet-500/35 text-violet-200/90 bg-violet-500/10',
+      }
+    case 'anki':
+      return {
+        label: 'Anki',
+        className:
+          'border-purple-500/35 text-purple-200/90 bg-purple-500/10',
+      }
+    case 'google-fit':
+      return {
+        label: 'Google Fit',
+        className:
+          'border-blue-500/35 text-blue-200/90 bg-blue-500/10',
+      }
+    case 'manual':
+      return {
+        label: 'Manual',
+        className:
+          'border-white/20 text-white/70 bg-white/5',
+      }
+    case 'tracked':
+      return {
+        label: 'Tracked',
+        className:
+          'border-emerald-500/35 text-emerald-200/90 bg-emerald-500/10',
+      }
+    default:
+      return {
+        label: session.source ?? 'Unknown',
+        className: 'border-white/15 text-white/50 bg-white/5',
+      }
+  }
+}
+
 export function SessionCard({
   session,
   onUpdate,
@@ -67,6 +113,14 @@ export function SessionCard({
     }
     return `${seconds}s`
   }
+
+  const rawDetailsJson =
+    session.healthData?.details != null &&
+    typeof session.healthData.details === 'object'
+      ? JSON.stringify(session.healthData.details, null, 2)
+      : null
+
+  const srcBadge = sourceBadge(session)
 
   const handleSave = async () => {
     // Convert time strings back to Date objects
@@ -144,6 +198,12 @@ export function SessionCard({
                 <h4 className="font-semibold text-white text-lg truncate">
                   {session.activity}
                 </h4>
+                <span
+                  className={`shrink-0 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded border ${srcBadge.className}`}
+                  title="Where this row came from. Laptop = desktop TimeChecker sync only."
+                >
+                  {srcBadge.label}
+                </span>
                 {session.source === 'phone' && session.userOverridden ? (
                   <span
                     className="shrink-0 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-400/40 text-amber-200/90 bg-amber-500/10"
@@ -154,7 +214,19 @@ export function SessionCard({
                 ) : null}
               </div>
               {session.description && (
-                <p className="text-white/60 text-sm mb-2">{session.description}</p>
+                <p className="text-white/60 text-sm mb-2 whitespace-pre-wrap break-words">
+                  {session.description}
+                </p>
+              )}
+              {rawDetailsJson != null && (
+                <details className="mt-2 text-xs">
+                  <summary className="cursor-pointer text-white/45 hover:text-white/65 select-none">
+                    Raw tracker / health details (JSON)
+                  </summary>
+                  <pre className="mt-2 max-h-48 overflow-auto rounded-lg border border-white/10 bg-black/50 p-2 text-left text-[11px] leading-relaxed text-cyan-100/80 font-mono whitespace-pre-wrap break-all">
+                    {rawDetailsJson}
+                  </pre>
+                </details>
               )}
             </>
           )}

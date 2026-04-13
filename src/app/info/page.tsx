@@ -74,19 +74,26 @@ export default async function InfoPage() {
 
       <section className="mb-10 rounded-lg border border-white/10 bg-white/[0.03] p-4">
         <h2 className="text-base font-semibold mb-2 text-cyan-300">
-          TimeChecker payload (browser / StartUp)
+          TimeChecker → StartUp goal
         </h2>
         <p className="text-white/55 text-sm leading-relaxed mb-2">
-          For browser windows, the web app only sees what you send. Put the{' '}
-          <strong className="text-white/80">tab or window title</strong> and/or{' '}
-          <strong className="text-white/80">page URL</strong> inside{' '}
-          <code className="text-cyan-200/90">healthData.details</code> (any nesting is
-          fine). On each sync we copy those strings into{' '}
-          <code className="text-cyan-200/90">description</code> so they stay visible on
-          the timeline and count toward goals (e.g. GitHub, localhost, dev ports).
+          The <strong className="text-white/80">StartUp</strong> daily goal counts
+          TimeChecker sessions when the desktop client sets{' '}
+          <code className="text-cyan-200/90">healthData.details.saemiGoals</code> to{' '}
+          <code className="text-cyan-200/90">[&quot;startup&quot;]</code>. Configure
+          which <strong className="text-white/80">rule ids</strong> from{' '}
+          <code className="text-cyan-200/90">config.json</code> in{' '}
+          <code className="text-cyan-200/90">sync.json</code> as{' '}
+          <code className="text-cyan-200/90">startup_rule_ids</code> (see{' '}
+          <code className="text-cyan-200/90">sync.example.json</code> in the TimeChecker
+          repo). Sessions whose text still matches “Cursor” also count (e.g. rule
+          label Cursor).
         </p>
-        <p className="text-white/45 text-xs font-mono break-all">
-          Example keys we scan: title, windowTitle, tabTitle, url, href, pageUrl…
+        <p className="text-white/55 text-sm leading-relaxed mb-2">
+          Optional: if your tracker puts tab title or URL inside{' '}
+          <code className="text-cyan-200/90">healthData.details</code>, we merge those
+          strings into <code className="text-cyan-200/90">description</code> for the
+          timeline (keys like title, url, href…).
         </p>
       </section>
 
