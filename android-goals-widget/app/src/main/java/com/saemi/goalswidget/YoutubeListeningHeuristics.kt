@@ -3,14 +3,14 @@ package com.saemi.goalswidget
 import android.view.accessibility.AccessibilityEvent
 
 /**
- * Mirrors [browser-extension/background.js] `listeningRegex` and `normalizeYoutubeTitleText`.
- * If you change one, update the other.
+ * Mirrors [browser-extension/background.js] `listeningRegex` and `normalizeYoutubeTitleText`,
+ * and aligns with [TimeChecker/config.example.json] `listening_comprehension.title_regex`
+ * (YouTube is implied by package — no `youtube` lookahead in the title).
  */
 object YoutubeListeningHeuristics {
 
     private val LISTENING_REGEX = Regex(
-        "(japanese|nihongo|comprehensible|comprehension|jlpt|日本語|listen(ing)?|english|esl|podcast|immersion)",
-        RegexOption.IGNORE_CASE,
+        """(?is)(聞き取り|リスニング|ヒアリング|日本語|字幕|nihongo|japanese|japan(ese)?|japanisch|japanische|jlpt|n[1-5]\b|immersion|comprehensible|comprehension|verständlich|verstaendlich|listening|listen|learn\s+japanese|study\s+japanese|lass\s+uns\s+japanisch|shadowing|subtitles?|japonais|giapponese|japonés|anfänger|anfaenger|english|esl|podcast)""",
     )
 
     private val TRAILING_YOUTUBE_SUFFIX = Regex("\\s*-\\s*YouTube(\\s+Music)?\\s*$", RegexOption.IGNORE_CASE)

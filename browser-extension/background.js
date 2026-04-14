@@ -16,8 +16,9 @@ function todayYmdLocal() {
   return `${y}-${m}-${day}`;
 }
 
+/** Keep in sync with `android-goals-widget/.../YoutubeListeningHeuristics.kt` LISTENING_REGEX. */
 const listeningRegex =
-  /(japanese|nihongo|comprehensible|comprehension|jlpt|日本語|listen(ing)?|english|esl|podcast|immersion)/i;
+  /(聞き取り|リスニング|ヒアリング|日本語|字幕|nihongo|japanese|japan(ese)?|japanisch|japanische|jlpt|n[1-5]\b|immersion|comprehensible|comprehension|verständlich|verstaendlich|listening|listen|learn\s+japanese|study\s+japanese|lass\s+uns\s+japanisch|shadowing|subtitles?|japonais|giapponese|japonés|anfänger|anfaenger|english|esl|podcast)/i;
 
 /**
  * Cache last status briefly to avoid hammering server on every tab event.
