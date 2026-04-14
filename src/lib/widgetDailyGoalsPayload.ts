@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
 import {
   minutesTowardGoal,
   normalizeStoredGoals,
@@ -81,7 +82,7 @@ export async function getWidgetDailyGoalsPayload(
   const [goalRow, sessionRows] = await Promise.all([
     prisma.userGoalSettings.findFirst({ where: userIdMatch }),
     prisma.timeSession.findMany({
-      where: { ...userIdMatch, date },
+      where: excludePhoneDeletionTombstones({ ...userIdMatch, date }),
       orderBy: { startTime: 'asc' },
     }),
   ])

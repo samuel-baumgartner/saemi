@@ -4,6 +4,7 @@ import { getDbUserId } from '@/lib/authDbUser'
 import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 import type { TimeSession as DbTimeSession } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
 
 export const dynamic = 'force-dynamic'
 import {
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
     const [goalRow, rows] = await Promise.all([
       prisma.userGoalSettings.findUnique({ where: { userId } }),
       prisma.timeSession.findMany({
-        where: { userId, date },
+        where: excludePhoneDeletionTombstones({ userId, date }),
         orderBy: { startTime: 'asc' },
       }),
     ])

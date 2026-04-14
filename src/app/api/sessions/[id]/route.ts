@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
 import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
-import type { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { PHONE_DELETION_TOMBSTONE_TYPE } from '@/lib/phoneSessionDeletion'
 
 export const dynamic = 'force-dynamic'
 export async function PATCH(
@@ -108,9 +109,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    await prisma.timeSession.delete({
-      where: { id },
-    })
+    if (existingSession.source === 'phone') {
+      await prisma.timeSession.update({
+        where: { id },
+        data: {
+          userOverridden: true,
+          healthDataType: PHONE_DELETION_TOMBSTONE_TYPE,
+          healthDataDetails: Prisma.JsonNull,
+        },
+      })
+    } else {
+      await prisma.timeSession.delete({
+        where: { id },
+      })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {

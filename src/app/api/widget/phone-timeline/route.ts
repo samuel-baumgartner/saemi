@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
+import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -146,7 +147,11 @@ export async function GET(request: NextRequest) {
 
   try {
     const rows = await prisma.timeSession.findMany({
-      where: { userId, date, endTime: { not: null } },
+      where: excludePhoneDeletionTombstones({
+        userId,
+        date,
+        endTime: { not: null },
+      }),
       select: {
         activity: true,
         description: true,

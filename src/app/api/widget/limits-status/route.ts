@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
+import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
 import type { TimeSession } from '@/types/task'
 import {
   normalizeStoredGoals,
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
     const [goalRow, rows] = await Promise.all([
       prisma.userGoalSettings.findUnique({ where: { userId } }),
       prisma.timeSession.findMany({
-        where: { userId, date },
+        where: excludePhoneDeletionTombstones({ userId, date }),
         orderBy: { startTime: 'asc' },
       }),
     ])

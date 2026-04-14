@@ -4,6 +4,7 @@ import { getDbUserId } from '@/lib/authDbUser'
 import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
-    const where: Prisma.TimeSessionWhereInput =
+    const baseWhere: Prisma.TimeSessionWhereInput =
       startDate && endDate
         ? {
             userId,
@@ -33,6 +34,7 @@ export async function GET(request: NextRequest) {
             },
           }
         : { userId }
+    const where = excludePhoneDeletionTombstones(baseWhere)
 
     const sessions = await prisma.timeSession.findMany({
       where,
