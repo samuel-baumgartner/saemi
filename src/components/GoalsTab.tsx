@@ -59,7 +59,18 @@ export function GoalsTab({
   const sessionsSig = useMemo(
     () =>
       sessions
-        .map((s) => `${s.id}:${s.date}:${s.endTime?.getTime() ?? 0}`)
+        .map(
+          (s) =>
+            [
+              s.id,
+              s.date,
+              s.activity,
+              s.description ?? '',
+              s.source ?? '',
+              s.startTime.getTime(),
+              s.endTime?.getTime() ?? 0,
+            ].join(':')
+        )
         .join('|'),
     [sessions]
   )
@@ -158,7 +169,7 @@ export function GoalsTab({
   const weeklyRollups = useMemo(
     () =>
       weeklyGoalRollups(displayGoals, sessions, weekDaySet, activeSessionId),
-    [displayGoals, sessions, weekDaySet, activeSessionId, sessionsSig]
+    [displayGoals, sessions, weekDaySet, activeSessionId]
   )
 
   const weeklyMetCount = useMemo(

@@ -23,6 +23,7 @@ import {
 import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 import {
   effectiveSessionDurationMs,
+  DEFAULT_DAILY_GOALS,
   normalizeStoredGoals,
   type DailyGoalDef,
 } from '@/lib/goalConfig'
@@ -89,6 +90,13 @@ export function TimelineView({
   }, [])
 
   const subjectSuggestions = useSubjectSuggestions(sessions)
+  const activitySuggestions = Array.from(
+    new Set([
+      ...DEFAULT_DAILY_GOALS.map((g) => g.label),
+      ...exportGoals.map((g) => g.label),
+      ...subjectSuggestions,
+    ])
+  )
   const effectiveViewMode = isSmallScreen ? 'list' : viewMode
 
   const sortedSessionDates = [...new Set(sessions.map((s) => s.date))].sort()
@@ -393,6 +401,7 @@ export function TimelineView({
               onUpdate={onUpdate}
               onDelete={onDelete}
               isActive={session.id === activeSessionId}
+              activitySuggestions={activitySuggestions}
             />
           ))}
         </div>
@@ -437,6 +446,7 @@ export function TimelineView({
               }}
               isActive={graphEditSession.id === activeSessionId}
               onAfterSave={() => setGraphEditSession(null)}
+              activitySuggestions={activitySuggestions}
             />
           </div>
         </div>

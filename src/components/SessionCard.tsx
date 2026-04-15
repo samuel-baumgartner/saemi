@@ -4,6 +4,7 @@ import { TimeSession } from '@/types/task'
 import { effectiveSessionDurationMs } from '@/lib/goalConfig'
 import { Trash2, Edit2, Check, Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { SubjectAutocomplete } from './SubjectAutocomplete'
 
 interface SessionCardProps {
   session: TimeSession
@@ -11,6 +12,7 @@ interface SessionCardProps {
   onDelete: (id: string) => void
   isActive?: boolean
   onAfterSave?: () => void
+  activitySuggestions?: string[]
 }
 
 function sourceBadge(session: TimeSession): { label: string; className: string } {
@@ -65,6 +67,7 @@ export function SessionCard({
   onDelete,
   isActive = false,
   onAfterSave,
+  activitySuggestions = [],
 }: SessionCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editActivity, setEditActivity] = useState(session.activity)
@@ -157,11 +160,12 @@ export function SessionCard({
         <div className="flex-1 min-w-0">
           {isEditing ? (
             <div className="space-y-2 mb-3">
-              <input
-                type="text"
+              <SubjectAutocomplete
                 value={editActivity}
-                onChange={(e) => setEditActivity(e.target.value)}
+                onChange={setEditActivity}
+                placeholder="Activity"
                 className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-white outline-none focus:border-white/30"
+                suggestions={activitySuggestions}
                 autoFocus
               />
               <input
