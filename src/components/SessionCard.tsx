@@ -126,24 +126,36 @@ export function SessionCard({
   const srcBadge = sourceBadge(session)
 
   const handleSave = async () => {
-    // Convert time strings back to Date objects
-    const [startHours, startMinutes] = editStartTime.split(':').map(Number)
-    const newStartTime = new Date(session.startTime)
-    newStartTime.setHours(startHours, startMinutes, 0, 0)
+    const updates: Partial<TimeSession> = {}
 
-    let newEndTime: Date | undefined = undefined
-    if (editEndTime) {
-      const [endHours, endMinutes] = editEndTime.split(':').map(Number)
-      newEndTime = new Date(session.endTime || session.startTime)
-      newEndTime.setHours(endHours, endMinutes, 0, 0)
+    if (editActivity !== session.activity) {
+      updates.activity = editActivity
+    }
+    if (editDescription !== (session.description || '')) {
+      updates.description = editDescription
     }
 
-    await onUpdate(session.id, {
-      activity: editActivity,
-      description: editDescription,
-      startTime: newStartTime,
-      endTime: newEndTime,
-    })
+    const originalStart = dateToTimeString(session.startTime)
+    if (editStartTime !== originalStart) {
+      const [startHours, startMinutes] = editStartTime.split(':').map(Number)
+      const newStartTime = new Date(session.startTime)
+      newStartTime.setHours(startHours, startMinutes, 0, 0)
+      updates.startTime = newStartTime
+    }
+
+    const originalEnd = session.endTime ? dateToTimeString(session.endTime) : ''
+    if (editEndTime !== originalEnd) {
+      if (editEndTime) {
+        const [endHours, endMinutes] = editEndTime.split(':').map(Number)
+        const newEndTime = new Date(session.endTime || session.startTime)
+        newEndTime.setHours(endHours, endMinutes, 0, 0)
+        updates.endTime = newEndTime
+      }
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await onUpdate(session.id, updates)
+    }
     setIsEditing(false)
     onAfterSave?.()
   }
