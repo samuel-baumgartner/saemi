@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate --no-engine && prisma migrate deploy && next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "prisma generate --no-engine",
+    "postinstall": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:setup-new": "bash scripts/setup-new-db.sh",
     "seed": "tsx prisma/seed.ts"
