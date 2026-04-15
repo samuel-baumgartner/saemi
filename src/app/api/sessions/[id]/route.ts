@@ -42,8 +42,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    const locksPhoneRow =
-      existingSession.source === 'phone' &&
+    const locksSourceRow =
+      (existingSession.source === 'phone' ||
+        existingSession.source === 'timechecker') &&
       ('activity' in body ||
         'description' in body ||
         'startTime' in body ||
@@ -63,7 +64,7 @@ export async function PATCH(
             ? undefined
             : (healthData.details as Prisma.InputJsonValue),
       }),
-      ...(locksPhoneRow ? { userOverridden: true } : {}),
+      ...(locksSourceRow ? { userOverridden: true } : {}),
     }
 
     const updatedSession = await prisma.timeSession.update({

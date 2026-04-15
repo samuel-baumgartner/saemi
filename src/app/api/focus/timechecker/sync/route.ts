@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { mergeTimecheckerDescription } from '@/lib/timecheckerSessionDetails'
+import { incomingPhoneSessionSuppressedByLockedRow } from '@/lib/phoneSessionUserOverride'
 
 const SOURCE = 'timechecker'
 
@@ -97,15 +98,40 @@ export async function POST(request: NextRequest) {
                 : undefined,
           }))
 
-    // Replace timechecker rows atomically: if insert fails, do NOT leave prior data deleted.
+    // Replace non-overridden timechecker rows atomically:
+    // - web-edited (`userOverridden=true`) rows are kept
+    // - incoming rows that overlap kept rows are suppressed
+    // - if insert fails, do NOT leave prior data deleted.
     const created = await prisma.$transaction(async (tx) => {
-      await tx.timeSession.deleteMany({
-        where: { userId: userEmail, source: SOURCE },
+      const lockedRows = await tx.timeSession.findMany({
+        where: { userId: userEmail, source: SOURCE, userOverridden: true },
+        select: { startTime: true, endTime: true },
       })
-      if (rows.length === 0) {
+
+      const rowsToInsert = rows.filter((row) => {
+        for (const L of lockedRows) {
+          // Reuse the same robust interval suppression used by phone sync.
+          if (
+            incomingPhoneSessionSuppressedByLockedRow(
+              row.startTime,
+              row.endTime,
+              L.startTime,
+              L.endTime
+            )
+          ) {
+            return false
+          }
+        }
+        return true
+      })
+
+      await tx.timeSession.deleteMany({
+        where: { userId: userEmail, source: SOURCE, userOverridden: false },
+      })
+      if (rowsToInsert.length === 0) {
         return { count: 0 }
       }
-      return tx.timeSession.createMany({ data: rows })
+      return tx.timeSession.createMany({ data: rowsToInsert })
     })
 
     if (sessions.length === 0) {
