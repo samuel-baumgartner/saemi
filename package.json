@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "postinstall": "prisma generate --no-engine",
+    "db:migrate": "prisma migrate deploy",
+    "db:setup-new": "bash scripts/setup-new-db.sh",
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
