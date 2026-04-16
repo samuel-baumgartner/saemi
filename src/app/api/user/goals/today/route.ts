@@ -7,11 +7,13 @@ import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 export const dynamic = 'force-dynamic'
 
 /**
- * Today's goal progress — uses WIDGET_USER_ID so web always shows the same
- * numbers as the Android widget.  Falls back to the signed-in user when
- * WIDGET_USER_ID is not configured.
+ * Goal progress for a calendar day (same rules as the Android widget).
+ * Uses WIDGET_USER_ID so web matches widget; falls back to signed-in user when unset.
+ *
+ * Query: `?date=YYYY-MM-DD` optional — if omitted or invalid, uses server "today"
+ * in CALENDAR_TIMEZONE (same as GET /api/widget/daily-goals).
  */
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth()
     const sessionUserId = getDbUserId(session)
@@ -21,12 +23,13 @@ export async function GET(_request: NextRequest) {
 
     const userId = resolveSessionsOwnerUserId(sessionUserId)
 
-    const { date: d, items } = await getDailyGoalsPayloadForUser(userId, null)
+    const rawDate = request.nextUrl.searchParams.get('date')
+    const { date: d, items } = await getDailyGoalsPayloadForUser(userId, rawDate)
     return NextResponse.json({ date: d, items })
   } catch (e) {
     console.error('GET /api/user/goals/today', e)
     return NextResponse.json(
-      { error: "Failed to load today's goal progress" },
+      { error: 'Failed to load goal progress' },
       { status: 500 }
     )
   }

@@ -4,8 +4,10 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { TimeSession } from '@/types/task'
 import {
   formatCalendarWeekRangeLabel,
+  formatDateYmdInCalendarTz,
   getCalendarTodayString,
   getCalendarWeekDateStringsContaining,
+  resolveInstantOnCalendarYmd,
 } from '@/lib/dateUtils'
 import type { DailyGoalDef } from '@/lib/goalConfig'
 import {
@@ -17,7 +19,7 @@ import {
   weeklyGoalsMetCount,
 } from '@/lib/goalConfig'
 import type { WidgetGoalItem } from '@/lib/widgetDailyGoalsPayload'
-import { CalendarRange, Loader2, RotateCcw, Save } from 'lucide-react'
+import { CalendarRange, ChevronLeft, ChevronRight, Loader2, RotateCcw, Save } from 'lucide-react'
 
 interface GoalsTabProps {
   /** Used only to refetch server progress when sessions change (same DB as widget). */
@@ -51,11 +53,19 @@ function formatDoneTarget(done: number, target: number) {
   return { doneStr, targetStr }
 }
 
+function shiftCalendarYmd(ymd: string, deltaDays: number): string {
+  const base =
+    resolveInstantOnCalendarYmd(ymd).getTime() + deltaDays * 86_400_000
+  return formatDateYmdInCalendarTz(new Date(base))
+}
+
 export function GoalsTab({
   sessions,
   activeSessionId = null,
 }: GoalsTabProps) {
   const todayStr = getCalendarTodayString()
+  const yesterdayStr = useMemo(() => shiftCalendarYmd(todayStr, -1), [todayStr])
+  const [progressDate, setProgressDate] = useState(() => getCalendarTodayString())
   const sessionsSig = useMemo(
     () =>
       sessions
@@ -118,9 +128,12 @@ export function GoalsTab({
   }, [load])
 
   const loadProgress = useCallback(async () => {
+    setProgressLoading(true)
     setProgressError(null)
     try {
-      const r = await fetch('/api/user/goals/today', {
+      const q = new URLSearchParams()
+      q.set('date', progressDate)
+      const r = await fetch(`/api/user/goals/today?${q.toString()}`, {
         cache: 'no-store',
       })
       if (!r.ok) throw new Error('Failed to load progress')
@@ -130,12 +143,12 @@ export function GoalsTab({
       }
       setProgressPayload({ date: data.date, items: data.items })
     } catch {
-      setProgressError('Could not load today’s progress.')
+      setProgressError('Could not load goal progress for that day.')
       setProgressPayload(null)
     } finally {
       setProgressLoading(false)
     }
-  }, [])
+  }, [progressDate])
 
   useEffect(() => {
     void loadProgress()
@@ -187,6 +200,20 @@ export function GoalsTab({
     if (den <= 0) return null
     return Math.round((num / den) * 100)
   }, [weeklyRollups])
+
+  const progressDateLabel = useMemo(() => {
+    if (progressDate === todayStr) return 'Today'
+    if (progressDate === yesterdayStr) return 'Yesterday'
+    const d = resolveInstantOnCalendarYmd(progressDate)
+    return d.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  }, [progressDate, todayStr, yesterdayStr])
+
+  const canStepProgressNext = progressDate < todayStr
 
   const dirty = useMemo(() => {
     if (!draft || !goals) return false
@@ -365,9 +392,53 @@ export function GoalsTab({
           <div>
             <h3 className="text-lg font-semibold text-white">Daily goals</h3>
             <p className="text-sm text-white/50 mt-1">
-              Edit labels and targets (minutes per day). Progress for calendar day{' '}
-              {progressPayload?.date ?? todayStr} (same rules as the phone widget).
+              Edit labels and targets (minutes per day). Bars below show progress for
+              the selected calendar day (same rules as the phone widget).
             </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-xs text-white/45 mr-1">View day</span>
+              <button
+                type="button"
+                onClick={() => setProgressDate(todayStr)}
+                disabled={progressDate === todayStr}
+                className="px-2.5 py-1 rounded-md border border-white/15 text-xs text-white/85 hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none"
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => setProgressDate(yesterdayStr)}
+                disabled={progressDate === yesterdayStr}
+                className="px-2.5 py-1 rounded-md border border-white/15 text-xs text-white/85 hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none"
+              >
+                Yesterday
+              </button>
+              <button
+                type="button"
+                aria-label="Previous day"
+                onClick={() => setProgressDate((d) => shiftCalendarYmd(d, -1))}
+                className="p-1 rounded-md border border-white/15 text-white/80 hover:bg-white/10"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                aria-label="Next day"
+                onClick={() =>
+                  setProgressDate((d) =>
+                    d < todayStr ? shiftCalendarYmd(d, 1) : d
+                  )
+                }
+                disabled={!canStepProgressNext}
+                className="p-1 rounded-md border border-white/15 text-white/80 hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <span className="text-xs text-white/55 tabular-nums ml-1">
+                {progressDateLabel}{' '}
+                <span className="text-white/35">({progressPayload?.date ?? progressDate})</span>
+              </span>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
