@@ -407,14 +407,6 @@ export function GoalsTab({
               </button>
               <button
                 type="button"
-                onClick={() => setProgressDate(yesterdayStr)}
-                disabled={progressDate === yesterdayStr}
-                className="px-2.5 py-1 rounded-md border border-white/15 text-xs text-white/85 hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none"
-              >
-                Yesterday
-              </button>
-              <button
-                type="button"
                 aria-label="Previous day"
                 onClick={() => setProgressDate((d) => shiftCalendarYmd(d, -1))}
                 className="p-1 rounded-md border border-white/15 text-white/80 hover:bg-white/10"
