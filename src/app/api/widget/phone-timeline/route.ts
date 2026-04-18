@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
-import { prisma } from '@/lib/prisma'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
-import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
+import { loadWidgetDayBundleCached } from '@/lib/widgetDayDataCache'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -146,24 +145,22 @@ export async function GET(request: NextRequest) {
     limitRaw && /^\d{1,3}$/.test(limitRaw) ? Math.min(120, Math.max(5, Number(limitRaw))) : 40
 
   try {
-    const rows = await prisma.timeSession.findMany({
-      where: excludePhoneDeletionTombstones({
-        userId,
-        date,
-        endTime: { not: null },
-      }),
-      select: {
-        activity: true,
-        description: true,
-        startTime: true,
-        endTime: true,
-        date: true,
-        source: true,
-      },
-      orderBy: { startTime: 'asc' },
-    })
+    const { sessions: daySessions } = await loadWidgetDayBundleCached(
+      userId,
+      date,
+    )
+    const rows = daySessions
+      .filter((r) => r.endTime)
+      .map((r) => ({
+        activity: r.activity,
+        description: r.description ?? null,
+        startTime: r.startTime,
+        endTime: r.endTime!,
+        date: r.date,
+        source: r.source,
+      })) as SessionRow[]
 
-    const effective = effectiveSessionsForDate(rows as SessionRow[])
+    const effective = effectiveSessionsForDate(rows)
     const merged = mergeAdjacent(effective, 60_000)
     const trimmed = merged.slice(-limit)
 

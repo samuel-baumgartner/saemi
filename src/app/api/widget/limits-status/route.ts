@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
-import { prisma } from '@/lib/prisma'
-import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
-import type { TimeSession } from '@/types/task'
 import {
-  normalizeStoredGoals,
   unproductiveBudgetLimitMinutes,
   unproductiveBudgetProgressParts,
   unproductiveMinutesToday,
 } from '@/lib/goalConfig'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
+import { loadWidgetDayBundleCached } from '@/lib/widgetDayDataCache'
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -23,26 +20,6 @@ function parseBearerToken(header: string | null): string | null {
   if (!header || !header.startsWith('Bearer ')) return null
   const t = header.slice(7).trim()
   return t.length > 0 ? t : null
-}
-
-function toTimeSession(row: {
-  id: string
-  activity: string
-  description: string | null
-  startTime: Date
-  endTime: Date | null
-  date: string
-  source: string
-}): TimeSession {
-  return {
-    id: row.id,
-    activity: row.activity,
-    description: row.description ?? undefined,
-    startTime: row.startTime,
-    endTime: row.endTime ?? undefined,
-    date: row.date,
-    source: row.source as TimeSession['source'],
-  }
 }
 
 export async function GET(request: NextRequest) {
@@ -67,15 +44,7 @@ export async function GET(request: NextRequest) {
       : getServerCalendarDateString(new Date())
 
   try {
-    const [goalRow, rows] = await Promise.all([
-      prisma.userGoalSettings.findUnique({ where: { userId } }),
-      prisma.timeSession.findMany({
-        where: excludePhoneDeletionTombstones({ userId, date }),
-        orderBy: { startTime: 'asc' },
-      }),
-    ])
-    const goals = normalizeStoredGoals(goalRow?.goalsJson ?? null)
-    const sessions = rows.map(toTimeSession)
+    const { goals, sessions } = await loadWidgetDayBundleCached(userId, date)
     const minutes = unproductiveMinutesToday(sessions)
     const limitMinutes = unproductiveBudgetLimitMinutes(goals, sessions)
     const isOverLimit =
