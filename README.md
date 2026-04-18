@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# saemi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal productivity system that unifies phone, desktop, and browser activity into one timeline, then feeds daily goals, unproductive-time budgets, and review loops.
 
-Currently, two official plugins are available:
+Live: [samuelbaumgartner.ch/personal/dashboard](https://www.samuelbaumgartner.ch/personal/dashboard)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Built to solve the context-switching problem across devices. Now runs 100% of my own task tracking, time allocation, and language-learning goals.
 
-## React Compiler
+## What it is
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Web app** — Next.js (App Router) + Prisma + PostgreSQL. Timeline, daily goals, unproductive-time limits, edit/override UI.
+- **Browser extension** — Chrome/Chromium. Classifies browser tabs (productive / listening comprehension / unproductive) and enforces limits, with a title-level heuristic for YouTube listening.
+- **Android home-screen widget** — Kotlin. Shows today's goals at a glance, syncs phone usage via `UsageStatsManager`, blocks over-limit apps (YouTube, Instagram) through an AccessibilityService.
+- **Desktop focus daemon** ([TimeChecker](https://github.com/samuel-baumgartner)) — polls `cosmic-ext-window-helper` on Pop!_OS COSMIC to attribute keyboard-focus time to the right app.
+- **Google Fit uploader** — writes daily totals back to Google Fit for a single source of truth on a watch.
 
-## Expanding the ESLint configuration
+## What's interesting
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Cross-device session merging.** Phone usage-stats intervals, desktop focus seconds, and browser tab time collapse into a single per-minute timeline server-side. User edits on the web are locked (`userOverridden`) and suppress duplicate phone re-syncs, using Jaccard overlap on wall-clock intervals instead of exact timestamp matching.
+- **YouTube listening-comprehension detection on Android** — AccessibilityService records normalized window titles, and `PhoneUsageTracker` joins those matches against usage intervals so comprehension time stops counting as "Not productive" without the user tapping anything. Same regex is kept in sync between the Kotlin service and the browser extension.
+- **Over-limit blocker** — rather than wrapping individual apps, a single AccessibilityService launches a blocker activity when an unproductive foreground app crosses today's budget.
+- **Works offline-first on the phone** — widget buffers sessions locally and retries sync.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Next.js 15 · React 19 · TypeScript · Prisma · PostgreSQL · NextAuth (Google) · Tailwind · Kotlin / AndroidX (widget + accessibility service) · Chrome Extension MV3 · Python (desktop daemon).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Repo layout
+
+```
+prisma/                  DB schema + migrations
+src/app/                 Next.js App Router (pages + API routes)
+src/lib/                 goal/limit logic, session merging, overrides
+browser-extension/       Chrome MV3 extension
+android-goals-widget/    Android widget + accessibility service (Kotlin)
+scripts/                 maintenance / reclassification jobs
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Status
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Personal project, actively used daily. Not packaged for others to self-host — the code is here as a reference for how the pieces fit together.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Author
+
+[Samuel Baumgartner](https://www.samuelbaumgartner.ch) — BSc Electrical Engineering, ETH Zürich.
