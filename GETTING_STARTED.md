@@ -48,9 +48,9 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 
 Your `.env.local` should look like:
 ```env
-AUTH_SECRET=REMOVED_EXAMPLE_AUTH_SECRET
-GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=REMOVED_EXAMPLE_GOOGLE_CLIENT_SECRET
+AUTH_SECRET=<paste output of: openssl rand -base64 32>
+GOOGLE_CLIENT_ID=<client-id>.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=<client secret from Google Cloud Console — never commit real values>
 ```
 
 ### Step 3: Start the Development Server
