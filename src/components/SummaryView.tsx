@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { TimeSession } from '@/types/task';
+import { focusBreakdownLabel } from '@/lib/focusInfo';
 import { Clock, TrendingUp, Calendar } from 'lucide-react';
 
 interface SummaryViewProps {
@@ -61,7 +62,14 @@ export default function SummaryView({ sessions }: SummaryViewProps) {
   const summaryMap = new Map<string, SubjectSummary>();
 
   workSessions.forEach((session) => {
-    const subject = session.activity || 'Untitled';
+    const subject = (session.source === 'timechecker'
+      ? focusBreakdownLabel({
+          activity: session.activity,
+          startTime: session.startTime,
+          endTime: session.endTime ?? null,
+          healthData: session.healthData,
+        })
+      : session.activity) || 'Untitled';
     const duration = session.endTime
       ? new Date(session.endTime).getTime() - new Date(session.startTime).getTime()
       : 0;

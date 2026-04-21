@@ -14,13 +14,34 @@ type SessionSlice = {
   activity: string
   startTime: Date
   endTime: Date | null
-  healthData?: { details?: { focusSeconds?: unknown } }
+  healthData?: { details?: { focusSeconds?: unknown; saemiGoals?: unknown; saemiGoal?: unknown; ruleId?: unknown } }
 }
 
 function focusSecondsWeight(s: SessionSlice): number | null {
   const v = s.healthData?.details?.focusSeconds
   if (typeof v === 'number' && Number.isFinite(v) && v > 0) return v
   return null
+}
+
+function detailsClaimStartup(details: SessionSlice['healthData']): boolean {
+  const d = details?.details
+  if (d == null || typeof d !== 'object') return false
+  const single = d.saemiGoal
+  if (typeof single === 'string' && single.trim().toLowerCase() === 'startup') return true
+  const arr = d.saemiGoals
+  return Array.isArray(arr) && arr.some((x) => typeof x === 'string' && x.trim().toLowerCase() === 'startup')
+}
+
+function isStartupGatedRule(s: SessionSlice): boolean {
+  const rid = s.healthData?.details?.ruleId
+  if (typeof rid === 'string') return rid === 'chrome'
+  return /^google\s*chrome$/i.test(s.activity)
+}
+
+export function focusBreakdownLabel(s: SessionSlice): string {
+  if (!isStartupGatedRule(s)) return s.activity
+  if (detailsClaimStartup(s.healthData)) return 'StartUp'
+  return s.activity
 }
 
 /**
@@ -44,17 +65,12 @@ export function aggregateFocusByActivity(
     if (!s.endTime) continue
     const ov = overlapMs(s.startTime, s.endTime, winStart, winEnd)
     if (ov <= 0) continue
+    const label = focusBreakdownLabel(s)
     totalOverlap += ov
-    byActivityOverlap.set(
-      s.activity,
-      (byActivityOverlap.get(s.activity) ?? 0) + ov
-    )
+    byActivityOverlap.set(label, (byActivityOverlap.get(label) ?? 0) + ov)
     const fs = focusSecondsWeight(s)
     const w = fs ?? ov / 1000
-    byActivityWeight.set(
-      s.activity,
-      (byActivityWeight.get(s.activity) ?? 0) + w
-    )
+    byActivityWeight.set(label, (byActivityWeight.get(label) ?? 0) + w)
   }
 
   if (byActivityOverlap.size === 0) return []
