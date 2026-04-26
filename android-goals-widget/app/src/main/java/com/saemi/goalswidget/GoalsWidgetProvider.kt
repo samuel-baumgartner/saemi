@@ -74,7 +74,6 @@ class GoalsWidgetProvider : AppWidgetProvider() {
                         },
                     )
                 }
-                GoogleFitRefresh.maybeNudgeAfterWidgetRefresh(context)
                 Handler(Looper.getMainLooper()).post {
                     for (id in appWidgetIds) {
                         val rv = RemoteViews(context.packageName, R.layout.widget_goals_static)
