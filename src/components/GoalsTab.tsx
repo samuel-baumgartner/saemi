@@ -18,14 +18,17 @@ import {
   weeklyGoalRollups,
   weeklyGoalsMetCount,
 } from '@/lib/goalConfig'
-import type { WidgetGoalItem } from '@/lib/widgetDailyGoalsPayload'
+import { computeWidgetDailyGoalItems } from '@/lib/widgetDailyGoalsCompute'
+import { createThrottleGate } from '@/lib/clientThrottle'
 import { CalendarRange, ChevronLeft, ChevronRight, Loader2, RotateCcw, Save } from 'lucide-react'
 
 interface GoalsTabProps {
-  /** Used only to refetch server progress when sessions change (same DB as widget). */
   sessions: TimeSession[]
   /** Kept for Timeline parity; goal progress uses the same rules as the phone widget (no active-session bonus). */
   activeSessionId?: string | null
+  parentGoals: DailyGoalDef[] | null
+  parentGoalsLoading: boolean
+  reloadParentGoals: () => Promise<void>
 }
 
 function cloneGoals(g: DailyGoalDef[]) {
@@ -62,100 +65,45 @@ function shiftCalendarYmd(ymd: string, deltaDays: number): string {
 export function GoalsTab({
   sessions,
   activeSessionId = null,
+  parentGoals,
+  parentGoalsLoading,
+  reloadParentGoals,
 }: GoalsTabProps) {
   const todayStr = getCalendarTodayString()
   const yesterdayStr = useMemo(() => shiftCalendarYmd(todayStr, -1), [todayStr])
   const [progressDate, setProgressDate] = useState(() => getCalendarTodayString())
-  const sessionsSig = useMemo(
-    () =>
-      sessions
-        .map(
-          (s) =>
-            [
-              s.id,
-              s.date,
-              s.activity,
-              s.description ?? '',
-              s.source ?? '',
-              s.startTime.getTime(),
-              s.endTime?.getTime() ?? 0,
-            ].join(':')
-        )
-        .join('|'),
-    [sessions]
-  )
 
   const [goals, setGoals] = useState<DailyGoalDef[] | null>(null)
   const [draft, setDraft] = useState<DailyGoalDef[] | null>(null)
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const [progressPayload, setProgressPayload] = useState<{
-    date: string
-    items: WidgetGoalItem[]
-  } | null>(null)
-  const [progressLoading, setProgressLoading] = useState(true)
-  const [progressError, setProgressError] = useState<string | null>(null)
-
-  const load = useCallback(async (silent = false) => {
-    if (!silent) {
-      setLoading(true)
-      setError(null)
-    }
-    try {
-      const r = await fetch('/api/user/goals', { cache: 'no-store' })
-      if (!r.ok) throw new Error('Failed to load goals')
-      const data = await r.json()
-      const g = data.goals as DailyGoalDef[]
-      setGoals(cloneGoals(g))
-      setDraft(cloneGoals(g))
-      if (silent) setError(null)
-    } catch {
-      if (!silent) {
-        const fallback = cloneGoals(DEFAULT_DAILY_GOALS)
-        setGoals(fallback)
-        setDraft(cloneGoals(fallback))
-        setError('Could not load saved goals — using defaults until you save.')
-      }
-    } finally {
-      if (!silent) setLoading(false)
-    }
-  }, [])
+  const dirtyRef = useRef(false)
 
   useEffect(() => {
-    load(false)
-  }, [load])
+    if (!parentGoals) return
+    setGoals(cloneGoals(parentGoals))
+    if (!dirtyRef.current) setDraft(cloneGoals(parentGoals))
+  }, [parentGoals])
 
-  const loadProgress = useCallback(async () => {
-    setProgressLoading(true)
-    setProgressError(null)
-    try {
-      const q = new URLSearchParams()
-      q.set('date', progressDate)
-      const r = await fetch(`/api/user/goals/today?${q.toString()}`, {
-        cache: 'no-store',
-      })
-      if (!r.ok) throw new Error('Failed to load progress')
-      const data = (await r.json()) as {
-        date: string
-        items: WidgetGoalItem[]
-      }
-      setProgressPayload({ date: data.date, items: data.items })
-    } catch {
-      setProgressError('Could not load goal progress for that day.')
-      setProgressPayload(null)
-    } finally {
-      setProgressLoading(false)
-    }
-  }, [progressDate])
+  const loading = parentGoalsLoading && goals === null
 
-  useEffect(() => {
-    void loadProgress()
-  }, [loadProgress, sessionsSig])
+  const displayGoals = draft ?? goals ?? DEFAULT_DAILY_GOALS
+
+  const daySessions = useMemo(
+    () => sessions.filter((s) => s.date === progressDate),
+    [sessions, progressDate]
+  )
+
+  const progressPayload = useMemo(() => {
+    const items = computeWidgetDailyGoalItems({
+      goals: displayGoals,
+      sessions: daySessions,
+      activeSessionId: null,
+    })
+    return { date: progressDate, items }
+  }, [displayGoals, daySessions, progressDate])
 
   const doneByGoalId = useMemo(() => {
-    if (!progressPayload) return null
     const m: Record<string, number> = {}
     for (const it of progressPayload.items) {
       if (it.id !== 'unproductive') m[it.id] = it.doneMinutes
@@ -163,11 +111,9 @@ export function GoalsTab({
     return m
   }, [progressPayload])
 
-  const unproductiveRow = progressPayload?.items.find(
+  const unproductiveRow = progressPayload.items.find(
     (i) => i.id === 'unproductive'
   )
-
-  const displayGoals = draft ?? goals ?? DEFAULT_DAILY_GOALS
 
   const weekDayStrings = useMemo(
     () => getCalendarWeekDateStringsContaining(todayStr),
@@ -220,30 +166,24 @@ export function GoalsTab({
     return !goalsEqual(draft, goals)
   }, [draft, goals])
 
-  const dirtyRef = useRef(dirty)
   dirtyRef.current = dirty
 
-  const goalsDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const allowGoalsRefetch = useRef(createThrottleGate(120_000))
   useEffect(() => {
     const scheduleRefetch = () => {
       if (document.visibilityState !== 'visible') return
-      void loadProgress()
       if (dirtyRef.current) return
-      if (goalsDebounceRef.current) clearTimeout(goalsDebounceRef.current)
-      goalsDebounceRef.current = setTimeout(() => {
-        goalsDebounceRef.current = null
-        void load(true)
-      }, 150)
+      if (!allowGoalsRefetch.current()) return
+      void reloadParentGoals()
     }
 
     document.addEventListener('visibilitychange', scheduleRefetch)
     window.addEventListener('focus', scheduleRefetch)
     return () => {
-      if (goalsDebounceRef.current) clearTimeout(goalsDebounceRef.current)
       document.removeEventListener('visibilitychange', scheduleRefetch)
       window.removeEventListener('focus', scheduleRefetch)
     }
-  }, [load, loadProgress])
+  }, [reloadParentGoals])
 
   const updateDraft = (id: string, patch: Partial<DailyGoalDef>) => {
     setDraft((d) => {
@@ -267,7 +207,6 @@ export function GoalsTab({
       const g = data.goals as DailyGoalDef[]
       setGoals(cloneGoals(g))
       setDraft(cloneGoals(g))
-      void loadProgress()
     } catch {
       setError('Could not save goals. Try again.')
     } finally {
@@ -464,12 +403,6 @@ export function GoalsTab({
           </p>
         )}
 
-        {progressError && (
-          <p className="text-sm text-amber-300/90 mb-4 bg-amber-950/30 border border-amber-500/25 rounded-lg px-3 py-2">
-            {progressError}
-          </p>
-        )}
-
         {loading ? (
           <div className="flex items-center gap-2 text-white/50 py-8">
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -508,11 +441,7 @@ export function GoalsTab({
                   Goal progress for budget:{' '}
                   {progressReady && budgetProgress.totalTargetMinutes > 0
                     ? `${budgetProgress.creditedMinutes} / ${budgetProgress.totalTargetMinutes} min (${Math.round(budgetProgress.fraction * 100)}%)`
-                    : progressReady
-                      ? '—'
-                      : progressLoading
-                        ? '…'
-                        : '—'}
+                    : '—'}
                 </span>
                 <span className="text-sm text-red-300 tabular-nums">
                   {progressReady ? (
@@ -523,7 +452,7 @@ export function GoalsTab({
                     </>
                   ) : (
                     <span className="text-white/40">
-                      {progressLoading ? '…' : '—'}
+                      —
                     </span>
                   )}
                   {progressReady && unproductiveOver && (
@@ -603,7 +532,7 @@ export function GoalsTab({
                     <span className="text-sm text-white/70 tabular-nums">
                       {done == null ? (
                         <span className="text-white/40">
-                          {progressLoading ? '…' : '—'}
+                          —
                         </span>
                       ) : (
                         <>

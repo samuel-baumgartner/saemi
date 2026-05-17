@@ -171,6 +171,15 @@ export function matchesCursorGoal(text: string): boolean {
   return /\bcursor\b/i.test(text.trim())
 }
 
+/** Blender sessions from TimeChecker on laptop should count toward StartUp. */
+export function matchesBlenderStartupGoal(
+  s: TimeSession,
+  text: string
+): boolean {
+  if (s.source !== 'timechecker') return false
+  return /\bblender\b/i.test(text)
+}
+
 /**
  * True when a TimeChecker row’s `healthData.details` includes `saemiGoals`
  * (or `saemiGoal`) set on the computer — see `startup_rule_ids` in
@@ -199,11 +208,12 @@ export function timecheckerSessionClaimsSaemiGoal(
 
 /**
  * StartUp goal: **TimeChecker** rows tagged with `saemiGoals: ["startup"]` on the
- * computer, or any session whose text still matches Cursor (e.g. rule label
- * “Cursor”, or a manual session).
+ * computer, any laptop TimeChecker Blender session, or any session whose text
+ * still matches Cursor (e.g. rule label “Cursor”, or a manual session).
  */
 export function matchesStartupGoal(s: TimeSession, matchText: string): boolean {
   if (matchesCursorGoal(matchText)) return true
+  if (matchesBlenderStartupGoal(s, matchText)) return true
   if (timecheckerSessionClaimsSaemiGoal(s, 'startup')) return true
   return false
 }

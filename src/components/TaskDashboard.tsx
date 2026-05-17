@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useTimeTracker } from '@/hooks/useTimeTracker'
 import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
+import { normalizeStoredGoals, type DailyGoalDef } from '@/lib/goalConfig'
 import { ActiveSessionTracker } from '@/components/ActiveSessionTracker'
 import { TimelineView } from '@/components/TimelineView'
 import { GoogleFitConnect } from '@/components/GoogleFitConnect'
@@ -59,6 +60,31 @@ export function TaskDashboard({ userId }: TaskDashboardProps) {
     next.set('tab', tab)
     router.replace(`${pathname}?${next.toString()}`, { scroll: false })
   }
+
+  const [parentGoals, setParentGoals] = useState<DailyGoalDef[] | null>(null)
+  const [parentGoalsLoading, setParentGoalsLoading] = useState(true)
+
+  const reloadParentGoals = useCallback(async () => {
+    try {
+      const r = await fetch('/api/user/goals', { cache: 'no-store' })
+      if (!r.ok) throw new Error('Failed to load goals')
+      const data = await r.json()
+      setParentGoals(normalizeStoredGoals(data.goals))
+    } catch {
+      setParentGoals(normalizeStoredGoals(null))
+    } finally {
+      setParentGoalsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void reloadParentGoals()
+  }, [reloadParentGoals])
+
+  const exportGoals = useMemo(
+    () => normalizeStoredGoals(parentGoals),
+    [parentGoals]
+  )
 
   const previewPhone = searchParams.get('preview') === 'phone'
   const togglePreviewPhone = () => {
@@ -165,6 +191,9 @@ export function TaskDashboard({ userId }: TaskDashboardProps) {
         <GoalsTab
           sessions={sessions}
           activeSessionId={activeSession?.id ?? null}
+          parentGoals={parentGoals}
+          parentGoalsLoading={parentGoalsLoading}
+          reloadParentGoals={reloadParentGoals}
         />
       ) : activeTab === 'timeline' ? (
         <TimelineView
@@ -173,6 +202,7 @@ export function TaskDashboard({ userId }: TaskDashboardProps) {
           onDelete={deleteSession}
           onAddManual={addManualSession}
           activeSessionId={activeSession?.id}
+          exportGoals={exportGoals}
         />
       ) : (
         <SummaryView sessions={sessions} />

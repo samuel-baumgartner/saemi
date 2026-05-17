@@ -16,5 +16,6 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|data/).*)'],
+  // Only routes that need auth redirects — avoids edge middleware on /, assets, etc.
+  matcher: ['/personal', '/personal/:path*', '/info', '/info/:path*'],
 }

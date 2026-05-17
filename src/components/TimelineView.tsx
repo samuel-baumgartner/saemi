@@ -24,7 +24,6 @@ import { useSubjectSuggestions } from '@/hooks/useSubjectSuggestions'
 import {
   effectiveSessionDurationMs,
   DEFAULT_DAILY_GOALS,
-  normalizeStoredGoals,
   type DailyGoalDef,
 } from '@/lib/goalConfig'
 import {
@@ -39,6 +38,7 @@ interface TimelineViewProps {
   onDelete: (id: string) => void | Promise<void>
   onAddManual: (activity: string, startTime: Date, endTime: Date, description?: string) => void
   activeSessionId?: string
+  exportGoals: DailyGoalDef[]
 }
 
 export function TimelineView({
@@ -47,6 +47,7 @@ export function TimelineView({
   onDelete,
   onAddManual,
   activeSessionId,
+  exportGoals,
 }: TimelineViewProps) {
   const [selectedDate, setSelectedDate] = useState(getCalendarTodayString())
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph')
@@ -55,28 +56,7 @@ export function TimelineView({
     null
   )
   const [graphEditSession, setGraphEditSession] = useState<TimeSession | null>(null)
-  const [exportGoals, setExportGoals] = useState<DailyGoalDef[]>(() =>
-    normalizeStoredGoals(null)
-  )
   const SHORT_SESSION_MS = 5 * 60 * 1000
-
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const r = await fetch('/api/user/goals', { cache: 'no-store' })
-        if (!r.ok) throw new Error('goals fetch failed')
-        const data = await r.json()
-        const g = normalizeStoredGoals(data.goals)
-        if (!cancelled) setExportGoals(g)
-      } catch {
-        if (!cancelled) setExportGoals(normalizeStoredGoals(null))
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   /** Drop very short wall-time-only crumbs; duration uses Anki study timers when present. */
   const hideAsShortSession = (durationMs: number) =>

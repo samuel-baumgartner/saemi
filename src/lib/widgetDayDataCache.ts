@@ -4,7 +4,7 @@ import { normalizeStoredGoals } from '@/lib/goalConfig'
 import type { DailyGoalDef } from '@/lib/goalConfig'
 import type { TimeSession } from '@/types/task'
 
-const TTL_MS = 45_000
+const TTL_MS = 120_000
 const MAX_ENTRIES = 96
 
 type CacheEntry = {

@@ -11,9 +11,22 @@ object PhoneSync {
         timeZone = TimeZone.getDefault()
     }
 
+    private const val MIN_SYNC_INTERVAL_MS = 5 * 60 * 1000L
+
+    @Volatile
+    private var lastSyncAtMs: Long = 0L
+
+    /** Throttled upload from widget refresh (full sync still available via syncToday). */
+    fun syncTodayIfDue(context: Context) {
+        val now = System.currentTimeMillis()
+        if (now - lastSyncAtMs < MIN_SYNC_INTERVAL_MS) return
+        lastSyncAtMs = now
+        syncToday(context)
+    }
+
     /**
      * Best-effort: Build today's sessions from Usage Access and upload them.
-     * Safe to call often; server replaces today's phone sessions.
+     * Server replaces today's phone sessions.
      */
     fun syncToday(context: Context) {
         if (!WidgetPrefs.isConfigured(context)) return

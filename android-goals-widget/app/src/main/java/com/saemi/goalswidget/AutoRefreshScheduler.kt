@@ -7,8 +7,8 @@ import android.content.Intent
 import android.os.SystemClock
 
 object AutoRefreshScheduler {
-    /** Poll often enough to pick up goal label/target changes saved on the web. */
-    private const val INTERVAL_MS = 60 * 1000L
+    /** Poll for goal label/target changes (batched for battery + fewer server requests). */
+    private const val INTERVAL_MS = 180 * 1000L
 
     private fun pi(context: Context): PendingIntent =
         PendingIntent.getBroadcast(

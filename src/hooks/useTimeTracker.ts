@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { TimeSession } from '@/types/task'
 import type { HealthSyncSession } from '@/types/task'
 import { formatDateYmdInCalendarTz } from '@/lib/dateUtils'
+import { createThrottleGate } from '@/lib/clientThrottle'
 
 /** Row shape from GET /api/sessions (Prisma JSON + ISO date strings). */
 type TimeSessionApiRow = {
@@ -66,9 +67,11 @@ export function useTimeTracker() {
   }, [loadSessions])
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const allowVisibilityRefetch = useRef(createThrottleGate(90_000))
   useEffect(() => {
     const scheduleRefetch = () => {
       if (document.visibilityState !== 'visible') return
+      if (!allowVisibilityRefetch.current()) return
       if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => {
         debounceRef.current = null

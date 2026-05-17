@@ -54,7 +54,7 @@ class GoalsWidgetProvider : AppWidgetProvider() {
         ) {
             Thread {
                 try {
-                    PhoneSync.syncToday(context)
+                    PhoneSync.syncTodayIfDue(context)
                 } catch (_: Exception) {
                 }
 

@@ -9,6 +9,8 @@ object LimitStatusCache {
     @Volatile private var lastKnownOverLimit: Boolean = false
     @Volatile private var lastKnownDate: String = ""
 
+    private const val PREFETCH_MIN_INTERVAL_MS = 120_000L
+
     private val refreshing = AtomicBoolean(false)
     private val io = Executors.newSingleThreadExecutor()
 
@@ -32,6 +34,7 @@ object LimitStatusCache {
     fun prefetch(context: Context) {
         val app = context.applicationContext
         if (!WidgetPrefs.isConfigured(app)) return
+        if (System.currentTimeMillis() - lastFetchedAtMs < PREFETCH_MIN_INTERVAL_MS) return
         io.execute {
             if (!refreshing.compareAndSet(false, true)) return@execute
             try {
