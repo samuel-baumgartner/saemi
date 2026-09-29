@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
+import { resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -14,10 +15,11 @@ import {
 export async function GET() {
   try {
     const session = await auth()
-    const userId = getDbUserId(session)
-    if (!userId) {
+    const sessionUserId = getDbUserId(session)
+    if (!sessionUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const userId = resolveSessionsOwnerUserId(sessionUserId)
     const row = await prisma.userGoalSettings.findUnique({
       where: { userId },
     })
@@ -36,10 +38,11 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const session = await auth()
-    const userId = getDbUserId(session)
-    if (!userId) {
+    const sessionUserId = getDbUserId(session)
+    if (!sessionUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const userId = resolveSessionsOwnerUserId(sessionUserId)
 
     const body = await request.json()
     const sanitized = sanitizeGoalsFromClient(body?.goals)

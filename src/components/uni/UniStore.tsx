@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createThrottleGate } from '@/lib/clientThrottle'
 import { computeDue } from '@/lib/uni/dates'
 import { UNI_WEEKS, type UniCourse, type UniDueRule, type UniItem, type UniKind } from '@/lib/uni/types'
 
@@ -65,7 +66,8 @@ export function UniStoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refresh().finally(() => setLoading(false))
     const tick = setInterval(() => setNow(Date.now()), 60_000)
-    const onVisible = () => document.visibilityState === 'visible' && refresh()
+    const gate = createThrottleGate(30_000)
+    const onVisible = () => document.visibilityState === 'visible' && gate() && refresh()
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       clearInterval(tick)

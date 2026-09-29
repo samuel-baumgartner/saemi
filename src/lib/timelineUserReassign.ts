@@ -1,20 +1,6 @@
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
-
-/** Optional env: extra DB `userId` values to fold into primary email on Google sign-in. */
-function envLegacyIds(): string[] {
-  const raw = process.env.TIMELINE_LEGACY_USER_IDS
-  if (!raw?.trim()) return []
-  return raw.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean)
-}
-
-/**
- * Old row keys that belonged to the same Google account as this primary email.
- * Keeps timeline data unified when Google used to expose a different login id.
- */
-const PRIMARY_EMAIL_LEGACY_ROW_KEYS: Record<string, readonly string[]> = {
-  'sbaumgartn12@gmail.com': ['samuel.baumgartner@ebmnet.ch'],
-}
+import { isOwnerAccount } from '@/lib/sessionsOwnerUserId'
 
 export async function reassignTimelineUserData(
   fromUserId: string,
@@ -76,27 +62,24 @@ export async function reassignTimelineUserData(
   })
 }
 
-/** On Google OAuth sign-in, move any legacy `userId` rows into the primary email Google returns. */
+/**
+ * On Google OAuth sign-in, fold rows stored under the account's alternate Google emails into
+ * the primary one. Owner accounts are skipped: their data lives under `WIDGET_USER_ID`.
+ */
 export async function mergeLegacyTimelineSourcesIntoPrimaryEmail(args: {
   primaryEmail: string
   userEmail?: string | null
   profileEmail?: string | null
 }): Promise<void> {
   const target = args.primaryEmail.trim()
-  if (!target) return
+  if (!target || isOwnerAccount(target)) return
 
   const sources = new Set<string>()
-  const add = (s?: string | null) => {
+  for (const s of [args.userEmail, args.profileEmail]) {
     const t = s?.trim()
-    if (t) sources.add(t)
+    if (t && t.toLowerCase() !== target.toLowerCase() && !isOwnerAccount(t)) sources.add(t)
   }
-  add(args.userEmail)
-  add(args.profileEmail)
-  for (const x of envLegacyIds()) add(x)
-  for (const x of PRIMARY_EMAIL_LEGACY_ROW_KEYS[target.toLowerCase()] ?? []) add(x)
-
-  const fromList = [...sources].filter((s) => s.toLowerCase() !== target.toLowerCase())
-  for (const from of fromList) {
+  for (const from of sources) {
     await reassignTimelineUserData(from, target)
   }
 }

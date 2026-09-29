@@ -1,5 +1,6 @@
 import { auth, signOut } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
+import { isOwnerAccount } from '@/lib/sessionsOwnerUserId'
 import { TaskDashboard } from '@/components/TaskDashboard'
 import { LogOut, Home } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -12,6 +13,7 @@ export default async function DashboardPage() {
   if (!session?.user) {
     redirect('/personal')
   }
+  const userId = getDbUserId(session) || session.user.email || session.user.id || ''
 
   return (
     <div className="min-h-screen bg-black">
@@ -78,7 +80,8 @@ export default async function DashboardPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <TaskDashboard
-          userId={getDbUserId(session) || session.user.email || session.user.id || ''}
+          userId={userId}
+          canRecoverTimeline={isOwnerAccount(userId)}
         />
       </main>
     </div>

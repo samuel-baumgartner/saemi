@@ -3,17 +3,20 @@ import { auth } from '@/auth'
 import { getDbUserId } from '@/lib/authDbUser'
 import { prisma } from '@/lib/prisma'
 import { reassignTimelineUserData } from '@/lib/timelineUserReassign'
+import { isOwnerAccount, resolveSessionsOwnerUserId } from '@/lib/sessionsOwnerUserId'
 
 /**
  * Manual merge: move rows from another `userId` into the current canonical account.
+ * Only between the owner's own accounts, so nobody can pull in someone else's data.
  */
 export async function POST(req: NextRequest) {
   try {
     const session = await auth()
-    const toUserId = getDbUserId(session)
-    if (!toUserId) {
+    const sessionUserId = getDbUserId(session)
+    if (!sessionUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const toUserId = resolveSessionsOwnerUserId(sessionUserId)
 
     let body: { fromUserId?: unknown }
     try {
@@ -27,6 +30,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'fromUserId must be a non-empty string (the email you used before)' },
         { status: 400 }
+      )
+    }
+
+    if (!isOwnerAccount(sessionUserId) || !isOwnerAccount(fromRaw)) {
+      return NextResponse.json(
+        { error: 'You can only merge data between your own accounts' },
+        { status: 403 }
       )
     }
 

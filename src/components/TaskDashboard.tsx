@@ -15,9 +15,10 @@ import { Calendar, BarChart3, Target } from 'lucide-react'
 
 interface TaskDashboardProps {
   userId: string
+  canRecoverTimeline?: boolean
 }
 
-export function TaskDashboard({ userId }: TaskDashboardProps) {
+export function TaskDashboard({ userId, canRecoverTimeline = false }: TaskDashboardProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -128,7 +129,7 @@ export function TaskDashboard({ userId }: TaskDashboardProps) {
           {previewPhone ? 'Exit phone preview' : 'Phone preview'}
         </button>
       </div>
-      {!isLoading && sessions.length === 0 && (
+      {canRecoverTimeline && !isLoading && sessions.length === 0 && (
         <RecoverTimelineData currentEmail={userId} onRecovered={loadSessions} />
       )}
 
