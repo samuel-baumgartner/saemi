@@ -20,9 +20,12 @@ object LimitStatusApi {
         timeZone = TimeZone.getDefault()
     }
 
-    fun fetchStatus(baseUrl: String, token: String): Result<LimitStatus> {
+    fun fetchStatus(baseUrl: String, token: String, fresh: Boolean = false): Result<LimitStatus> {
         val date = dateFmt.format(Date())
-        var url = URL("${baseUrl.trim().trimEnd('/')}/api/widget/limits-status?date=$date")
+        val freshParam = if (fresh) "&fresh=1" else ""
+        var url = URL(
+            "${baseUrl.trim().trimEnd('/')}/api/widget/limits-status?date=$date$freshParam",
+        )
         return try {
             var redirects = 0
             while (redirects < 8) {

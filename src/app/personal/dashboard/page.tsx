@@ -34,6 +34,12 @@ export default async function DashboardPage() {
               >
                 Focus info
               </Link>
+              <Link
+                href="/personal/uni"
+                className="text-sm text-indigo-400/90 hover:text-indigo-300"
+              >
+                Uni
+              </Link>
             </div>
 
             <div className="flex items-center gap-4">

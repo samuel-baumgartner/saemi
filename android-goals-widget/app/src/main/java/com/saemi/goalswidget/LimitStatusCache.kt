@@ -1,6 +1,10 @@
 package com.saemi.goalswidget
 
 import android.content.Context
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -8,25 +12,48 @@ object LimitStatusCache {
     @Volatile private var lastFetchedAtMs: Long = 0L
     @Volatile private var lastKnownOverLimit: Boolean = false
     @Volatile private var lastKnownDate: String = ""
+    @Volatile private var lastKnownLimitMinutes: Int = DEFAULT_LIMIT_MINUTES
 
+    private const val DEFAULT_LIMIT_MINUTES = 120
     private const val PREFETCH_MIN_INTERVAL_MS = 120_000L
+    private const val BLOCKER_CACHE_MS = 30_000L
+    private const val BLOCKER_SYNC_INTERVAL_MS = 60_000L
+
+    private val dayFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+        timeZone = TimeZone.getDefault()
+    }
 
     private val refreshing = AtomicBoolean(false)
     private val io = Executors.newSingleThreadExecutor()
 
     /**
-     * Synchronous fetch for the accessibility blocker (call only from a background thread).
-     * Always hits the network; updates cache; returns whether the user is over unproductive budget.
+     * For the accessibility blocker (background thread only). Uploads fresh phone usage,
+     * asks the server (phone + laptop combined), and falls back to phone-only minutes offline.
      */
-    fun refreshForBlocker(context: Context): Boolean {
+    fun isOverLimitForBlocker(context: Context): Boolean {
         val app = context.applicationContext
-        val baseUrl = WidgetPrefs.getBaseUrl(app)
-        val token = WidgetPrefs.getToken(app)
-        if (baseUrl.isBlank() || token.isBlank()) {
-            return false
+        if (!WidgetPrefs.isConfigured(app)) return false
+        val now = System.currentTimeMillis()
+        val today = dayFmt.format(Date(now))
+        if (now - lastFetchedAtMs < BLOCKER_CACHE_MS && lastKnownDate == today) {
+            return lastKnownOverLimit
         }
-        val result = LimitStatusApi.fetchStatus(baseUrl, token)
+        try {
+            PhoneSync.syncTodayIfDue(app, BLOCKER_SYNC_INTERVAL_MS)
+        } catch (_: Exception) {
+        }
+        val result = LimitStatusApi.fetchStatus(
+            WidgetPrefs.getBaseUrl(app),
+            WidgetPrefs.getToken(app),
+            fresh = true,
+        )
         applyFetchResult(result)
+        if (lastKnownOverLimit) return true
+        val localMinutes = PhoneUsageTracker.unproductiveMinutesToday(app)
+        if (localMinutes >= lastKnownLimitMinutes) {
+            lastKnownOverLimit = true
+            lastKnownDate = today
+        }
         return lastKnownOverLimit
     }
 
@@ -51,18 +78,15 @@ object LimitStatusCache {
     }
 
     private fun applyFetchResult(result: Result<LimitStatus>) {
-        if (result.isSuccess) {
-            val s = result.getOrNull()
-            if (s != null) {
-                lastKnownOverLimit = s.isOverLimit
-                lastKnownDate = s.date
-            } else {
-                lastKnownOverLimit = false
-            }
+        val s = result.getOrNull()
+        if (s != null) {
+            lastKnownOverLimit = s.isOverLimit
+            lastKnownDate = s.date
+            if (s.limitMinutes > 0) lastKnownLimitMinutes = s.limitMinutes
         } else {
             lastKnownOverLimit = false
+            lastKnownDate = ""
         }
         lastFetchedAtMs = System.currentTimeMillis()
     }
 }
-

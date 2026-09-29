@@ -12,9 +12,6 @@ const MAX_LABEL_LENGTH = 100
 
 /** Default targets when nothing is stored yet (also used for “reset”). */
 export const DEFAULT_DAILY_GOALS: DailyGoalDef[] = [
-  { id: 'listening', label: 'Listening', targetMinutes: 120 },
-  { id: 'anki', label: 'Anki', targetMinutes: 60 },
-  { id: 'grammar', label: 'Grammar', targetMinutes: 10 },
   { id: 'startup', label: 'StartUp', targetMinutes: 60 },
 ]
 
@@ -335,7 +332,7 @@ export function unproductiveMinutesToday(
   return sum
 }
 
-/** Max unproductive minutes you can unlock in a day (full “leisure” cap). */
+/** Fixed daily unproductive allowance (Instagram + YouTube, phone and laptop combined). */
 export const UNPRODUCTIVE_BUDGET_MAX_MIN = 120
 
 /**
@@ -368,21 +365,13 @@ export function unproductiveBudgetProgressParts(
   }
 }
 
-/**
- * Today's allowed unproductive minutes: (progress fraction) × UNPRODUCTIVE_BUDGET_MAX_MIN.
- * Starts at 0; fully weighted by actual time toward each goal vs sum of targets.
- */
+/** Today's allowed unproductive minutes: a flat daily allowance, independent of goal progress. */
 export function unproductiveBudgetLimitMinutes(
-  goals: DailyGoalDef[],
-  sessions: TimeSession[],
-  activeSessionId?: string | null
+  _goals?: DailyGoalDef[],
+  _sessions?: TimeSession[],
+  _activeSessionId?: string | null
 ): number {
-  const { fraction } = unproductiveBudgetProgressParts(
-    goals,
-    sessions,
-    activeSessionId
-  )
-  return Math.round(fraction * UNPRODUCTIVE_BUDGET_MAX_MIN)
+  return UNPRODUCTIVE_BUDGET_MAX_MIN
 }
 
 /**
@@ -415,12 +404,8 @@ export function unproductiveBudgetProgressPartsFromDones(
 }
 
 export function unproductiveBudgetLimitMinutesFromDones(
-  goals: DailyGoalDef[],
-  doneByGoalId: Record<string, number>
+  _goals?: DailyGoalDef[],
+  _doneByGoalId?: Record<string, number>
 ): number {
-  const { fraction } = unproductiveBudgetProgressPartsFromDones(
-    goals,
-    doneByGoalId
-  )
-  return Math.round(fraction * UNPRODUCTIVE_BUDGET_MAX_MIN)
+  return UNPRODUCTIVE_BUDGET_MAX_MIN
 }

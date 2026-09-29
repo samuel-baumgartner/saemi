@@ -16,6 +16,7 @@ class AutoRefreshReceiver : BroadcastReceiver() {
         if (goalIds.isNotEmpty()) {
             GoalsWidgetProvider.refreshData(context, mgr, goalIds)
         }
+        UniWidgetProvider.refresh(context, force = false)
     }
 
     companion object {

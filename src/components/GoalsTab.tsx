@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { TimeSession } from '@/types/task'
 import {
   formatCalendarWeekRangeLabel,
@@ -14,7 +14,6 @@ import {
   DEFAULT_DAILY_GOALS,
   UNPRODUCTIVE_BUDGET_MAX_MIN,
   unproductiveBudgetLimitMinutesFromDones,
-  unproductiveBudgetProgressPartsFromDones,
   weeklyGoalRollups,
   weeklyGoalsMetCount,
 } from '@/lib/goalConfig'
@@ -220,9 +219,6 @@ export function GoalsTab({
 
   const progressReady = progressPayload != null
 
-  const budgetProgress = progressReady
-    ? unproductiveBudgetProgressPartsFromDones(displayGoals, doneByGoalId ?? {})
-    : { creditedMinutes: 0, totalTargetMinutes: 0, fraction: 0 }
   const unproductiveTarget = progressReady
     ? unproductiveBudgetLimitMinutesFromDones(displayGoals, doneByGoalId ?? {})
     : 0
@@ -420,10 +416,8 @@ export function GoalsTab({
                   <div className="w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-white text-sm">
                     <span className="block">Unproductive</span>
                     <span className="block text-[11px] text-white/45 font-normal mt-1 leading-snug">
-                      Leisure budget = your progress through today's goals (time
-                      counted up to each target) divided by the sum of all targets,
-                      times {UNPRODUCTIVE_BUDGET_MAX_MIN} min max. Example: 2h done
-                      of a 2h goal out of 3h total targets → two thirds unlocked.
+                      Instagram + YouTube (phone, Chrome and laptop combined):
+                      {' '}{UNPRODUCTIVE_BUDGET_MAX_MIN} min per day. Blocked once used up.
                     </span>
                   </div>
                 </div>
@@ -437,12 +431,6 @@ export function GoalsTab({
                 </div>
               </div>
               <div className="flex flex-col items-end gap-0.5 mb-2">
-                <span className="text-xs text-white/40 tabular-nums">
-                  Goal progress for budget:{' '}
-                  {progressReady && budgetProgress.totalTargetMinutes > 0
-                    ? `${budgetProgress.creditedMinutes} / ${budgetProgress.totalTargetMinutes} min (${Math.round(budgetProgress.fraction * 100)}%)`
-                    : '—'}
-                </span>
                 <span className="text-sm text-red-300 tabular-nums">
                   {progressReady ? (
                     <>

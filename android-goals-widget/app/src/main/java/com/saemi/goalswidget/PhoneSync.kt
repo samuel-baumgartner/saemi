@@ -17,9 +17,9 @@ object PhoneSync {
     private var lastSyncAtMs: Long = 0L
 
     /** Throttled upload from widget refresh (full sync still available via syncToday). */
-    fun syncTodayIfDue(context: Context) {
+    fun syncTodayIfDue(context: Context, minIntervalMs: Long = MIN_SYNC_INTERVAL_MS) {
         val now = System.currentTimeMillis()
-        if (now - lastSyncAtMs < MIN_SYNC_INTERVAL_MS) return
+        if (now - lastSyncAtMs < minIntervalMs) return
         lastSyncAtMs = now
         syncToday(context)
     }

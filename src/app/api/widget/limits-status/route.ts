@@ -44,7 +44,10 @@ export async function GET(request: NextRequest) {
       : getServerCalendarDateString(new Date())
 
   try {
-    const { goals, sessions } = await loadWidgetDayBundleCached(userId, date)
+    const fresh = request.nextUrl.searchParams.get('fresh') === '1'
+    const { goals, sessions } = await loadWidgetDayBundleCached(userId, date, {
+      bypassCache: fresh,
+    })
     const minutes = unproductiveMinutesToday(sessions)
     const limitMinutes = unproductiveBudgetLimitMinutes(goals, sessions)
     const isOverLimit =

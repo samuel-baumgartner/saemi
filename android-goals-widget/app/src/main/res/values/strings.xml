@@ -9,21 +9,37 @@
     <string name="refresh">Refresh</string>
     <string name="usage_access">Usage Access</string>
     <string name="grant_usage_access">Grant Usage Access</string>
-    <string name="packages_title">Phone tracking (packages)</string>
-    <string name="bunpro_pkg">Bunpro package</string>
-    <string name="anki_pkg">AnkiDroid package</string>
-    <string name="youtube_pkg">YouTube package (unproductive)</string>
-    <string name="instagram_pkg">Instagram package (unproductive)</string>
+    <string name="packages_title">Custom app packages (optional)</string>
+    <string name="youtube_pkg">Extra YouTube package</string>
+    <string name="instagram_pkg">Extra Instagram package</string>
     <string name="detect_current_app">Detect current app</string>
 
-    <string name="unproductive_blocker_message">2h unproductive limit reached. Go back to work.</string>
+    <string name="unproductive_blocker_message">2h of Instagram + YouTube used up for today. Go back to work.</string>
     <string name="widget_empty_configure">Open Saemi Goals to set URL and token, then tap Refresh.</string>
     <string name="widget_error">Could not load goals. Tap Refresh.</string>
     <string name="widget_loading">Loading…</string>
-    <string name="listening_grace_title">Unproductive limit (Accessibility)</string>
-    <string name="listening_grace_button">Allow YouTube 30s (listening)</string>
-    <string name="listening_grace_toast">YouTube allowed for 30 seconds. Open the YouTube app now.</string>
-    <string name="blocker_hint">The blocker watches the YouTube and Instagram apps only (not Chrome). If YouTube works on your laptop browser but feels blocked on the phone, use this button before opening the YouTube app, or watch in Chrome (not covered by the app blocker).</string>
+
+    <string name="blocker_title">Instagram + YouTube limit</string>
+    <string name="blocker_hint">2 hours per day, phone and laptop combined. Blocks the YouTube and Instagram apps and youtube.com / instagram.com in Chrome, Brave, Firefox, Samsung Internet, Edge and other browsers. Requires the Saemi accessibility service to be turned on.</string>
+    <string name="blocker_open_settings">Open Accessibility settings</string>
+    <string name="blocker_status_on">Blocker is ON</string>
+    <string name="blocker_status_off">Blocker is OFF: tap below, choose Saemi Goals and turn it on</string>
+    <string name="accessibility_description">Limits Instagram and YouTube (apps and websites in your browser) to 2 hours per day and blocks them afterwards.</string>
+
+    <string name="uni_title">Uni</string>
+    <string name="uni_widget_name">Saemi Uni deadlines</string>
+    <string name="uni_widget_description">Upcoming exercises and quizzes</string>
+    <string name="uni_subtitle">%1$d due this week</string>
+    <string name="uni_subtitle_overdue">%1$d overdue · %2$d this week</string>
+    <string name="uni_empty">Nothing due. Enjoy.</string>
+    <string name="uni_error">Could not load deadlines. Tap refresh.</string>
+    <string name="uni_channel_name">Uni deadlines</string>
+    <string name="uni_channel_description">Reminders 24 hours and 3 hours before an exercise or quiz is due</string>
+    <string name="uni_notification_text">Due %1$s (%2$s)</string>
+    <string name="uni_section_title">Uni reminders</string>
+    <string name="uni_section_hint">Add the "Saemi Uni deadlines" widget to your home screen. You get a notification 24h and 3h before each open deadline.</string>
+    <string name="uni_allow_notifications">Allow notifications</string>
+    <string name="uni_notifications_on">Notifications are allowed</string>
 
     <string name="google_fit_nudge_title">Google Fit upload nudge</string>
     <string name="google_fit_nudge_summary">When enabled: at most once every 4 hours, briefly open Google Fit so data can sync to Google — after each home-screen widget refresh (then return home), and ~1s before the YouTube/Instagram blocker if that fires. Requires Google Fit installed. Not a guarantee; there is no official background sync API.</string>

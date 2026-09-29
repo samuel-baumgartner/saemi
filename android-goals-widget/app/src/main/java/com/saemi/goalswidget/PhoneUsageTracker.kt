@@ -43,11 +43,6 @@ object PhoneUsageTracker {
         val events = usm.queryEvents(start, end) ?: return emptyList()
         val e = UsageEvents.Event()
 
-        val bunproPkg = WidgetPrefs.getBunproPackage(context)
-        val ankiPkg = WidgetPrefs.getAnkiPackage(context)
-        val youtubePkg = WidgetPrefs.getYoutubePackage(context)
-        val instagramPkg = WidgetPrefs.getInstagramPackage(context)
-
         var curPkg: String? = null
         var curStart: Long? = null
 
@@ -57,24 +52,33 @@ object PhoneUsageTracker {
             val p = curPkg ?: return
             val s = curStart ?: return
             if (ts <= s) return
-            val cat = PhoneClassifier.categoryForPackage(p, bunproPkg, ankiPkg, youtubePkg, instagramPkg)
-            var activity = cat.activityLabel
-            var description: String? = null
-            if (cat == PhoneCategory.Unproductive &&
-                PhoneClassifier.isYoutubePackage(p, youtubePkg) &&
-                YoutubeListeningTitleLog.hasListeningMatchBetween(context, s, ts)
-            ) {
-                activity = "Listening · YouTube"
-                description = YoutubeListeningTitleLog.bestTitleInRange(context, s, ts)?.take(500)
-            }
             val day = dayFmt.format(Date(s))
+            if (BrowserSites.isBrowser(p)) {
+                val browser = BrowserSites.browserName(p)
+                for ((segStart, segEnd, site) in BrowserSiteLog.segments(context, s, ts)) {
+                    val unproductive = site != BrowserSites.NONE
+                    raw.add(
+                        PhoneSession(
+                            activity = if (unproductive) {
+                                PhoneCategory.Unproductive.activityLabel
+                            } else {
+                                PhoneCategory.Other.activityLabel
+                            },
+                            startMs = segStart,
+                            endMs = segEnd,
+                            date = day,
+                            description = if (unproductive) "$browser · $site" else null,
+                        ),
+                    )
+                }
+                return
+            }
             raw.add(
                 PhoneSession(
-                    activity = activity,
+                    activity = PhoneClassifier.categoryForPackage(context, p).activityLabel,
                     startMs = s,
                     endMs = ts,
                     date = day,
-                    description = description,
                 ),
             )
         }
@@ -122,6 +126,15 @@ object PhoneUsageTracker {
             }
         }
         return merged
+    }
+
+    /** Phone-only YouTube + Instagram minutes today (offline fallback for the blocker). */
+    fun unproductiveMinutesToday(context: Context): Int {
+        val label = PhoneCategory.Unproductive.activityLabel
+        val ms = buildTodaySessions(context)
+            .filter { it.activity == label }
+            .sumOf { it.endMs - it.startMs }
+        return (ms / 60_000L).toInt()
     }
 
     fun toJsonPayload(date: String, sessions: List<PhoneSession>): JSONObject {

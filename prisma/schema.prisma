@@ -48,3 +48,41 @@ model UserGoalSettings {
   goalsJson Json
   updatedAt DateTime @updatedAt
 }
+
+/// Uni: one course with a Week 1-14 grid of exercises (and optional quizzes).
+model UniCourse {
+  id           String    @id @default(cuid())
+  userId       String
+  name         String
+  color        String    @default("#6366f1")
+  hasQuiz      Boolean   @default(false)
+  position     Int       @default(0)
+  notes        String    @default("")
+  /// { weekday: 0-6, time: "HH:MM", start: "YYYY-MM-DD" }
+  exerciseRule Json?
+  quizRule     Json?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  items        UniItem[]
+
+  @@index([userId])
+}
+
+model UniItem {
+  id        String    @id @default(cuid())
+  userId    String
+  courseId  String
+  course    UniCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  week      Int
+  kind      String // 'exercise' | 'quiz'
+  done      Boolean   @default(false)
+  skipped   Boolean   @default(false)
+  notes     String    @default("")
+  dueAt     DateTime?
+  dueManual Boolean   @default(false)
+  points    String    @default("")
+  updatedAt DateTime  @updatedAt
+
+  @@unique([courseId, week, kind])
+  @@index([userId, dueAt])
+}

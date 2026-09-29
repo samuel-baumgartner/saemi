@@ -89,11 +89,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="24dp"
             android:paddingBottom="6dp"
-            android:text="@string/listening_grace_title"
+            android:text="@string/blocker_title"
             android:textColor="@color/widget_text"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -104,12 +104,44 @@
             android:textColor="@color/widget_muted"
             android:textSize="12sp" />
 
-        <Button
-            android:id="@+id/btn_listening_grace"
+        <TextView
+            android:id="@+id/blocker_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="@string/listening_grace_button" />
+            android:textColor="@color/widget_text"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_accessibility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/blocker_open_settings" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingBottom="6dp"
+            android:text="@string/uni_section_title"
+            android:textColor="@color/widget_text"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/uni_section_hint"
+            android:textColor="@color/widget_muted"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_notifications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uni_allow_notifications" />
 
         <TextView
             android:layout_width="match_parent"
@@ -136,68 +168,6 @@
             android:textColor="@color/widget_text"
             android:textSize="18sp"
             android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:labelFor="@id/edit_bunpro_pkg"
-            android:text="@string/bunpro_pkg"
-            android:textColor="@color/widget_muted"
-            android:textSize="12sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/edit_bunpro_pkg"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="com.bunpro…"
-                android:inputType="text"
-                android:textColor="@color/widget_text"
-                android:textColorHint="@color/widget_muted" />
-
-            <Button
-                android:id="@+id/btn_detect_bunpro"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/detect_current_app" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:labelFor="@id/edit_anki_pkg"
-            android:text="@string/anki_pkg"
-            android:textColor="@color/widget_muted"
-            android:textSize="12sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/edit_anki_pkg"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="com.ichi2.anki"
-                android:inputType="text"
-                android:textColor="@color/widget_text"
-                android:textColorHint="@color/widget_muted" />
-
-            <Button
-                android:id="@+id/btn_detect_anki"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/detect_current_app" />
-        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"

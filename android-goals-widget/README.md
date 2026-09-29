@@ -1,8 +1,8 @@
-# Saemi — Android home screen widgets (Goals + Timeline)
+# Saemi — Android app (Goals widget, Uni widget, Instagram/YouTube blocker)
 
-Two widgets:
-- **Goals**: read-only daily goals progress (server uses the same logic as the web app).
-- **Timeline**: a list of recent “sessions” (Bunpro / Anki / Not productive / Other) built from your phone’s foreground app usage.
+- **Goals widget**: read-only daily goals progress (server uses the same logic as the web app).
+- **Uni widget** (“Saemi Uni deadlines”): open exercises/quizzes from `/personal/uni`, plus notifications 24h and 3h before each deadline.
+- **Blocker** (accessibility service): Instagram + YouTube get 2h per day, phone and laptop combined. Covers the native apps and youtube.com / instagram.com in Chrome and other browsers. Phone usage is uploaded as “Not productive” / “Other” sessions.
 
 ## 1. Server configuration
 
@@ -16,6 +16,8 @@ Redeploy so these endpoints are available (Bearer token auth):
 - `GET /api/widget/phone-goals`
 - `GET /api/widget/phone-timeline`
 - `POST /api/widget/phone-sessions/sync`
+- `GET /api/widget/limits-status`
+- `GET /api/widget/uni`
 
 The widget sends your phone’s **local calendar date** as `?date=YYYY-MM-DD` so “today” matches the device, not the server clock.
 
@@ -59,17 +61,14 @@ cd android-goals-widget
 
 ## 4. Enable phone tracking (Usage Access)
 
-To track Bunpro / AnkiDroid / YouTube / Instagram automatically, the app needs **Usage Access**.
+To track YouTube / Instagram automatically, the app needs **Usage Access**.
 
 1. Open **Saemi Goals** from the app drawer.
 2. Tap **Grant Usage Access**.
 3. Enable **Saemi Goals** in the Usage Access list.
-4. Back in the app, fill package names (or use **Detect current app** while the target app is in foreground):
-   - Bunpro package
-   - AnkiDroid package
-   - YouTube package (unproductive)
-   - Instagram package (unproductive)
-5. Tap **Save**, then hit **Refresh** on the widgets.
+4. Tap **Open Accessibility settings** → **Saemi Goals** → turn it on (needed for blocking and for detecting YouTube / Instagram in browsers).
+5. Tap **Allow notifications** for Uni reminders.
+6. The official YouTube / Instagram apps are detected automatically; the optional package fields are only for clones.
 
 Behavior:
 - The app rebuilds **today’s** phone sessions from Usage Events and uploads them right before each widget refresh.

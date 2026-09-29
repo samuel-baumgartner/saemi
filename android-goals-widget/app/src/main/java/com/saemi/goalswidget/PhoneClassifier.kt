@@ -1,33 +1,36 @@
 package com.saemi.goalswidget
 
+import android.content.Context
+
 object PhoneClassifier {
-    fun categoryForPackage(
-        pkg: String,
-        bunproPkg: String,
-        ankiPkg: String,
-        youtubePkg: String,
-        instagramPkg: String,
-    ): PhoneCategory {
-        val p = pkg.trim()
-        if (p.isEmpty()) return PhoneCategory.Other
+    private val defaultYoutubePackages = setOf(
+        "com.google.android.youtube",
+        "com.google.android.youtube.tv",
+        "app.revanced.android.youtube",
+    )
 
-        if (bunproPkg.isNotBlank() && p == bunproPkg.trim()) return PhoneCategory.Bunpro
-        if (ankiPkg.isNotBlank() && p == ankiPkg.trim()) return PhoneCategory.Anki
-        if (youtubePkg.isNotBlank() && p == youtubePkg.trim()) return PhoneCategory.Unproductive
-        if (instagramPkg.isNotBlank() && p == instagramPkg.trim()) return PhoneCategory.Unproductive
+    private val defaultInstagramPackages = setOf(
+        "com.instagram.android",
+        "com.instagram.lite",
+    )
 
-        // Common fallbacks if user hasn't configured everything yet.
-        if (p == "com.ichi2.anki") return PhoneCategory.Anki
-        if (p == "com.google.android.youtube" || p == "com.google.android.youtube.tv") return PhoneCategory.Unproductive
-        if (p == "com.instagram.android") return PhoneCategory.Unproductive
-
-        return PhoneCategory.Other
+    fun youtubePackages(context: Context): Set<String> {
+        val custom = WidgetPrefs.getYoutubePackage(context)
+        return if (custom.isEmpty()) defaultYoutubePackages else defaultYoutubePackages + custom
     }
 
-    fun isYoutubePackage(pkg: String, youtubePkgFromPrefs: String): Boolean {
-        val p = pkg.trim()
-        if (youtubePkgFromPrefs.isNotBlank() && p == youtubePkgFromPrefs.trim()) return true
-        return p == "com.google.android.youtube" || p == "com.google.android.youtube.tv"
+    fun instagramPackages(context: Context): Set<String> {
+        val custom = WidgetPrefs.getInstagramPackage(context)
+        return if (custom.isEmpty()) defaultInstagramPackages else defaultInstagramPackages + custom
     }
+
+    /** Native YouTube / Instagram apps (browsers are handled via [BrowserSites]). */
+    fun isUnproductiveApp(context: Context, pkg: String): Boolean {
+        val p = pkg.trim()
+        if (p.isEmpty()) return false
+        return youtubePackages(context).contains(p) || instagramPackages(context).contains(p)
+    }
+
+    fun categoryForPackage(context: Context, pkg: String): PhoneCategory =
+        if (isUnproductiveApp(context, pkg)) PhoneCategory.Unproductive else PhoneCategory.Other
 }
-

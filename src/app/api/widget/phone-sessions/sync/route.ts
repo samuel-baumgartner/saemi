@@ -4,6 +4,7 @@ import { createHash, timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { getServerCalendarDateString } from '@/lib/dateUtils'
 import { incomingPhoneSessionSuppressedByLockedRow } from '@/lib/phoneSessionUserOverride'
+import { invalidateWidgetDayCacheForUser } from '@/lib/widgetDayDataCache'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -172,6 +173,7 @@ export async function POST(request: NextRequest) {
     }
 
     const created = await prisma.timeSession.createMany({ data: rows })
+    invalidateWidgetDayCacheForUser(userId)
     return NextResponse.json({
       success: true,
       count: created.count,

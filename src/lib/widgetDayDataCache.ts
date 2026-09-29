@@ -72,11 +72,12 @@ function rowToTimeSession(row: {
 export async function loadWidgetDayBundleCached(
   userId: string,
   date: string,
+  opts?: { bypassCache?: boolean },
 ): Promise<{ goals: DailyGoalDef[]; sessions: TimeSession[] }> {
   const key = cacheKey(userId, date)
   const now = Date.now()
   const hit = cache.get(key)
-  if (hit && now - hit.at < TTL_MS) {
+  if (!opts?.bypassCache && hit && now - hit.at < TTL_MS) {
     return { goals: hit.goals, sessions: hit.sessions }
   }
 

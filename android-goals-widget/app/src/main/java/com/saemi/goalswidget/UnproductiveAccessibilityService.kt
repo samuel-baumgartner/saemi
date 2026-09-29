@@ -3,33 +3,38 @@ package com.saemi.goalswidget
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Blocks the YouTube / Instagram apps and youtube.com / instagram.com in mobile browsers
+ * once the combined daily allowance (phone + laptop) is used up.
+ */
 class UnproductiveAccessibilityService : AccessibilityService() {
 
     private val worker = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
+    private val checking = AtomicBoolean(false)
 
-    /** Throttle [TYPE_WINDOW_CONTENT_CHANGED] — YouTube fires very often. */
-    private var lastYoutubeTitleProbeMs = 0L
-    private val contentProbeIntervalMs = 2_000L
+    /** Browsers fire content-changed events constantly; don't walk the tree on every one. */
+    private var lastBrowserProbeMs = 0L
+    private val browserProbeIntervalMs = 1_000L
 
-    private fun youtubePackages(): Set<String> {
-        val set = linkedSetOf("com.google.android.youtube")
-        val custom = WidgetPrefs.getYoutubePackage(this).trim()
-        if (custom.isNotEmpty()) set.add(custom)
-        return set
-    }
-
-    private fun instagramPackages(): Set<String> {
-        val set = linkedSetOf("com.instagram.android")
-        val custom = WidgetPrefs.getInstagramPackage(this).trim()
-        if (custom.isNotEmpty()) set.add(custom)
-        return set
+    /** While a target stays open (e.g. a long video), re-check the limit periodically. */
+    private val watchIntervalMs = 45_000L
+    private var watching = false
+    private val watchTick = object : Runnable {
+        override fun run() {
+            if (isOnTargetNow()) {
+                requestLimitCheck()
+                mainHandler.postDelayed(this, watchIntervalMs)
+            } else {
+                watching = false
+            }
+        }
     }
 
     override fun onServiceConnected() {
@@ -39,7 +44,9 @@ class UnproductiveAccessibilityService : AccessibilityService() {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
         info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
-        info.flags = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+        info.flags = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS or
+            AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
+        info.notificationTimeout = 100
         serviceInfo = info
     }
 
@@ -52,79 +59,87 @@ class UnproductiveAccessibilityService : AccessibilityService() {
             return
         }
         val pkg = event.packageName?.toString() ?: return
-
-        val yt = youtubePackages()
-        val ig = instagramPackages()
-        val isYoutube = yt.contains(pkg)
-        val isInstagram = ig.contains(pkg)
-        if (!isYoutube && !isInstagram) return
-
-        if (isYoutube && WidgetPrefs.isConfigured(this)) {
-            if (type == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-                val now = System.currentTimeMillis()
-                if (now - lastYoutubeTitleProbeMs < contentProbeIntervalMs) {
-                    // Still run blocker path below for Instagram / over-limit; skip title probe.
-                } else {
-                    lastYoutubeTitleProbeMs = now
-                    maybeRecordYoutubeListeningFromEvent(event)
-                }
-            } else {
-                maybeRecordYoutubeListeningFromEvent(event)
-            }
-        }
-
         if (!WidgetPrefs.isConfigured(this)) return
 
+        val onTarget = when {
+            PhoneClassifier.isUnproductiveApp(this, pkg) -> true
+            BrowserSites.isBrowser(pkg) -> {
+                val now = System.currentTimeMillis()
+                val force = type == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+                if (force || now - lastBrowserProbeMs >= browserProbeIntervalMs) {
+                    lastBrowserProbeMs = now
+                    probeBrowser(pkg)
+                }
+                BrowserSiteLog.currentSite(this) != BrowserSites.NONE
+            }
+            else -> false
+        }
+        if (!onTarget) return
+
+        requestLimitCheck()
+        if (!watching) {
+            watching = true
+            mainHandler.postDelayed(watchTick, watchIntervalMs)
+        }
+    }
+
+    /** Records the site in the browser's address bar; returns it, or null if not visible. */
+    private fun probeBrowser(pkg: String): String? {
+        val root = rootInActiveWindow ?: return null
+        try {
+            if (root.packageName?.toString() != pkg) return null
+            val site = BrowserSites.siteFromRoot(root, pkg) ?: return null
+            BrowserSiteLog.record(this, System.currentTimeMillis(), site)
+            return site
+        } finally {
+            root.recycle()
+        }
+    }
+
+    private enum class Target { None, App, Browser }
+
+    private fun currentTarget(): Target {
+        val root = rootInActiveWindow ?: return Target.None
+        val pkg = try {
+            root.packageName?.toString()
+        } finally {
+            root.recycle()
+        } ?: return Target.None
+        if (PhoneClassifier.isUnproductiveApp(this, pkg)) return Target.App
+        if (!BrowserSites.isBrowser(pkg)) return Target.None
+        val site = probeBrowser(pkg) ?: BrowserSiteLog.currentSite(this)
+        return if (site != BrowserSites.NONE) Target.Browser else Target.None
+    }
+
+    private fun isOnTargetNow(): Boolean = currentTarget() != Target.None
+
+    private fun requestLimitCheck() {
+        if (!checking.compareAndSet(false, true)) return
         worker.execute {
-            val overLimit = LimitStatusCache.refreshForBlocker(this)
-            if (!overLimit) return@execute
-
-            if (isYoutube && ListeningGracePrefs.isActive(this)) return@execute
-
-            if (UsageAccess.hasUsageAccess(this)) {
-                val fg = ForegroundApp.getCurrentForegroundPackage(this, 8_000L)
-                val stillTarget =
-                    fg != null && (yt.contains(fg) || ig.contains(fg))
-                if (!stillTarget) return@execute
-            }
-
-            mainHandler.post { launchBlocker() }
-        }
-    }
-
-    /**
-     * Log timestamps when the current YouTube screen looks like listening / Japanese study,
-     * for [PhoneUsageTracker] to upgrade usage intervals to [Listening · YouTube].
-     */
-    private fun maybeRecordYoutubeListeningFromEvent(event: AccessibilityEvent) {
-        val normalizedCandidates = LinkedHashSet<String>()
-        val fromEvent = YoutubeListeningHeuristics.titleFromAccessibilityEvent(event)
-        val nEvent = YoutubeListeningHeuristics.normalizeYoutubeTitleText(fromEvent)
-        if (nEvent.isNotEmpty()) normalizedCandidates.add(nEvent)
-
-        val root = rootInActiveWindow
-        if (root != null) {
             try {
-                val fromRoot = YoutubeTitleFromRoot.longestPlausibleTitle(root)
-                val nRoot =
-                    YoutubeListeningHeuristics.normalizeYoutubeTitleText(fromRoot.orEmpty())
-                if (nRoot.isNotEmpty()) normalizedCandidates.add(nRoot)
+                if (!LimitStatusCache.isOverLimitForBlocker(this)) return@execute
+                mainHandler.post {
+                    when (currentTarget()) {
+                        Target.App -> {
+                            showBlocker()
+                            performGlobalAction(GLOBAL_ACTION_HOME)
+                        }
+                        // Going home would leave the tab open on the site; navigate away instead.
+                        Target.Browser -> {
+                            performGlobalAction(GLOBAL_ACTION_BACK)
+                            mainHandler.postDelayed({ showBlocker() }, 350L)
+                        }
+                        Target.None -> {}
+                    }
+                }
+            } catch (_: Exception) {
             } finally {
-                root.recycle()
+                checking.set(false)
             }
         }
-
-        var best: String? = null
-        for (c in normalizedCandidates) {
-            if (!YoutubeListeningHeuristics.looksLikeListeningTitle(c)) continue
-            if (best == null || c.length > best.length) best = c
-        }
-        val match = best ?: return
-        YoutubeListeningTitleLog.recordMatch(this, System.currentTimeMillis(), match)
-        ListeningGracePrefs.startGrace(this)
     }
 
-    private fun launchBlocker() {
+    private fun showBlocker() {
         val intent = Intent(this, UnproductiveBlockerActivity::class.java).apply {
             addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -133,9 +148,6 @@ class UnproductiveAccessibilityService : AccessibilityService() {
             )
         }
         startActivity(intent)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            performGlobalAction(GLOBAL_ACTION_HOME)
-        }
     }
 
     override fun onInterrupt() {
@@ -143,6 +155,7 @@ class UnproductiveAccessibilityService : AccessibilityService() {
     }
 
     override fun onDestroy() {
+        mainHandler.removeCallbacks(watchTick)
         worker.shutdownNow()
         super.onDestroy()
     }

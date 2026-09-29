@@ -1,8 +1,11 @@
 package com.saemi.goalswidget
 
+import android.Manifest
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,6 +13,7 @@ import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 
 class ConfigureActivity : Activity() {
@@ -25,14 +29,10 @@ class ConfigureActivity : Activity() {
 
         val editUrl = findViewById<EditText>(R.id.edit_base_url)
         val editToken = findViewById<EditText>(R.id.edit_token)
-        val editBunpro = findViewById<EditText>(R.id.edit_bunpro_pkg)
-        val editAnki = findViewById<EditText>(R.id.edit_anki_pkg)
         val editYoutube = findViewById<EditText>(R.id.edit_youtube_pkg)
         val editInstagram = findViewById<EditText>(R.id.edit_instagram_pkg)
         editUrl.setText(WidgetPrefs.getBaseUrl(this))
         editToken.setText(WidgetPrefs.getToken(this))
-        editBunpro.setText(WidgetPrefs.getBunproPackage(this))
-        editAnki.setText(WidgetPrefs.getAnkiPackage(this))
         editYoutube.setText(WidgetPrefs.getYoutubePackage(this))
         editInstagram.setText(WidgetPrefs.getInstagramPackage(this))
 
@@ -43,13 +43,19 @@ class ConfigureActivity : Activity() {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
 
-        findViewById<Button>(R.id.btn_listening_grace).setOnClickListener {
-            ListeningGracePrefs.startGrace(this)
-            Toast.makeText(
-                this,
-                getString(R.string.listening_grace_toast),
-                Toast.LENGTH_LONG,
-            ).show()
+        findViewById<Button>(R.id.btn_accessibility).setOnClickListener {
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+
+        findViewById<Button>(R.id.btn_notifications).setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !UniReminders.canNotify(this)) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQ_NOTIFICATIONS)
+            } else {
+                startActivity(
+                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                        .putExtra(Settings.EXTRA_APP_PACKAGE, packageName),
+                )
+            }
         }
 
         val ui = Handler(Looper.getMainLooper())
@@ -85,17 +91,9 @@ class ConfigureActivity : Activity() {
             }, 3_000L)
         }
 
-        val btnDetectBunpro = findViewById<Button>(R.id.btn_detect_bunpro)
-        val btnDetectAnki = findViewById<Button>(R.id.btn_detect_anki)
         val btnDetectYoutube = findViewById<Button>(R.id.btn_detect_youtube)
         val btnDetectInstagram = findViewById<Button>(R.id.btn_detect_instagram)
 
-        btnDetectBunpro.setOnClickListener {
-            detectInto(editBunpro, btnDetectBunpro)
-        }
-        btnDetectAnki.setOnClickListener {
-            detectInto(editAnki, btnDetectAnki)
-        }
         btnDetectYoutube.setOnClickListener {
             detectInto(editYoutube, btnDetectYoutube)
         }
@@ -111,12 +109,12 @@ class ConfigureActivity : Activity() {
                 this,
                 url,
                 token,
-                editBunpro.text.toString(),
-                editAnki.text.toString(),
                 editYoutube.text.toString(),
                 editInstagram.text.toString(),
             )
             WidgetPrefs.setGoogleFitNudgeEnabled(this, switchGoogleFitNudge.isChecked)
+            UniWidgetProvider.refresh(this, force = true)
+            AutoRefreshScheduler.schedule(this)
             val mgr = AppWidgetManager.getInstance(this)
             if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                 GoalsWidgetProvider.bindWidget(this, mgr, widgetId)
@@ -133,12 +131,50 @@ class ConfigureActivity : Activity() {
             }
             finish()
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !UniReminders.canNotify(this)) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQ_NOTIFICATIONS)
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        updateStatus()
         if (WidgetPrefs.isConfigured(this)) {
             GoalsWidgetProvider.updateAllWidgets(this)
+            UniWidgetProvider.refresh(this, force = false)
+            AutoRefreshScheduler.schedule(this)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        updateStatus()
+    }
+
+    private fun updateStatus() {
+        val blockerOn = isBlockerEnabled()
+        findViewById<TextView>(R.id.blocker_status).apply {
+            setText(if (blockerOn) R.string.blocker_status_on else R.string.blocker_status_off)
+            setTextColor(if (blockerOn) 0xFF86EFAC.toInt() else 0xFFFCA5A5.toInt())
+        }
+        findViewById<Button>(R.id.btn_notifications).setText(
+            if (UniReminders.canNotify(this)) R.string.uni_notifications_on else R.string.uni_allow_notifications,
+        )
+    }
+
+    private fun isBlockerEnabled(): Boolean {
+        val enabled = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+        ) ?: return false
+        val me = ComponentName(this, UnproductiveAccessibilityService::class.java)
+        return enabled.split(':').any {
+            ComponentName.unflattenFromString(it) == me
         }
     }
 
@@ -154,5 +190,9 @@ class ConfigureActivity : Activity() {
             }
         }
         super.onBackPressed()
+    }
+
+    companion object {
+        private const val REQ_NOTIFICATIONS = 42
     }
 }

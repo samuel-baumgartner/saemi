@@ -30,7 +30,7 @@ class GoalsWidgetProvider : AppWidgetProvider() {
 
     override fun onDisabled(context: Context) {
         super.onDisabled(context)
-        AutoRefreshScheduler.cancel(context)
+        AutoRefreshScheduler.cancelIfNoWidgets(context)
     }
 
     companion object {
