@@ -8,6 +8,9 @@ on:
       - 'android-goals-widget/**'
       - '.github/workflows/android-goals-widget-apk.yml'
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -19,14 +22,36 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest ships the Android SDK (ANDROID_HOME); setup-android@v3 breaks on the removed 'tools' package.
+
+      - name: Restore signing key
+        env:
+          SAEMI_KEYSTORE_B64: ${{ secrets.SAEMI_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$SAEMI_KEYSTORE_B64" ]; then
+            echo "$SAEMI_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/saemi.keystore"
+            echo "SAEMI_KEYSTORE=$RUNNER_TEMP/saemi.keystore" >> "$GITHUB_ENV"
+          fi
 
       - name: Assemble debug APK
         run: |
           chmod +x android-goals-widget/gradlew
           cd android-goals-widget && ./gradlew assembleDebug --no-daemon --stacktrace
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/saemi-goals.apk"
 
       - uses: actions/upload-artifact@v4
         with:
           name: saemi-goals-widget-debug-apk
           path: android-goals-widget/app/build/outputs/apk/debug/*.apk
+
+      - name: Publish to the android-latest release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-latest --yes --cleanup-tag || true
+          gh release create android-latest "$RUNNER_TEMP/saemi-goals.apk" \
+            --target "$GITHUB_SHA" \
+            --title "Saemi Goals (Android)" \
+            --notes "Latest build from ${GITHUB_SHA::7}. Install saemi-goals.apk on the phone." \
+            --latest

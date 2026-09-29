@@ -12,6 +12,18 @@ android {
         versionCode = 2
         versionName = "2.0"
     }
+    signingConfigs {
+        // Same key on every machine/CI run so updates install over the previous APK.
+        getByName("debug") {
+            val shared = System.getenv("SAEMI_KEYSTORE")?.let { file(it) }
+            if (shared != null && shared.exists()) {
+                storeFile = shared
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
