@@ -12,7 +12,7 @@ export function getLocalDateString(date: Date): string {
 /**
  * Calendar day in a fixed IANA timezone (YYYY-MM-DD). Used on the server because
  * Vercel runs in UTC; `getLocalDateString(new Date())` would be the wrong "today"
- * for users in e.g. Asia/Tokyo.
+ * for users in e.g. Europe/Zurich.
  */
 export function formatDateYmdInTimeZone(date: Date, timeZone: string): string {
   return new Intl.DateTimeFormat('en-CA', {
@@ -24,7 +24,7 @@ export function formatDateYmdInTimeZone(date: Date, timeZone: string): string {
 }
 
 /** Default IANA zone for stored session `date` and widgets (must match server). */
-const DEFAULT_CALENDAR_TZ = 'Asia/Tokyo'
+const DEFAULT_CALENDAR_TZ = 'Europe/Zurich'
 
 function calendarTimeZone(): string {
   if (typeof process === 'undefined') return DEFAULT_CALENDAR_TZ
@@ -46,7 +46,7 @@ export function formatDateYmdInCalendarTz(date: Date): string {
 
 /**
  * Default calendar day for API routes when the client does not pass `?date=`.
- * Set `CALENDAR_TIMEZONE` (e.g. Asia/Tokyo). Defaults to Asia/Tokyo if unset.
+ * Set `CALENDAR_TIMEZONE` (e.g. Europe/Zurich). Defaults to Europe/Zurich if unset.
  */
 export function getServerCalendarDateString(date: Date = new Date()): string {
   return formatDateYmdInCalendarTz(date)

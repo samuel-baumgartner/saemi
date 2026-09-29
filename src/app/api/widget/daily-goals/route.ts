@@ -19,7 +19,7 @@ function parseBearerToken(header: string | null): string | null {
  * Auth: Authorization: Bearer <WIDGET_API_TOKEN>
  * Server env: WIDGET_API_TOKEN, WIDGET_USER_ID (same as Prisma userId / sign-in email)
  *
- * Query: ?date=YYYY-MM-DD (optional; if omitted, uses CALENDAR_TIMEZONE on server, default Asia/Tokyo)
+ * Query: ?date=YYYY-MM-DD (optional; if omitted, uses CALENDAR_TIMEZONE on server, default Europe/Zurich)
  */
 export async function GET(request: NextRequest) {
   const expected = process.env.WIDGET_API_TOKEN?.trim()
