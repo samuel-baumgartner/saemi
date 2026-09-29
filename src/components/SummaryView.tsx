@@ -113,8 +113,6 @@ export default function SummaryView({ sessions }: SummaryViewProps) {
     switch (source) {
       case 'google-fit':
         return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-      case 'anki':
-        return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
       case 'timechecker':
         return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
       case 'tracked':
@@ -128,8 +126,6 @@ export default function SummaryView({ sessions }: SummaryViewProps) {
     switch (source) {
       case 'google-fit':
         return 'Google Fit';
-      case 'anki':
-        return 'Anki';
       case 'timechecker':
         return 'Focus (desktop)';
       case 'tracked':

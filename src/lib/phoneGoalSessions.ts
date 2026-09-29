@@ -47,15 +47,13 @@ function subtractIntervals(base: Interval, cuts: Interval[]): Interval[] {
 }
 
 /**
- * Phone sessions (source=phone) take precedence over overlapping laptop time for
- * non-anki rows (used for timeline / phone-specific views; not for daily goal
+ * Phone sessions (source=phone) take precedence over overlapping laptop time
+ * (used for timeline / phone-specific views; not for daily goal
  * progress — that uses {@link getWidgetDailyGoalsPayload} raw sessions).
  */
 export function effectiveSessionsForDate(rows: GoalSessionRow[]): GoalSessionRow[] {
   const phone = rows.filter((r) => r.source === 'phone' && r.endTime)
   const other = rows.filter((r) => r.source !== 'phone' && r.endTime)
-  const anki = other.filter((r) => r.source === 'anki')
-  const otherNonAnki = other.filter((r) => r.source !== 'anki')
 
   const phoneCuts = mergeIntervals(
     phone.map((r) => ({
@@ -65,7 +63,7 @@ export function effectiveSessionsForDate(rows: GoalSessionRow[]): GoalSessionRow
   )
 
   const fragments: GoalSessionRow[] = []
-  for (const r of otherNonAnki) {
+  for (const r of other) {
     const base = { start: r.startTime.getTime(), end: r.endTime!.getTime() }
     const parts = subtractIntervals(base, phoneCuts)
     for (const p of parts) {
@@ -77,7 +75,7 @@ export function effectiveSessionsForDate(rows: GoalSessionRow[]): GoalSessionRow
     }
   }
 
-  return [...phone, ...fragments, ...anki].sort(
+  return [...phone, ...fragments].sort(
     (a, b) => a.startTime.getTime() - b.startTime.getTime()
   )
 }

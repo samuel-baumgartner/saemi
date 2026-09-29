@@ -1,8 +1,5 @@
 import type { TimeSession } from '@/types/task'
-import {
-  effectiveSessionDurationMs,
-  type DailyGoalDef,
-} from '@/lib/goalConfig'
+import type { DailyGoalDef } from '@/lib/goalConfig'
 import { getLocalDateString } from '@/lib/dateUtils'
 
 function formatGoalLine(g: DailyGoalDef): string {
@@ -19,22 +16,6 @@ function formatGoalLine(g: DailyGoalDef): string {
 function goalsBlock(goals: DailyGoalDef[]): string[] {
   if (!goals.length) return []
   return ['Goals:', ...goals.map(formatGoalLine), '']
-}
-
-/** How to read Anki / StartUp (Cursor + productive apps) / listening blocks when pasting into ChatGPT. */
-function chatGptContextBlock(): string[] {
-  return [
-    'Context for interpreting this timeline:',
-    '- Anki and the editor (Cursor, etc.) often alternate in short bursts: while programming, I do Anki cards in between, so you will see lots of switching between them.',
-    '- Listening practice (per line or segment) usually follows this loop:',
-    '  1. Listen without subtitles',
-    '  2. Turn on subtitles and replay',
-    '  3. Understand the line',
-    '  4. Subtitles off and replay',
-    '  5. Repeat one line aloud',
-    '  6. Replay one final time without subtitles',
-    '',
-  ]
 }
 
 /** Drop brief phone / laptop check-ins from exports (noise for LLM). */
@@ -97,17 +78,9 @@ function formatSessionLine(
   const start = fmtClock(s.startTime)
   const end = s.endTime ? fmtClock(s.endTime) : 'ongoing'
   const wall = wallDurationMs(s, activeSessionId)
-  const eff = effectiveSessionDurationMs(s, activeSessionId)
   const src = s.source ?? 'unknown'
 
-  let dur = `wall ${fmtDurationMs(wall)}`
-  if (
-    s.source === 'anki' &&
-    eff > 0 &&
-    Math.abs(eff - wall) > 30_000
-  ) {
-    dur += `, Anki timer ${fmtDurationMs(eff)}`
-  }
+  const dur = `wall ${fmtDurationMs(wall)}`
 
   const desc = s.description ? ` | ${s.description}` : ''
   const health = healthTag(s)
@@ -155,7 +128,6 @@ export function buildDayTimelineExport(
     `Day: ${dateYmd}`,
     '',
     ...goalsBlock(goals ?? []),
-    ...chatGptContextBlock(),
   ]
 
   if (day.length === 0) {
@@ -182,7 +154,6 @@ export function buildMonthTimelineExport(
     `Month (local): ${first.slice(0, 7)} (${first} … ${last})`,
     '',
     ...goalsBlock(goals ?? []),
-    ...chatGptContextBlock(),
   ]
 
   for (const d of allDays) {

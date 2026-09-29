@@ -37,12 +37,5 @@ export default tseslint.config(
         },
       ],
     },
-  },
-  {
-    files: ['src/lib/anki.ts'],
-    rules: {
-      // AnkiConnect JSON-RPC payloads are untyped at the boundary.
-      '@typescript-eslint/no-explicit-any': 'off',
-    },
   }
 )

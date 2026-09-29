@@ -29,12 +29,6 @@ function sourceBadge(session: TimeSession): { label: string; className: string }
         className:
           'border-violet-500/35 text-violet-200/90 bg-violet-500/10',
       }
-    case 'anki':
-      return {
-        label: 'Anki',
-        className:
-          'border-purple-500/35 text-purple-200/90 bg-purple-500/10',
-      }
     case 'google-fit':
       return {
         label: 'Google Fit',

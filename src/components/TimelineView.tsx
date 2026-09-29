@@ -58,7 +58,7 @@ export function TimelineView({
   const [graphEditSession, setGraphEditSession] = useState<TimeSession | null>(null)
   const SHORT_SESSION_MS = 5 * 60 * 1000
 
-  /** Drop very short wall-time-only crumbs; duration uses Anki study timers when present. */
+  /** Drop very short wall-time-only crumbs. */
   const hideAsShortSession = (durationMs: number) =>
     durationMs > 0 && durationMs < SHORT_SESSION_MS
 

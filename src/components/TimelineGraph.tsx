@@ -38,17 +38,10 @@ function getRangePosition(start: Date, end: Date) {
   }
 }
 
-/** Anki bars use summed review timers so height matches goals / Anki stats. */
 function getSessionPosition(session: TimeSession) {
   const end = session.endTime ?? new Date()
   const startMs = msIntoLocalDay(session.startTime)
-  let durMs = Math.max(0, end.getTime() - session.startTime.getTime())
-  if (session.source === 'anki') {
-    const st = session.healthData?.details?.['studyTimeMs']
-    if (st != null && Number.isFinite(Number(st)) && Number(st) > 0) {
-      durMs = Number(st)
-    }
-  }
+  const durMs = Math.max(0, end.getTime() - session.startTime.getTime())
   const topPct = (startMs / DAY_MS) * 100
   const heightPct = Math.min((durMs / DAY_MS) * 100, 100 - topPct)
   return {
@@ -176,13 +169,7 @@ export function TimelineGraph({ sessions, onSessionClick }: TimelineGraphProps) 
 
   const getDuration = (session: TimeSession) => {
     const end = session.endTime || new Date()
-    let ms = end.getTime() - session.startTime.getTime()
-    if (session.source === 'anki') {
-      const st = session.healthData?.details?.['studyTimeMs']
-      if (st != null && Number.isFinite(Number(st)) && Number(st) > 0) {
-        ms = Number(st)
-      }
-    }
+    const ms = end.getTime() - session.startTime.getTime()
     const minutes = Math.floor(ms / 60000)
     const hrs = Math.floor(minutes / 60)
     const mins = minutes % 60

@@ -9,15 +9,15 @@ Built to solve the context-switching problem across devices. Now runs 100% of my
 ## What it is
 
 - **Web app** — Next.js (App Router) + Prisma + PostgreSQL. Timeline, daily goals, unproductive-time limits, edit/override UI.
-- **Browser extension** — Chrome/Chromium. Classifies browser tabs (productive / listening comprehension / unproductive) and enforces limits, with a title-level heuristic for YouTube listening.
-- **Android home-screen widget** — Kotlin. Shows today's goals at a glance, syncs phone usage via `UsageStatsManager`, blocks over-limit apps (YouTube, Instagram) through an AccessibilityService.
+- **Browser extension** — Chrome/Chromium. Blanks YouTube / Instagram tabs once the daily Instagram + YouTube allowance (phone + laptop) is used up.
+- **Android app** — Kotlin. Goals and Uni-deadline home-screen widgets, deadline reminders, syncs phone usage via `UsageStatsManager`, blocks YouTube / Instagram (apps and in browsers) through an AccessibilityService once over the limit.
 - **Desktop focus daemon** ([TimeChecker](https://github.com/samuel-baumgartner)) — polls `cosmic-ext-window-helper` on Pop!_OS COSMIC to attribute keyboard-focus time to the right app.
 - **Google Fit uploader** — writes daily totals back to Google Fit for a single source of truth on a watch.
 
 ## What's interesting
 
 - **Cross-device session merging.** Phone usage-stats intervals, desktop focus seconds, and browser tab time collapse into a single per-minute timeline server-side. User edits on the web are locked (`userOverridden`) and suppress duplicate phone re-syncs, using Jaccard overlap on wall-clock intervals instead of exact timestamp matching.
-- **YouTube listening-comprehension detection on Android** — AccessibilityService records normalized window titles, and `PhoneUsageTracker` joins those matches against usage intervals so comprehension time stops counting as "Not productive" without the user tapping anything. Same regex is kept in sync between the Kotlin service and the browser extension.
+- **Browser-aware phone tracking** — the AccessibilityService reads the address bar of Chrome, Firefox, Samsung Internet etc. and logs site transitions, so `PhoneUsageTracker` can split browser time into youtube.com / instagram.com vs everything else.
 - **Over-limit blocker** — rather than wrapping individual apps, a single AccessibilityService launches a blocker activity when an unproductive foreground app crosses today's budget.
 - **Works offline-first on the phone** — widget buffers sessions locally and retries sync.
 

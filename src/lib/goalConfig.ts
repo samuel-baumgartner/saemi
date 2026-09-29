@@ -73,15 +73,6 @@ export const UNPRODUCTIVE_ACTIVITY_MARKERS = [
   'distracted',
 ] as const
 
-function studyTimeMsFromHealthDetails(s: TimeSession): number | null {
-  const raw = s.healthData?.details
-  if (raw == null || typeof raw !== 'object') return null
-  const v = (raw as Record<string, unknown>)['studyTimeMs']
-  if (v == null || !Number.isFinite(Number(v))) return null
-  const n = Number(v)
-  return n > 0 ? n : null
-}
-
 /**
  * Wall-clock span, or “now” when this session id is the active tracker session.
  */
@@ -92,24 +83,9 @@ export function effectiveSessionDurationMs(
   const isActive = !s.endTime && activeSessionId === s.id
   if (!s.endTime && !isActive) return 0
 
-  const wallMs = s.endTime
+  return s.endTime
     ? Math.max(0, s.endTime.getTime() - s.startTime.getTime())
     : Math.max(0, Date.now() - s.startTime.getTime())
-
-  const study = studyTimeMsFromHealthDetails(s)
-  if (study != null) {
-    if (s.source === 'anki') {
-      return Math.min(study, wallMs)
-    }
-    // Anki rows synced before source was stored as "anki" (e.g. defaulted to
-    // google-fit) still carry healthData.type "study" + studyTimeMs — use study
-    // time, not wall span, for goal totals.
-    if (s.healthData?.type === 'study' && matchesAnkiGoalSession(s)) {
-      return Math.min(study, wallMs)
-    }
-  }
-
-  return wallMs
 }
 
 export function sessionDurationMinutes(
@@ -122,7 +98,7 @@ export function sessionDurationMinutes(
 /**
  * Text used for daily-goal keyword matching. TimeChecker often puts the browser
  * title in `activity` (e.g. "Brave") while the active URL lives in
- * `healthData.details` — so Bunpro must be detected from details/description too.
+ * `healthData.details` — so goal keywords are matched against details/description too.
  */
 export function sessionTextForGoalMatching(s: TimeSession): string {
   const parts: string[] = [s.activity]
@@ -133,34 +109,6 @@ export function sessionTextForGoalMatching(s: TimeSession): string {
     else parts.push(JSON.stringify(d))
   }
   return parts.join('\n')
-}
-
-export function matchesListeningGoal(activity: string): boolean {
-  return /listening/i.test(activity)
-}
-
-export function matchesAnkiGoal(activity: string, source?: string): boolean {
-  if (source === 'anki') return true
-  if (/anki/i.test(activity)) return true
-  if (activity.includes('📚 Anki')) return true
-  return false
-}
-
-/**
- * Whether a session counts toward the Anki daily goal. Prefer this over
- * {@link matchesAnkiGoal} with {@link sessionTextForGoalMatching}: full JSON
- * from health details can contain "anki" in deck/URL strings and false-match.
- */
-export function matchesAnkiGoalSession(s: TimeSession): boolean {
-  if (s.source === 'anki') return true
-  const a = [s.activity, s.description ?? ''].filter(Boolean).join('\n')
-  if (/anki/i.test(a)) return true
-  if (a.includes('📚 Anki')) return true
-  return false
-}
-
-export function matchesGrammarGoal(text: string): boolean {
-  return /grammar|bunpro|文法|ぶんプロ/i.test(text)
 }
 
 /** TimeChecker foreground title is often exactly "Cursor". */
@@ -231,9 +179,6 @@ export function minutesTowardGoal(
     if (ms <= 0) continue
     const matchText = sessionTextForGoalMatching(s)
     let hit = false
-    if (goalId === 'listening' && matchesListeningGoal(matchText)) hit = true
-    if (goalId === 'anki' && matchesAnkiGoalSession(s)) hit = true
-    if (goalId === 'grammar' && matchesGrammarGoal(matchText)) hit = true
     if (goalId === 'startup' && matchesStartupGoal(s, matchText)) hit = true
     // Legacy stored goal id until users re-save goals.
     if (goalId === 'cursor' && matchesStartupGoal(s, matchText)) hit = true
@@ -264,9 +209,6 @@ export function minutesTowardGoalOnDates(
     if (ms <= 0) continue
     const matchText = sessionTextForGoalMatching(s)
     let hit = false
-    if (goalId === 'listening' && matchesListeningGoal(matchText)) hit = true
-    if (goalId === 'anki' && matchesAnkiGoalSession(s)) hit = true
-    if (goalId === 'grammar' && matchesGrammarGoal(matchText)) hit = true
     if (goalId === 'startup' && matchesStartupGoal(s, matchText)) hit = true
     if (goalId === 'cursor' && matchesStartupGoal(s, matchText)) hit = true
     if (hit) sumMs += ms

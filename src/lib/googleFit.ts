@@ -183,7 +183,7 @@ export class GoogleFitService {
     description: string,
     startTime: Date,
     endTime: Date,
-    source: 'manual' | 'tracked' | 'google-fit' | 'anki',
+    source: 'manual' | 'tracked' | 'google-fit',
     healthData: NonNullable<TimeSession['healthData']>
   ): TimeSession[] {
     const sessions: TimeSession[] = []
