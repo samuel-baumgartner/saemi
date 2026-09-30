@@ -19,9 +19,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (typeof body.points === 'string') data.points = body.points.slice(0, 100)
   if (typeof body.dueManual === 'boolean') data.dueManual = body.dueManual
   const due = parseDue(body.dueAt)
-  if (due !== undefined) data.dueAt = due
 
   try {
+    if (due !== undefined) {
+      const existing = await prisma.uniItem.findFirst({ where: { id, userId }, select: { kind: true } })
+      if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+      if (existing.kind === 'lecture' && due) {
+        return NextResponse.json({ error: 'A Vorlesung has no deadline' }, { status: 400 })
+      }
+      if (existing.kind === 'quiz' && !due) {
+        return NextResponse.json({ error: 'A quiz always needs a deadline' }, { status: 400 })
+      }
+      data.dueAt = due
+    }
     const { count } = await prisma.uniItem.updateMany({ where: { id, userId }, data })
     if (!count) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     const item = await prisma.uniItem.findUnique({ where: { id } })

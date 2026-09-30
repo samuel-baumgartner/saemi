@@ -30,6 +30,11 @@ export async function PATCH(request: NextRequest, { params }: Ctx) {
   try {
     const course = await prisma.uniCourse.findFirst({ where: { id, userId } })
     if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    const nextHasQuiz = data.hasQuiz ?? course.hasQuiz
+    const nextQuizRule = 'quizRule' in body ? parseRule(body.quizRule) : parseRule(course.quizRule)
+    if (nextHasQuiz && !nextQuizRule) {
+      return NextResponse.json({ error: 'A quiz always needs a deadline' }, { status: 400 })
+    }
     const itemUpdates = Array.isArray(body.items)
       ? (body.items as Record<string, unknown>[]).flatMap((raw) => {
           const due = parseDue(raw?.dueAt)
@@ -39,7 +44,10 @@ export async function PATCH(request: NextRequest, { params }: Ctx) {
     await prisma.$transaction([
       prisma.uniCourse.update({ where: { id }, data }),
       ...itemUpdates.map((u) =>
-        prisma.uniItem.updateMany({ where: { id: u.id, courseId: id, userId }, data: { dueAt: u.dueAt } }),
+        prisma.uniItem.updateMany({
+          where: { id: u.id, courseId: id, userId, kind: { not: 'lecture' } },
+          data: { dueAt: u.dueAt },
+        }),
       ),
     ])
     return NextResponse.json({ ok: true })

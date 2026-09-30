@@ -1,4 +1,4 @@
-import type { UniDueRule, UniItem, UniStatus } from './types'
+import { KIND_NAME, type UniDueRule, type UniItem, type UniStatus } from './types'
 
 export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -53,7 +53,7 @@ export function toLocalInput(iso: string | null): string {
 }
 
 export function kindLabel(kind: UniItem['kind'], week: number): string {
-  return `${kind === 'exercise' ? 'Exercise' : 'Quiz'} ${week}`
+  return `${KIND_NAME[kind]} ${week}`
 }
 
 export function todayYmd(): string {

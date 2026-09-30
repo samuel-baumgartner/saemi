@@ -70,7 +70,7 @@ export default function UniUpcoming() {
   const { overdue, upcoming, noDate } = useMemo(() => {
     const visible = items.filter((i) => {
       const c = courseById.get(i.courseId)
-      if (!c || (i.kind === 'quiz' && !c.hasQuiz) || i.skipped) return false
+      if (!c || i.kind === 'lecture' || (i.kind === 'quiz' && !c.hasQuiz) || i.skipped) return false
       return showDone || !i.done
     })
     const dated = visible.filter((i) => i.dueAt).sort((a, b) => a.dueAt!.localeCompare(b.dueAt!))

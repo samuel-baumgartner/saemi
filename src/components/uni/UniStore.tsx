@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { createThrottleGate } from '@/lib/clientThrottle'
 import { computeDue } from '@/lib/uni/dates'
-import { UNI_WEEKS, type UniCourse, type UniDueRule, type UniItem, type UniKind } from '@/lib/uni/types'
+import { UNI_KINDS, UNI_WEEKS, type UniCourse, type UniDueRule, type UniItem, type UniKind } from '@/lib/uni/types'
 
 export interface NewUniCourse {
   name: string
@@ -30,7 +30,8 @@ interface Store {
 
 const StoreContext = createContext<Store | null>(null)
 
-function ruleFor(course: Pick<UniCourse, 'exerciseRule' | 'quizRule'>, kind: UniKind) {
+export function ruleFor(course: Pick<UniCourse, 'exerciseRule' | 'quizRule'>, kind: UniKind) {
+  if (kind === 'lecture') return null
   return kind === 'exercise' ? course.exerciseRule : course.quizRule
 }
 
@@ -101,7 +102,7 @@ export function UniStoreProvider({ children }: { children: React.ReactNode }) {
   const addCourse = useCallback(
     (c: NewUniCourse) =>
       run(async () => {
-        const dueItems = (['exercise', 'quiz'] as UniKind[]).flatMap((kind) =>
+        const dueItems = UNI_KINDS.flatMap((kind) =>
           Array.from({ length: UNI_WEEKS }, (_, w) => {
             const rule = ruleFor(c, kind)
             return { week: w + 1, kind, dueAt: rule ? computeDue(rule, w + 1).toISOString() : null }

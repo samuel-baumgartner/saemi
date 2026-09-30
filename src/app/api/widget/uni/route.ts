@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { kindLabel } from '@/lib/uni/dates'
 import { widgetUserId } from '@/lib/uni/server'
+import type { UniKind } from '@/lib/uni/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
         color: r.course.color,
         kind: r.kind,
         week: r.week,
-        label: `${r.kind === 'exercise' ? 'Exercise' : 'Quiz'} ${r.week}`,
+        label: kindLabel(r.kind as UniKind, r.week),
         dueAt: r.dueAt!.toISOString(),
         dueAtMs: r.dueAt!.getTime(),
         overdue: r.dueAt!.getTime() < now,

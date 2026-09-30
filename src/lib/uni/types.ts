@@ -1,4 +1,11 @@
-export type UniKind = 'exercise' | 'quiz'
+/** Lectures never have a deadline, exercises optionally, quizzes always. */
+export type UniKind = 'lecture' | 'exercise' | 'quiz'
+
+export const UNI_KINDS: readonly UniKind[] = ['lecture', 'exercise', 'quiz']
+
+export const KIND_NAME: Record<UniKind, string> = { lecture: 'Vorlesung', exercise: 'Exercise', quiz: 'Quiz' }
+
+export const KIND_SHORT: Record<UniKind, string> = { lecture: 'V', exercise: 'E', quiz: 'Q' }
 
 export const UNI_WEEKS = 14
 

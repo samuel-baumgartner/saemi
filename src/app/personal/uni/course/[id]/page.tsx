@@ -5,10 +5,10 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { ChevronLeft } from 'lucide-react'
 import { formatDue, itemStatus, relativeDue } from '@/lib/uni/dates'
-import { UNI_WEEKS, type UniCourse, type UniItem, type UniKind } from '@/lib/uni/types'
+import { KIND_NAME, KIND_SHORT, UNI_WEEKS, type UniCourse, type UniItem, type UniKind } from '@/lib/uni/types'
 import { useUni } from '@/components/uni/UniStore'
 import { useOpenItem } from '@/components/uni/UniShell'
-import { RuleEditor } from '@/components/uni/RuleEditor'
+import { EXERCISE_HINT, RuleEditor, defaultRule } from '@/components/uni/RuleEditor'
 import { COURSE_COLORS, STATUS_CELL, STATUS_LABEL } from '@/components/uni/status'
 
 const weeks = Array.from({ length: UNI_WEEKS }, (_, i) => i + 1)
@@ -20,7 +20,7 @@ function ItemCell({ item, kind, now, onOpen }: { item?: UniItem; kind: UniKind; 
     <td className="px-2 py-1.5">
       <button onClick={() => onOpen(item.id)} className="flex w-full items-center gap-3 rounded-lg p-1.5 text-left hover:bg-zinc-900">
         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-xs font-semibold ${STATUS_CELL[status]}`}>
-          {item.done ? '\u2713' : kind === 'exercise' ? 'E' : 'Q'}
+          {item.done ? '\u2713' : KIND_SHORT[kind]}
         </span>
         <span className="min-w-0">
           <span className="block text-sm">
@@ -28,7 +28,11 @@ function ItemCell({ item, kind, now, onOpen }: { item?: UniItem; kind: UniKind; 
             {item.points && <span className="text-zinc-400"> &middot; {item.points}</span>}
           </span>
           <span className="block truncate text-xs text-zinc-500">
-            {item.dueAt ? `${formatDue(item.dueAt)} \u00b7 ${relativeDue(item.dueAt, now)}` : 'No deadline'}
+            {item.dueAt
+              ? `${formatDue(item.dueAt)} \u00b7 ${relativeDue(item.dueAt, now)}`
+              : kind === 'lecture'
+                ? KIND_NAME.lecture
+                : 'No deadline'}
           </span>
           {item.notes && <span className="block max-w-[16rem] truncate text-xs text-sky-400/80">{item.notes}</span>}
         </span>
@@ -91,20 +95,38 @@ function CourseView({ course }: { course: UniCourse }) {
 
       {showSettings && (
         <section className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4">
-          <RuleEditor label="Exercise" rule={course.exerciseRule} onChange={(r) => updateCourse(course.id, { exerciseRule: r })} />
+          <RuleEditor
+            label="Exercise"
+            rule={course.exerciseRule}
+            onChange={(r) => updateCourse(course.id, { exerciseRule: r })}
+            hint={EXERCISE_HINT}
+          />
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={course.hasQuiz}
-              onChange={(e) => updateCourse(course.id, { hasQuiz: e.target.checked })}
+              onChange={(e) =>
+                updateCourse(
+                  course.id,
+                  e.target.checked && !course.quizRule
+                    ? { hasQuiz: true, quizRule: course.exerciseRule ?? defaultRule() }
+                    : { hasQuiz: e.target.checked },
+                )
+              }
             />
             This course has a weekly quiz
           </label>
           {course.hasQuiz && (
-            <RuleEditor label="Quiz" rule={course.quizRule} onChange={(r) => updateCourse(course.id, { quizRule: r })} />
+            <RuleEditor
+              label="Quiz"
+              rule={course.quizRule}
+              onChange={(r) => updateCourse(course.id, { quizRule: r })}
+              required
+            />
           )}
           <p className="text-xs text-zinc-500">
-            Changing a rule recalculates all deadlines of that type, except ones you set by hand on a single exercise or quiz.
+            A Vorlesung never has a deadline. Changing a rule recalculates all deadlines of that type, except ones you set by
+            hand on a single exercise or quiz.
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-zinc-400">Color</span>
@@ -159,6 +181,7 @@ function CourseView({ course }: { course: UniCourse }) {
           <thead>
             <tr className="border-b border-zinc-800 text-left text-zinc-400">
               <th className="w-16 px-3 py-2 font-medium">Week</th>
+              <th className="px-3 py-2 font-medium">{KIND_NAME.lecture}</th>
               <th className="px-3 py-2 font-medium">Exercise</th>
               {course.hasQuiz && <th className="px-3 py-2 font-medium">Quiz</th>}
             </tr>
@@ -167,6 +190,7 @@ function CourseView({ course }: { course: UniCourse }) {
             {weeks.map((w) => (
               <tr key={w} className="border-b border-zinc-900 last:border-0">
                 <td className="px-3 py-2 font-medium text-zinc-400">{w}</td>
+                <ItemCell item={getItem(course.id, w, 'lecture')} kind="lecture" now={now} onOpen={openItem} />
                 <ItemCell item={getItem(course.id, w, 'exercise')} kind="exercise" now={now} onOpen={openItem} />
                 {course.hasQuiz && <ItemCell item={getItem(course.id, w, 'quiz')} kind="quiz" now={now} onOpen={openItem} />}
               </tr>

@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { X } from 'lucide-react'
 import { computeDue, formatDue, itemStatus, kindLabel, relativeDue, toLocalInput } from '@/lib/uni/dates'
-import type { UniCourse, UniItem } from '@/lib/uni/types'
-import { useUni } from './UniStore'
+import { KIND_NAME, type UniCourse, type UniItem } from '@/lib/uni/types'
+import { ruleFor, useUni } from './UniStore'
 import { STATUS_CELL, STATUS_LABEL } from './status'
 
 export function ItemSheet({ itemId, onClose }: { itemId: string | null; onClose: () => void }) {
@@ -59,7 +59,8 @@ function Sheet({
 
   if (!course) return null
   const status = itemStatus(item, now)
-  const rule = item.kind === 'exercise' ? course.exerciseRule : course.quizRule
+  const rule = ruleFor(course, item.kind)
+  const isLecture = item.kind === 'lecture'
 
   function scheduleSave(patch: { notes?: string; points?: string }) {
     if (saveTimer.current) clearTimeout(saveTimer.current)
@@ -75,13 +76,21 @@ function Sheet({
         <div className="mb-4 flex items-start gap-3">
           <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full" style={{ background: course.color }} />
           <div className="min-w-0 flex-1">
-            <Link href={`/personal/uni/course/${course.id}`} onClick={close} className="text-sm text-zinc-400 hover:underline">
+            <Link
+              href={`/personal/uni/course/${course.id}`}
+              onClick={close}
+              className="text-sm text-zinc-400 hover:underline"
+            >
               {course.name} &middot; Week {item.week}
             </Link>
             <h2 className="text-xl font-semibold">{kindLabel(item.kind, item.week)}</h2>
           </div>
           <span className={`rounded-md border px-2 py-0.5 text-xs ${STATUS_CELL[status]}`}>{STATUS_LABEL[status]}</span>
-          <button onClick={close} className="-mr-1 -mt-1 rounded-lg p-1 text-zinc-500 hover:text-white" aria-label="Close">
+          <button
+            onClick={close}
+            className="-mr-1 -mt-1 rounded-lg p-1 text-zinc-500 hover:text-white"
+            aria-label="Close"
+          >
             <X size={22} />
           </button>
         </div>
@@ -90,7 +99,9 @@ function Sheet({
           <button
             onClick={() => updateItem(item.id, { done: !item.done, skipped: false })}
             className={`rounded-lg border py-2.5 font-medium ${
-              item.done ? 'border-emerald-500 bg-emerald-600 text-white' : 'border-zinc-700 bg-zinc-900 hover:bg-zinc-800'
+              item.done
+                ? 'border-emerald-500 bg-emerald-600 text-white'
+                : 'border-zinc-700 bg-zinc-900 hover:bg-zinc-800'
             }`}
           >
             {item.done ? 'Done' : 'Mark done'}
@@ -98,61 +109,75 @@ function Sheet({
           <button
             onClick={() => updateItem(item.id, { skipped: !item.skipped, done: false })}
             className={`rounded-lg border py-2.5 ${
-              item.skipped ? 'border-zinc-500 bg-zinc-700 text-white' : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
+              item.skipped
+                ? 'border-zinc-500 bg-zinc-700 text-white'
+                : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
             }`}
           >
-            {item.skipped ? 'Skipped' : 'No submission this week'}
+            {item.skipped ? 'Skipped' : isLecture ? 'Skip this week' : 'No submission this week'}
           </button>
         </div>
 
-        <label className="mb-1 block text-sm text-zinc-400">Deadline</label>
-        <div className="mb-1 flex gap-2">
-          <input
-            type="datetime-local"
-            value={toLocalInput(item.dueAt)}
-            onChange={(e) =>
-              updateItem(item.id, {
-                dueAt: e.target.value ? new Date(e.target.value).toISOString() : null,
-                dueManual: true,
-              })
-            }
-            className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2"
-          />
-          {item.dueManual && (
-            <button
-              onClick={() =>
-                updateItem(item.id, {
-                  dueManual: false,
-                  dueAt: rule ? computeDue(rule, item.week).toISOString() : null,
-                })
-              }
-              className="rounded-lg border border-zinc-700 px-3 text-sm text-zinc-300 hover:bg-zinc-800"
-            >
-              Reset
-            </button>
-          )}
-        </div>
-        <p className="mb-4 text-xs text-zinc-500">
-          {item.dueAt ? `${formatDue(item.dueAt)} (${relativeDue(item.dueAt, now)})` : 'No deadline set'}
-          {item.dueManual ? ' \u00b7 set manually' : rule ? " \u00b7 from the course's weekly rule" : ''}
-        </p>
+        {isLecture ? (
+          <p className="mb-4 text-xs text-zinc-500">A Vorlesung has no deadline.</p>
+        ) : (
+          <>
+            <label className="mb-1 block text-sm text-zinc-400">Deadline</label>
+            <div className="mb-1 flex gap-2">
+              <input
+                type="datetime-local"
+                value={toLocalInput(item.dueAt)}
+                required={item.kind === 'quiz'}
+                onChange={(e) => {
+                  if (!e.target.value && item.kind === 'quiz') return
+                  updateItem(item.id, {
+                    dueAt: e.target.value ? new Date(e.target.value).toISOString() : null,
+                    dueManual: true,
+                  })
+                }}
+                className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2"
+              />
+              {item.dueManual && (
+                <button
+                  onClick={() =>
+                    updateItem(item.id, {
+                      dueManual: false,
+                      dueAt: rule ? computeDue(rule, item.week).toISOString() : null,
+                    })
+                  }
+                  className="rounded-lg border border-zinc-700 px-3 text-sm text-zinc-300 hover:bg-zinc-800"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+            <p className="mb-4 text-xs text-zinc-500">
+              {item.dueAt ? `${formatDue(item.dueAt)} (${relativeDue(item.dueAt, now)})` : 'No deadline set'}
+              {item.dueManual ? ' \u00b7 set manually' : rule ? " \u00b7 from the course's weekly rule" : ''}
+            </p>
+          </>
+        )}
 
-        <label className="mb-1 block text-sm text-zinc-400">Points / grade</label>
-        <input
-          value={points}
-          placeholder="e.g. 8/10"
-          onChange={(e) => {
-            setPoints(e.target.value)
-            scheduleSave({ points: e.target.value })
-          }}
-          onBlur={flush}
-          className="mb-4 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2"
-        />
+        {!isLecture && (
+          <>
+            <label className="mb-1 block text-sm text-zinc-400">Points / grade</label>
+            <input
+              value={points}
+              placeholder="e.g. 8/10"
+              onChange={(e) => {
+                setPoints(e.target.value)
+                scheduleSave({ points: e.target.value })
+              }}
+              onBlur={flush}
+              className="mb-4 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2"
+            />
+          </>
+        )}
 
         <label className="mb-1 block text-sm text-zinc-400">Notes</label>
         <textarea
           value={notes}
-          placeholder="Anything about this exercise..."
+          placeholder={`Anything about this ${KIND_NAME[item.kind]}...`}
           rows={7}
           onChange={(e) => {
             setNotes(e.target.value)

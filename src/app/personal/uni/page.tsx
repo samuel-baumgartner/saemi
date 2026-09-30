@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { formatDue, itemStatus } from '@/lib/uni/dates'
-import { UNI_WEEKS, type UniCourse, type UniItem, type UniKind } from '@/lib/uni/types'
+import { formatDue, itemStatus, kindLabel } from '@/lib/uni/dates'
+import { KIND_SHORT, UNI_WEEKS, type UniCourse, type UniItem, type UniKind } from '@/lib/uni/types'
 import { useUni } from '@/components/uni/UniStore'
 import { useOpenItem } from '@/components/uni/UniShell'
 import { AddCourse } from '@/components/uni/AddCourse'
@@ -29,10 +29,10 @@ function Cell({
   return (
     <button
       onClick={() => onOpen(item.id)}
-      title={`${kind === 'exercise' ? 'Exercise' : 'Quiz'} ${week} \u00b7 ${formatDue(item.dueAt)}`}
+      title={kind === 'lecture' ? kindLabel(kind, week) : `${kindLabel(kind, week)} \u00b7 ${formatDue(item.dueAt)}`}
       className={`relative flex h-9 w-9 items-center justify-center rounded-md border text-xs font-semibold transition hover:brightness-125 ${STATUS_CELL[status]}`}
     >
-      {item.done ? '\u2713' : kind === 'exercise' ? 'E' : 'Q'}
+      {item.done ? '\u2713' : KIND_SHORT[kind]}
       {item.notes && <span className="absolute right-0.5 top-0.5 h-1.5 w-1.5 rounded-full bg-sky-400" />}
     </button>
   )
@@ -53,7 +53,7 @@ export default function UniOverview() {
   const anyQuiz = courses.some((c) => c.hasQuiz)
 
   const { overdue, soon, currentWeek } = useMemo(() => {
-    const visible = items.filter((i) => i.kind === 'exercise' || courses.find((c) => c.id === i.courseId)?.hasQuiz)
+    const visible = items.filter((i) => i.kind !== 'quiz' || courses.find((c) => c.id === i.courseId)?.hasQuiz)
     const upcoming = visible
       .filter((i) => i.dueAt && new Date(i.dueAt).getTime() >= now)
       .sort((a, b) => a.dueAt!.localeCompare(b.dueAt!))
@@ -69,7 +69,7 @@ export default function UniOverview() {
       <div className="mx-auto max-w-md py-16 text-center">
         <h2 className="mb-2 text-2xl font-semibold">No courses yet</h2>
         <p className="mb-6 text-zinc-400">
-          Add your first course. It gets Weeks 1 to 14 with an exercise (and optionally a quiz) each week.
+          Add your first course. It gets Weeks 1 to 14 with a Vorlesung and an exercise (and optionally a quiz) each week.
         </p>
         <button
           onClick={() => setAdding(true)}
@@ -108,7 +108,7 @@ export default function UniOverview() {
               {weeks.map((w) => (
                 <th
                   key={w}
-                  colSpan={anyQuiz ? 2 : 1}
+                  colSpan={anyQuiz ? 3 : 2}
                   className={`border-b border-l border-zinc-800 px-1 py-2 text-center font-medium ${
                     w === currentWeek ? 'bg-indigo-950/70 text-indigo-300' : 'text-zinc-400'
                   }`}
@@ -143,7 +143,8 @@ export default function UniOverview() {
         <Legend className={STATUS_CELL.soon} label="Due within 48h" />
         <Legend className={STATUS_CELL.overdue} label="Overdue" />
         <Legend className={STATUS_CELL.done} label="Done" />
-        <Legend className={STATUS_CELL.skipped} label="No submission" />
+        <Legend className={STATUS_CELL.skipped} label="Skipped" />
+        <span>V = Vorlesung &middot; E = Exercise &middot; Q = Quiz</span>
         <span className="flex items-center gap-1">
           <span className="h-1.5 w-1.5 rounded-full bg-sky-400" /> has notes
         </span>
@@ -168,7 +169,8 @@ function WeekCells({
 }) {
   return (
     <>
-      <td className={`border-b border-l border-zinc-900 py-0.5 pl-1 pr-0.5 ${bg}`}>{children('exercise')}</td>
+      <td className={`border-b border-l border-zinc-900 py-0.5 pl-1 pr-0.5 ${bg}`}>{children('lecture')}</td>
+      <td className={`border-b border-zinc-900 px-0.5 py-0.5 ${anyQuiz ? '' : 'pr-1'} ${bg}`}>{children('exercise')}</td>
       {anyQuiz && (
         <td className={`border-b border-zinc-900 py-0.5 pl-0.5 pr-1 ${bg}`}>
           {course.hasQuiz ? children('quiz') : <div className="h-9 w-9" />}

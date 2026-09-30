@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { UniDueRule } from '@/lib/uni/types'
 import { useUni } from './UniStore'
-import { RuleEditor, defaultRule } from './RuleEditor'
+import { EXERCISE_HINT, RuleEditor, defaultRule } from './RuleEditor'
 import { COURSE_COLORS } from './status'
 
 export function AddCourse({ onClose }: { onClose: () => void }) {
@@ -11,7 +11,7 @@ export function AddCourse({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('')
   const [color, setColor] = useState(COURSE_COLORS[courses.length % COURSE_COLORS.length])
   const [hasQuiz, setHasQuiz] = useState(false)
-  const [exerciseRule, setExerciseRule] = useState<UniDueRule | null>(defaultRule)
+  const [exerciseRule, setExerciseRule] = useState<UniDueRule | null>(null)
   const [quizRule, setQuizRule] = useState<UniDueRule | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -19,7 +19,7 @@ export function AddCourse({ onClose }: { onClose: () => void }) {
     e.preventDefault()
     if (!name.trim()) return
     setBusy(true)
-    await addCourse({ name: name.trim(), color, hasQuiz, exerciseRule, quizRule: hasQuiz ? quizRule : null })
+    await addCourse({ name: name.trim(), color, hasQuiz, exerciseRule, quizRule: hasQuiz ? (quizRule ?? defaultRule()) : null })
     setBusy(false)
     onClose()
   }
@@ -52,7 +52,8 @@ export function AddCourse({ onClose }: { onClose: () => void }) {
             />
           ))}
         </div>
-        <RuleEditor label="Exercise" rule={exerciseRule} onChange={setExerciseRule} />
+        <p className="text-sm text-zinc-400">Every week gets a Vorlesung (no deadline) and an exercise.</p>
+        <RuleEditor label="Exercise" rule={exerciseRule} onChange={setExerciseRule} hint={EXERCISE_HINT} />
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -64,7 +65,7 @@ export function AddCourse({ onClose }: { onClose: () => void }) {
           />
           This course also has a weekly quiz
         </label>
-        {hasQuiz && <RuleEditor label="Quiz" rule={quizRule} onChange={setQuizRule} />}
+        {hasQuiz && <RuleEditor label="Quiz" rule={quizRule} onChange={setQuizRule} required />}
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-zinc-400 hover:text-white">
             Cancel

@@ -74,7 +74,7 @@ model UniItem {
   courseId  String
   course    UniCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
   week      Int
-  kind      String // 'exercise' | 'quiz'
+  kind      String // 'lecture' | 'exercise' | 'quiz'
   done      Boolean   @default(false)
   skipped   Boolean   @default(false)
   notes     String    @default("")
