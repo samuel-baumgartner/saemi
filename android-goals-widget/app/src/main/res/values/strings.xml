@@ -29,8 +29,8 @@
     <string name="uni_title">Uni</string>
     <string name="uni_widget_name">Saemi Uni deadlines</string>
     <string name="uni_widget_description">Upcoming exercises and quizzes</string>
-    <string name="uni_subtitle">%1$d due this week</string>
-    <string name="uni_subtitle_overdue">%1$d overdue · %2$d this week</string>
+    <string name="uni_subtitle">%1$d due in 7 days</string>
+    <string name="uni_subtitle_overdue">%1$d overdue · %2$d due in 7 days</string>
     <string name="uni_empty">Nothing due. Enjoy.</string>
     <string name="uni_error">Could not load deadlines. Tap refresh.</string>
     <string name="uni_channel_name">Uni deadlines</string>
