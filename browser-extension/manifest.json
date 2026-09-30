@@ -1,19 +1,34 @@
 {
   "manifest_version": 3,
   "name": "Saemi Unproductive Limit",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Blocks YouTube/Instagram once the 2h daily allowance (phone + laptop) is used up.",
   "permissions": [
     "tabs",
-    "alarms"
+    "alarms",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "*://samuelbaumgartner.ch/*",
-    "*://www.samuelbaumgartner.ch/*"
+    "*://www.samuelbaumgartner.ch/*",
+    "*://*.youtube.com/*",
+    "*://youtu.be/*",
+    "*://yt.be/*",
+    "*://*.youtube-nocookie.com/*",
+    "*://*.youtubekids.com/*",
+    "*://*.instagram.com/*",
+    "*://instagr.am/*",
+    "*://ig.me/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "icons": {
     "128": "icon128.png"
   }

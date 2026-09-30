@@ -1,5 +1,21 @@
 const LIMIT_ENDPOINT = 'https://www.samuelbaumgartner.ch/api/limits/status';
 const CHECK_ALARM = 'saemi-limit-check';
+const BLOCKED_PAGE = 'blocked.html';
+
+/** Subdomains are included (m.youtube.com, music.youtube.com, www.instagram.com, ...). */
+const TARGET_DOMAINS = [
+  'youtube.com',
+  'youtu.be',
+  'yt.be',
+  'youtube-nocookie.com',
+  'youtubekids.com',
+  'instagram.com',
+  'instagr.am',
+  'ig.me',
+];
+
+const RULE_PAGE = 1;
+const RULE_EMBED = 2;
 
 function todayYmdLocal() {
   const d = new Date();
@@ -19,13 +35,7 @@ function hostOf(url) {
 
 function isTarget(url) {
   const h = hostOf(url);
-  return (
-    h === 'youtube.com' ||
-    h.endsWith('.youtube.com') ||
-    h === 'youtu.be' ||
-    h === 'instagram.com' ||
-    h.endsWith('.instagram.com')
-  );
+  return TARGET_DOMAINS.some((d) => h === d || h.endsWith('.' + d));
 }
 
 /**
@@ -62,15 +72,39 @@ async function fetchLimitStatus() {
   return json;
 }
 
-function block(tabId) {
-  chrome.tabs.update(tabId, { url: 'about:blank' }).catch(() => {});
+/**
+ * While over the limit, network rules stop every navigation to a target domain before it
+ * loads (typed URLs, links, redirects, short links) and blank embedded players on other sites.
+ */
+async function setNetworkBlock(on) {
+  const addRules = on
+    ? [
+        {
+          id: RULE_PAGE,
+          priority: 1,
+          action: { type: 'redirect', redirect: { extensionPath: '/' + BLOCKED_PAGE } },
+          condition: { requestDomains: TARGET_DOMAINS, resourceTypes: ['main_frame'] },
+        },
+        {
+          id: RULE_EMBED,
+          priority: 1,
+          action: { type: 'block' },
+          condition: { requestDomains: TARGET_DOMAINS, resourceTypes: ['sub_frame'] },
+        },
+      ]
+    : [];
+  await chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [RULE_PAGE, RULE_EMBED],
+    addRules,
+  });
 }
 
-/** Blocks every open YouTube / Instagram tab if the daily allowance is used up. */
+function block(tabId) {
+  chrome.tabs.update(tabId, { url: chrome.runtime.getURL(BLOCKED_PAGE) }).catch(() => {});
+}
+
+/** Syncs the network rules with the allowance and blocks any target tab that is already open. */
 async function enforceAll() {
-  const tabs = await chrome.tabs.query({});
-  const targets = tabs.filter((t) => t.id != null && t.url && isTarget(t.url));
-  if (targets.length === 0) return;
   let status;
   try {
     status = await fetchLimitStatus();
@@ -78,8 +112,12 @@ async function enforceAll() {
     console.warn('Saemi limit extension error', e);
     return;
   }
+  await setNetworkBlock(Boolean(status.isOverLimit));
   if (!status.isOverLimit) return;
-  for (const t of targets) block(t.id);
+  const tabs = await chrome.tabs.query({});
+  for (const t of tabs) {
+    if (t.id != null && t.url && isTarget(t.url)) block(t.id);
+  }
 }
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -87,12 +125,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (!url || !isTarget(url)) return;
   fetchLimitStatus()
     .then((status) => {
-      if (status.isOverLimit) block(tabId);
+      if (!status.isOverLimit) return;
+      block(tabId);
+      return setNetworkBlock(true);
     })
     .catch((e) => console.warn('Saemi limit extension error', e));
 });
 
-// Catches videos left playing across the limit (service workers can't keep timers alive).
+// Catches videos left playing across the limit and lifts the block after midnight
+// (service workers can't keep timers alive).
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === CHECK_ALARM) void enforceAll();
 });
