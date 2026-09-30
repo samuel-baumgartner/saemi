@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/widget_bg"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/empty_view"
@@ -25,7 +25,7 @@
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingVertical="8dp"
         android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_1" />
@@ -35,12 +35,12 @@
         android:id="@+id/goal_slot_2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingVertical="8dp"
         android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_2" />
@@ -50,12 +50,12 @@
         android:id="@+id/goal_slot_3"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingVertical="8dp"
         android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_3" />
@@ -65,12 +65,12 @@
         android:id="@+id/goal_slot_4"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingVertical="8dp"
         android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_4" />
@@ -80,12 +80,12 @@
         android:id="@+id/goal_slot_5"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_weight="1"
         android:background="@drawable/widget_card_bg"
         android:orientation="vertical"
         android:paddingHorizontal="14dp"
-        android:paddingVertical="12dp"
+        android:paddingVertical="8dp"
         android:visibility="gone">
 
         <include layout="@layout/widget_goal_row_content_5" />
