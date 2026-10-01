@@ -8,6 +8,7 @@ import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
 
 export const dynamic = 'force-dynamic'
 import {
+  nextUnproductiveUnlock,
   normalizeStoredGoals,
   unproductiveBudgetLimitMinutes,
   unproductiveBudgetProgressParts,
@@ -63,11 +64,12 @@ export async function GET(request: NextRequest) {
     }))
 
     const minutes = unproductiveMinutesToday(sessions)
-    const limitMinutes = unproductiveBudgetLimitMinutes(goals, sessions)
+    const limitMinutes = unproductiveBudgetLimitMinutes(date)
     const isOverLimit =
       limitMinutes > 0 ? minutes >= limitMinutes : minutes > 0
     const remainingMinutes = Math.max(0, limitMinutes - minutes)
     const budgetProgress = unproductiveBudgetProgressParts(goals, sessions)
+    const nextUnlock = nextUnproductiveUnlock(date)
 
     return NextResponse.json({
       date,
@@ -75,6 +77,8 @@ export async function GET(request: NextRequest) {
       limitMinutes,
       isOverLimit,
       remainingMinutes,
+      nextUnlockAt: nextUnlock?.at.toISOString() ?? null,
+      nextUnlockMinutes: nextUnlock?.minutes ?? null,
       budgetFraction: Math.round(budgetProgress.fraction * 10_000) / 10_000,
       budgetCreditedMinutes: budgetProgress.creditedMinutes,
       budgetTotalTargetMinutes: budgetProgress.totalTargetMinutes,

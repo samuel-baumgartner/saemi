@@ -44,6 +44,16 @@ export function formatDateYmdInCalendarTz(date: Date): string {
   return formatDateYmdInTimeZone(date, calendarTimeZone())
 }
 
+/** Hour of day (0–23) for an instant in {@link calendarTimeZone}. */
+export function getCalendarHour(date: Date = new Date()): number {
+  const h = new Intl.DateTimeFormat('en-GB', {
+    timeZone: calendarTimeZone(),
+    hour: '2-digit',
+    hourCycle: 'h23',
+  }).format(date)
+  return Number(h) % 24
+}
+
 /**
  * Default calendar day for API routes when the client does not pass `?date=`.
  * Set `CALENDAR_TIMEZONE` (e.g. Europe/Zurich). Defaults to Europe/Zurich if unset.

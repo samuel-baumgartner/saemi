@@ -14,17 +14,17 @@
     <string name="instagram_pkg">Extra Instagram package</string>
     <string name="detect_current_app">Detect current app</string>
 
-    <string name="unproductive_blocker_message">2h of Instagram + YouTube used up for today. Go back to work.</string>
+    <string name="unproductive_blocker_message">Instagram + YouTube allowance used up for now. More unlocks at 12:00 and 19:00. Go back to work.</string>
     <string name="widget_empty_configure">Open Saemi Goals to set URL and token, then tap Refresh.</string>
     <string name="widget_error">Could not load goals. Tap Refresh.</string>
     <string name="widget_loading">Loading…</string>
 
     <string name="blocker_title">Instagram + YouTube limit</string>
-    <string name="blocker_hint">2 hours per day, phone and laptop combined. Blocks the YouTube and Instagram apps and youtube.com / instagram.com in Chrome, Brave, Firefox, Samsung Internet, Edge and other browsers. Requires the Saemi accessibility service to be turned on.</string>
+    <string name="blocker_hint">2 hours per day, phone and laptop combined, unlocked over the day: 30 min in the morning, +45 min at 12:00, +45 min at 19:00. Blocks the YouTube and Instagram apps and youtube.com / instagram.com in Chrome, Brave, Firefox, Samsung Internet, Edge and other browsers. Requires the Saemi accessibility service to be turned on.</string>
     <string name="blocker_open_settings">Open Accessibility settings</string>
     <string name="blocker_status_on">Blocker is ON</string>
     <string name="blocker_status_off">Blocker is OFF: tap below, choose Saemi Goals and turn it on</string>
-    <string name="accessibility_description">Limits Instagram and YouTube (apps and websites in your browser) to 2 hours per day and blocks them afterwards.</string>
+    <string name="accessibility_description">Limits Instagram and YouTube (apps and websites in your browser) to 2 hours per day (30 min in the morning, +45 min at 12:00, +45 min at 19:00) and blocks them once the unlocked time is used up.</string>
 
     <string name="uni_title">Uni</string>
     <string name="uni_widget_name">Saemi Uni deadlines</string>

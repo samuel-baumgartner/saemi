@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import {
+  nextUnproductiveUnlock,
   unproductiveBudgetLimitMinutes,
   unproductiveBudgetProgressParts,
   unproductiveMinutesToday,
@@ -49,10 +50,11 @@ export async function GET(request: NextRequest) {
       bypassCache: fresh,
     })
     const minutes = unproductiveMinutesToday(sessions)
-    const limitMinutes = unproductiveBudgetLimitMinutes(goals, sessions)
+    const limitMinutes = unproductiveBudgetLimitMinutes(date)
     const isOverLimit =
       limitMinutes > 0 ? minutes >= limitMinutes : minutes > 0
     const budgetProgress = unproductiveBudgetProgressParts(goals, sessions)
+    const nextUnlock = nextUnproductiveUnlock(date)
 
     return NextResponse.json({
       date,
@@ -60,6 +62,8 @@ export async function GET(request: NextRequest) {
       limitMinutes,
       isOverLimit,
       remainingMinutes: Math.max(0, limitMinutes - minutes),
+      nextUnlockAt: nextUnlock?.at.toISOString() ?? null,
+      nextUnlockMinutes: nextUnlock?.minutes ?? null,
       budgetFraction: Math.round(budgetProgress.fraction * 10_000) / 10_000,
       budgetCreditedMinutes: budgetProgress.creditedMinutes,
       budgetTotalTargetMinutes: budgetProgress.totalTargetMinutes,

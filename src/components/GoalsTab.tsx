@@ -13,7 +13,7 @@ import type { DailyGoalDef } from '@/lib/goalConfig'
 import {
   DEFAULT_DAILY_GOALS,
   UNPRODUCTIVE_BUDGET_MAX_MIN,
-  unproductiveBudgetLimitMinutesFromDones,
+  UNPRODUCTIVE_BUDGET_UNLOCKS,
   weeklyGoalRollups,
   weeklyGoalsMetCount,
 } from '@/lib/goalConfig'
@@ -95,6 +95,7 @@ export function GoalsTab({
 
   const progressPayload = useMemo(() => {
     const items = computeWidgetDailyGoalItems({
+      date: progressDate,
       goals: displayGoals,
       sessions: daySessions,
       activeSessionId: null,
@@ -220,7 +221,7 @@ export function GoalsTab({
   const progressReady = progressPayload != null
 
   const unproductiveTarget = progressReady
-    ? unproductiveBudgetLimitMinutesFromDones(displayGoals, doneByGoalId ?? {})
+    ? (unproductiveRow?.targetMinutes ?? 0)
     : 0
   const unproductive = progressReady ? (unproductiveRow?.doneMinutes ?? 0) : 0
   const unproductivePct =
@@ -417,7 +418,11 @@ export function GoalsTab({
                     <span className="block">Unproductive</span>
                     <span className="block text-[11px] text-white/45 font-normal mt-1 leading-snug">
                       Instagram + YouTube (phone, Chrome and laptop combined):
-                      {' '}{UNPRODUCTIVE_BUDGET_MAX_MIN} min per day. Blocked once used up.
+                      {' '}{UNPRODUCTIVE_BUDGET_MAX_MIN} min per day, unlocked as{' '}
+                      {UNPRODUCTIVE_BUDGET_UNLOCKS.map(
+                        (u) => `${u.minutes} min at ${String(u.hour).padStart(2, '0')}:00`
+                      ).join(', ')}
+                      . Blocked once used up.
                     </span>
                   </div>
                 </div>

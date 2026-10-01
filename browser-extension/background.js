@@ -40,16 +40,20 @@ function isTarget(url) {
 
 /**
  * Status cache. Far from the limit we ask rarely; close to it more often; once over,
- * it stays over until the date changes.
+ * we recheck every 10 min or right when the next slice of the allowance unlocks.
  */
 let lastStatus = null;
 let lastStatusAt = 0;
 let lastStatusForDate = '';
 
 function cacheTtlMs(status) {
-  if (status.isOverLimit) return 10 * 60_000;
   const remainingMs = Math.max(0, Number(status.remainingMinutes) || 0) * 60_000;
-  return Math.min(5 * 60_000, Math.max(30_000, remainingMs / 2));
+  const ttl = status.isOverLimit
+    ? 10 * 60_000
+    : Math.min(5 * 60_000, Math.max(30_000, remainingMs / 2));
+  const unlockAt = status.nextUnlockAt ? Date.parse(status.nextUnlockAt) : NaN;
+  if (!Number.isFinite(unlockAt)) return ttl;
+  return Math.max(0, Math.min(ttl, unlockAt - lastStatusAt));
 }
 
 async function fetchLimitStatus() {

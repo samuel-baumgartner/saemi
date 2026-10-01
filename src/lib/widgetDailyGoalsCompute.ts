@@ -28,6 +28,7 @@ function formatProgressLabel(done: number, target: number) {
 }
 
 export type ComputeWidgetDailyGoalItemsArgs = {
+  date: string
   goals: DailyGoalDef[]
   sessions: TimeSession[]
   activeSessionId?: string | null
@@ -38,15 +39,12 @@ export type ComputeWidgetDailyGoalItemsArgs = {
  * Used by the server payload builder and the Goals tab to avoid redundant DB reads.
  */
 export function computeWidgetDailyGoalItems({
+  date,
   goals,
   sessions,
   activeSessionId = null,
 }: ComputeWidgetDailyGoalItemsArgs): WidgetGoalItem[] {
-  const unproductiveBudget = unproductiveBudgetLimitMinutes(
-    goals,
-    sessions,
-    activeSessionId,
-  )
+  const unproductiveBudget = unproductiveBudgetLimitMinutes(date)
   const unproductiveDone = unproductiveMinutesToday(sessions, activeSessionId)
   const unproductivePct =
     unproductiveBudget > 0
