@@ -49,6 +49,18 @@ model UserGoalSettings {
   updatedAt DateTime @updatedAt
 }
 
+/// Extra unproductive minutes claimed from a blocker screen (hold-to-unlock) for one calendar day.
+model UnproductiveExtraGrant {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String
+  minutes   Int
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
 /// Uni: one course with a Week 1-14 grid of exercises (and optional quizzes).
 model UniCourse {
   id           String    @id @default(cuid())

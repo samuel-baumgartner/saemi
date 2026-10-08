@@ -1,4 +1,5 @@
 import type { TimeSession } from '@/types/task'
+import { formatDateYmdInCalendarTz, getCalendarHour } from '@/lib/dateUtils'
 
 export interface DailyGoalDef {
   id: string
@@ -274,8 +275,28 @@ export function unproductiveMinutesToday(
   return sum
 }
 
-/** Fixed daily unproductive allowance (Instagram + YouTube, phone and laptop combined). */
-export const UNPRODUCTIVE_BUDGET_MAX_MIN = 120
+/**
+ * Unproductive allowance (Instagram + YouTube, phone and laptop combined), unlocked in
+ * slices over the day. `hour` is local time in the calendar timezone.
+ */
+export const UNPRODUCTIVE_BUDGET_UNLOCKS: ReadonlyArray<{
+  hour: number
+  minutes: number
+}> = [
+  { hour: 0, minutes: 30 },
+  { hour: 12, minutes: 45 },
+  { hour: 19, minutes: 45 },
+]
+
+export const UNPRODUCTIVE_BUDGET_MAX_MIN = UNPRODUCTIVE_BUDGET_UNLOCKS.reduce(
+  (sum, u) => sum + u.minutes,
+  0
+)
+
+/** One-off total limits for specific calendar days (replace the schedule entirely). */
+const UNPRODUCTIVE_BUDGET_DAY_OVERRIDES: Readonly<Record<string, number>> = {
+  '2026-09-30': 178,
+}
 
 /**
  * Progress toward your daily goal mix: for each goal we count min(time logged, target).
@@ -307,13 +328,56 @@ export function unproductiveBudgetProgressParts(
   }
 }
 
-/** Today's allowed unproductive minutes: a flat daily allowance, independent of goal progress. */
+/** Extra unproductive minutes granted per hold-to-unlock on a blocker screen. */
+export const UNPRODUCTIVE_EXTRA_GRANT_MIN = 15
+
+/** How long the unlock button on a blocker screen has to be held. */
+export const UNPRODUCTIVE_EXTRA_HOLD_SECONDS = 60
+
+/**
+ * Unproductive minutes unlocked so far on `dateYmd`: past days get the full allowance,
+ * future days only the first slice, today the slices whose hour has been reached.
+ * `extraMinutes` (claimed via hold-to-unlock) is added on top.
+ */
 export function unproductiveBudgetLimitMinutes(
-  _goals?: DailyGoalDef[],
-  _sessions?: TimeSession[],
-  _activeSessionId?: string | null
+  dateYmd: string,
+  extraMinutes = 0,
+  now: Date = new Date()
 ): number {
-  return UNPRODUCTIVE_BUDGET_MAX_MIN
+  return scheduledUnproductiveMinutes(dateYmd, now) + Math.max(0, extraMinutes)
+}
+
+function scheduledUnproductiveMinutes(dateYmd: string, now: Date): number {
+  const override = UNPRODUCTIVE_BUDGET_DAY_OVERRIDES[dateYmd]
+  if (override !== undefined) return override
+  const today = formatDateYmdInCalendarTz(now)
+  if (dateYmd < today) return UNPRODUCTIVE_BUDGET_MAX_MIN
+  if (dateYmd > today) return UNPRODUCTIVE_BUDGET_UNLOCKS[0]?.minutes ?? 0
+  const hour = getCalendarHour(now)
+  return UNPRODUCTIVE_BUDGET_UNLOCKS.filter((u) => u.hour <= hour).reduce(
+    (sum, u) => sum + u.minutes,
+    0
+  )
+}
+
+/**
+ * Next time more unproductive minutes unlock today, or null if the day's allowance is
+ * complete. Assumes a whole-hour UTC offset for the calendar timezone.
+ */
+export function nextUnproductiveUnlock(
+  dateYmd: string,
+  now: Date = new Date()
+): { at: Date; minutes: number } | null {
+  if (UNPRODUCTIVE_BUDGET_DAY_OVERRIDES[dateYmd] !== undefined) return null
+  if (dateYmd !== formatDateYmdInCalendarTz(now)) return null
+  const hour = getCalendarHour(now)
+  const next = UNPRODUCTIVE_BUDGET_UNLOCKS.find((u) => u.hour > hour)
+  if (!next) return null
+  const startOfHourMs = now.getTime() - (now.getTime() % 3_600_000)
+  return {
+    at: new Date(startOfHourMs + (next.hour - hour) * 3_600_000),
+    minutes: next.minutes,
+  }
 }
 
 /**
@@ -343,11 +407,4 @@ export function unproductiveBudgetProgressPartsFromDones(
     totalTargetMinutes,
     fraction: creditedMinutes / totalTargetMinutes,
   }
-}
-
-export function unproductiveBudgetLimitMinutesFromDones(
-  _goals?: DailyGoalDef[],
-  _doneByGoalId?: Record<string, number>
-): number {
-  return UNPRODUCTIVE_BUDGET_MAX_MIN
 }

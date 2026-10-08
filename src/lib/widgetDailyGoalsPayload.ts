@@ -22,11 +22,16 @@ export async function getWidgetDailyGoalsPayload(
   options?: WidgetDailyGoalsOptions,
 ): Promise<{ date: string; items: WidgetGoalItem[] }> {
   const activeSessionId = options?.activeSessionId ?? null
-  const { goals, sessions } = await loadWidgetDayBundleCached(userId, date)
+  const { goals, sessions, extraMinutes } = await loadWidgetDayBundleCached(
+    userId,
+    date,
+  )
   const items = computeWidgetDailyGoalItems({
+    date,
     goals,
     sessions,
     activeSessionId,
+    extraMinutes,
   })
   return { date, items }
 }

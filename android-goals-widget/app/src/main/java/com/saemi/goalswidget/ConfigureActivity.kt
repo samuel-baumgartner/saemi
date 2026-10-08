@@ -2,6 +2,7 @@ package com.saemi.goalswidget
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
@@ -17,6 +19,16 @@ import android.widget.TextView
 import android.widget.Toast
 
 class ConfigureActivity : Activity() {
+
+    private val ui = Handler(Looper.getMainLooper())
+
+    /** Keeps the protection countdown live while the screen is open. */
+    private val statusTick = object : Runnable {
+        override fun run() {
+            updateStatus()
+            ui.postDelayed(this, 1_000L)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +59,16 @@ class ConfigureActivity : Activity() {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
 
+        findViewById<Button>(R.id.btn_protection).setOnClickListener {
+            when (TamperGuard.state(this)) {
+                TamperGuard.State.Off -> confirmEnableProtection()
+                TamperGuard.State.Locked -> TamperGuard.requestUnlock(this)
+                is TamperGuard.State.Waiting -> TamperGuard.cancelUnlock(this)
+                is TamperGuard.State.Open -> TamperGuard.disable(this)
+            }
+            updateStatus()
+        }
+
         findViewById<Button>(R.id.btn_notifications).setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !UniReminders.canNotify(this)) {
                 requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQ_NOTIFICATIONS)
@@ -58,7 +80,6 @@ class ConfigureActivity : Activity() {
             }
         }
 
-        val ui = Handler(Looper.getMainLooper())
         fun detectInto(target: EditText, button: Button) {
             if (!UsageAccess.hasUsageAccess(this)) {
                 Toast.makeText(
@@ -139,12 +160,17 @@ class ConfigureActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        updateStatus()
+        ui.post(statusTick)
         if (WidgetPrefs.isConfigured(this)) {
             GoalsWidgetProvider.updateAllWidgets(this)
             UniWidgetProvider.refresh(this, force = false)
             AutoRefreshScheduler.schedule(this)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ui.removeCallbacks(statusTick)
     }
 
     override fun onRequestPermissionsResult(
@@ -165,6 +191,61 @@ class ConfigureActivity : Activity() {
         findViewById<Button>(R.id.btn_notifications).setText(
             if (UniReminders.canNotify(this)) R.string.uni_notifications_on else R.string.uni_allow_notifications,
         )
+        updateProtection(blockerOn)
+    }
+
+    private fun updateProtection(blockerOn: Boolean) {
+        val state = TamperGuard.state(this)
+        val (statusText, buttonText) = when (state) {
+            TamperGuard.State.Off ->
+                getString(R.string.protection_status_off) to getString(R.string.protection_enable)
+            TamperGuard.State.Locked ->
+                getString(R.string.protection_status_on) to getString(
+                    R.string.protection_request_unlock,
+                    (TamperGuard.UNLOCK_WAIT_MS / 60_000).toInt(),
+                )
+            is TamperGuard.State.Waiting ->
+                getString(R.string.protection_status_waiting, formatMmSs(state.remainingMs)) to
+                    getString(R.string.protection_cancel_unlock)
+            is TamperGuard.State.Open ->
+                getString(R.string.protection_status_open, formatMmSs(state.remainingMs)) to
+                    getString(R.string.protection_disable)
+        }
+        val protecting = TamperGuard.isProtecting(this)
+        findViewById<TextView>(R.id.protection_status).apply {
+            text = if (protecting && !blockerOn) {
+                "$statusText\n${getString(R.string.protection_blocker_off_warning)}"
+            } else {
+                statusText
+            }
+            setTextColor(if (protecting) 0xFF86EFAC.toInt() else 0xFFFCA5A5.toInt())
+        }
+        findViewById<Button>(R.id.btn_protection).text = buttonText
+
+        for (id in LOCKED_FIELD_IDS) findViewById<View>(id).isEnabled = !protecting
+    }
+
+    private fun confirmEnableProtection() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.protection_title)
+            .setMessage(
+                getString(
+                    R.string.protection_confirm,
+                    (TamperGuard.UNLOCK_WAIT_MS / 60_000).toInt(),
+                    (TamperGuard.UNLOCK_WINDOW_MS / 60_000).toInt(),
+                ),
+            )
+            .setPositiveButton(R.string.protection_enable) { _, _ ->
+                TamperGuard.enable(this)
+                updateStatus()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun formatMmSs(ms: Long): String {
+        val totalSec = (ms + 999) / 1000
+        return "%d:%02d".format(totalSec / 60, totalSec % 60)
     }
 
     private fun isBlockerEnabled(): Boolean {
@@ -194,5 +275,15 @@ class ConfigureActivity : Activity() {
 
     companion object {
         private const val REQ_NOTIFICATIONS = 42
+
+        /** Clearing the URL/token or the package names would silently switch the blocker off. */
+        private val LOCKED_FIELD_IDS = intArrayOf(
+            R.id.edit_base_url,
+            R.id.edit_token,
+            R.id.edit_youtube_pkg,
+            R.id.edit_instagram_pkg,
+            R.id.btn_detect_youtube,
+            R.id.btn_detect_instagram,
+        )
     }
 }

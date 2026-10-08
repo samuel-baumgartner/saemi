@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
-import { getServerCalendarDateString } from '@/lib/dateUtils'
-import { buildLimitStatus } from '@/lib/unproductiveLimit'
-import { loadWidgetDayBundleCached } from '@/lib/widgetDayDataCache'
-
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+import { grantUnproductiveExtra } from '@/lib/unproductiveExtraGrant'
 
 function timingSafeTokenEqual(a: string, b: string): boolean {
   const da = createHash('sha256').update(a, 'utf8').digest()
@@ -18,7 +14,8 @@ function parseBearerToken(header: string | null): string | null {
   return t.length > 0 ? t : null
 }
 
-export async function GET(request: NextRequest) {
+/** Android blocker: claim extra unproductive minutes after holding the unlock button. */
+export async function POST(request: NextRequest) {
   const expected = process.env.WIDGET_API_TOKEN?.trim()
   const userId = process.env.WIDGET_USER_ID?.trim()
   if (!expected || !userId) {
@@ -33,26 +30,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const rawDate = request.nextUrl.searchParams.get('date')
-  const date =
-    rawDate && DATE_RE.test(rawDate)
-      ? rawDate
-      : getServerCalendarDateString(new Date())
-
   try {
-    const fresh = request.nextUrl.searchParams.get('fresh') === '1'
-    const { goals, sessions, extraMinutes } = await loadWidgetDayBundleCached(
-      userId,
-      date,
-      { bypassCache: fresh },
-    )
-    return NextResponse.json(buildLimitStatus(date, goals, sessions, extraMinutes))
+    const result = await grantUnproductiveExtra(userId, 'phone')
+    if (!result.ok) {
+      return NextResponse.json(
+        { error: 'Not blocked right now', status: result.status },
+        { status: 409 }
+      )
+    }
+    return NextResponse.json(result.status)
   } catch (e) {
-    console.error('GET /api/widget/limits-status', e)
-    return NextResponse.json(
-      { error: 'Failed to load limit status' },
-      { status: 500 }
-    )
+    console.error('POST /api/widget/limits-extra', e)
+    return NextResponse.json({ error: 'Failed to grant extra time' }, { status: 500 })
   }
 }
-

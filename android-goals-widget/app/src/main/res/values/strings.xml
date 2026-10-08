@@ -14,17 +14,38 @@
     <string name="instagram_pkg">Extra Instagram package</string>
     <string name="detect_current_app">Detect current app</string>
 
-    <string name="unproductive_blocker_message">2h of Instagram + YouTube used up for today. Go back to work.</string>
+    <string name="unproductive_blocker_message">Instagram + YouTube allowance used up for now. More unlocks at 12:00 and 19:00. Go back to work.</string>
     <string name="widget_empty_configure">Open Saemi Goals to set URL and token, then tap Refresh.</string>
     <string name="widget_error">Could not load goals. Tap Refresh.</string>
     <string name="widget_loading">Loading…</string>
 
     <string name="blocker_title">Instagram + YouTube limit</string>
-    <string name="blocker_hint">2 hours per day, phone and laptop combined. Blocks the YouTube and Instagram apps and youtube.com / instagram.com in Chrome, Brave, Firefox, Samsung Internet, Edge and other browsers. Requires the Saemi accessibility service to be turned on.</string>
+    <string name="blocker_hint">2 hours per day, phone and laptop combined, unlocked over the day: 30 min in the morning, +45 min at 12:00, +45 min at 19:00. When blocked, holding the button on the block screen for 1 min adds 15 min. Blocks the YouTube and Instagram apps and youtube.com / instagram.com in Chrome, Brave, Firefox, Samsung Internet, Edge and other browsers. Requires the Saemi accessibility service to be turned on.</string>
     <string name="blocker_open_settings">Open Accessibility settings</string>
     <string name="blocker_status_on">Blocker is ON</string>
     <string name="blocker_status_off">Blocker is OFF: tap below, choose Saemi Goals and turn it on</string>
-    <string name="accessibility_description">Limits Instagram and YouTube (apps and websites in your browser) to 2 hours per day and blocks them afterwards.</string>
+    <string name="blocker_hold_idle">Hold for 1 min to get 15 extra min</string>
+    <string name="blocker_hold_running">Keep holding… %1$ds</string>
+    <string name="blocker_hold_claiming">Unlocking…</string>
+    <string name="blocker_hold_done">15 extra min unlocked</string>
+    <string name="blocker_hold_done_detail">Extra time taken today: %1$d min</string>
+    <string name="blocker_hold_failed">Could not unlock: %1$s</string>
+
+    <string name="protection_title">Protection</string>
+    <string name="protection_hint">Stops you from switching the blocker off on impulse: Settings, uninstall and permission screens that show Saemi Goals are closed right away, and the server URL, token and package fields are locked. To turn it off, request an unlock and wait.</string>
+    <string name="protection_status_off">Protection is OFF: the blocker can be switched off in Settings anytime</string>
+    <string name="protection_status_on">Protection is ON</string>
+    <string name="protection_status_waiting">Protection is ON: unlock in %1$s</string>
+    <string name="protection_status_open">Unlocked for %1$s: Settings and fields are open</string>
+    <string name="protection_blocker_off_warning">The blocker itself is off, so nothing is protected. Turn it on in Accessibility settings.</string>
+    <string name="protection_enable">Turn on protection</string>
+    <string name="protection_request_unlock">Request unlock (%1$d min wait)</string>
+    <string name="protection_cancel_unlock">Cancel unlock request</string>
+    <string name="protection_disable">Turn off protection</string>
+    <string name="protection_confirm">Once on, turning the blocker off, uninstalling Saemi Goals or removing its permissions needs an unlock request, then a %1$d min wait, then a %2$d min window. Restarting the phone cancels a pending request.</string>
+    <string name="protection_kicked">Saemi protection is on. Request an unlock in the Saemi Goals app first.</string>
+
+    <string name="accessibility_description">Limits Instagram and YouTube (apps and websites in your browser) to 2 hours per day (30 min in the morning, +45 min at 12:00, +45 min at 19:00) and blocks them once the unlocked time is used up.</string>
 
     <string name="uni_title">Uni</string>
     <string name="uni_widget_name">Saemi Uni deadlines</string>

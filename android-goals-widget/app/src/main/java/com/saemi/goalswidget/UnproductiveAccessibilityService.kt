@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
+import android.widget.Toast
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -22,6 +23,11 @@ class UnproductiveAccessibilityService : AccessibilityService() {
     /** Browsers fire content-changed events constantly; don't walk the tree on every one. */
     private var lastBrowserProbeMs = 0L
     private val browserProbeIntervalMs = 1_000L
+
+    private var lastGuardProbeMs = 0L
+    private val guardProbeIntervalMs = 300L
+    private var lastGuardKickMs = 0L
+    private val guardKickCooldownMs = 1_500L
 
     /** While a target stays open (e.g. a long video), re-check the limit periodically. */
     private val watchIntervalMs = 45_000L
@@ -59,6 +65,10 @@ class UnproductiveAccessibilityService : AccessibilityService() {
             return
         }
         val pkg = event.packageName?.toString() ?: return
+        if (TamperGuard.isGuardedPackage(this, pkg)) {
+            guardSettings(event)
+            return
+        }
         if (!WidgetPrefs.isConfigured(this)) return
 
         val onTarget = when {
@@ -80,6 +90,37 @@ class UnproductiveAccessibilityService : AccessibilityService() {
         if (!watching) {
             watching = true
             mainHandler.postDelayed(watchTick, watchIntervalMs)
+        }
+    }
+
+    /**
+     * While protection is on, leaves any Settings / uninstall / permission screen that shows
+     * this app's name (its accessibility toggle, App info, usage access, uninstall dialog,
+     * settings search results, ...).
+     */
+    private fun guardSettings(event: AccessibilityEvent) {
+        val now = System.currentTimeMillis()
+        val force = event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+        if (!force && now - lastGuardProbeMs < guardProbeIntervalMs) return
+        if (now - lastGuardKickMs < guardKickCooldownMs) return
+        lastGuardProbeMs = now
+        if (!TamperGuard.isProtecting(this)) return
+        if (!windowMentionsThisApp(event)) return
+
+        lastGuardKickMs = now
+        performGlobalAction(GLOBAL_ACTION_BACK)
+        mainHandler.postDelayed({ performGlobalAction(GLOBAL_ACTION_HOME) }, 200L)
+        Toast.makeText(this, R.string.protection_kicked, Toast.LENGTH_LONG).show()
+    }
+
+    private fun windowMentionsThisApp(event: AccessibilityEvent): Boolean {
+        val label = getString(R.string.app_name)
+        if (event.text.any { it?.contains(label, ignoreCase = true) == true }) return true
+        val root = rootInActiveWindow ?: return false
+        return try {
+            root.findAccessibilityNodeInfosByText(label).isNotEmpty()
+        } finally {
+            root.recycle()
         }
     }
 

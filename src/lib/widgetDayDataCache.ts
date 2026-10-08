@@ -3,6 +3,7 @@ import { excludePhoneDeletionTombstones } from '@/lib/phoneSessionDeletion'
 import { normalizeStoredGoals } from '@/lib/goalConfig'
 import type { DailyGoalDef } from '@/lib/goalConfig'
 import type { TimeSession } from '@/types/task'
+import { unproductiveExtraMinutes } from '@/lib/unproductiveLimit'
 
 const TTL_MS = 120_000
 const MAX_ENTRIES = 96
@@ -11,6 +12,7 @@ type CacheEntry = {
   at: number
   goals: DailyGoalDef[]
   sessions: TimeSession[]
+  extraMinutes: number
 }
 
 const cache = new Map<string, CacheEntry>()
@@ -65,36 +67,37 @@ function rowToTimeSession(row: {
 }
 
 /**
- * One calendar day of goals + sessions for widget-style endpoints.
- * Short TTL in-memory cache cuts duplicate Prisma reads when the phone widget
+ * One calendar day of goals + sessions (+ extra unproductive minutes) for widget-style
+ * endpoints. Short TTL in-memory cache cuts duplicate Prisma reads when the phone widget
  * hits several routes or polls frequently (warm serverless instance).
  */
 export async function loadWidgetDayBundleCached(
   userId: string,
   date: string,
   opts?: { bypassCache?: boolean },
-): Promise<{ goals: DailyGoalDef[]; sessions: TimeSession[] }> {
+): Promise<{ goals: DailyGoalDef[]; sessions: TimeSession[]; extraMinutes: number }> {
   const key = cacheKey(userId, date)
   const now = Date.now()
   const hit = cache.get(key)
   if (!opts?.bypassCache && hit && now - hit.at < TTL_MS) {
-    return { goals: hit.goals, sessions: hit.sessions }
+    return { goals: hit.goals, sessions: hit.sessions, extraMinutes: hit.extraMinutes }
   }
 
   const userIdMatch = { userId: { equals: userId, mode: 'insensitive' as const } }
-  const [goalRow, sessionRows] = await Promise.all([
+  const [goalRow, sessionRows, extraMinutes] = await Promise.all([
     prisma.userGoalSettings.findFirst({ where: userIdMatch }),
     prisma.timeSession.findMany({
       where: excludePhoneDeletionTombstones({ ...userIdMatch, date }),
       orderBy: { startTime: 'asc' },
     }),
+    unproductiveExtraMinutes(userId, date),
   ])
 
   const goals = normalizeStoredGoals(goalRow?.goalsJson ?? null)
   const sessions = sessionRows.map(rowToTimeSession)
-  cache.set(key, { at: now, goals, sessions })
+  cache.set(key, { at: now, goals, sessions, extraMinutes })
   prune()
-  return { goals, sessions }
+  return { goals, sessions, extraMinutes }
 }
 
 /** Call after any mutation that affects this user's timeline or goal settings. */

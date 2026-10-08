@@ -13,7 +13,9 @@ import type { DailyGoalDef } from '@/lib/goalConfig'
 import {
   DEFAULT_DAILY_GOALS,
   UNPRODUCTIVE_BUDGET_MAX_MIN,
-  unproductiveBudgetLimitMinutesFromDones,
+  UNPRODUCTIVE_BUDGET_UNLOCKS,
+  UNPRODUCTIVE_EXTRA_GRANT_MIN,
+  UNPRODUCTIVE_EXTRA_HOLD_SECONDS,
   weeklyGoalRollups,
   weeklyGoalsMetCount,
 } from '@/lib/goalConfig'
@@ -93,14 +95,31 @@ export function GoalsTab({
     [sessions, progressDate]
   )
 
+  const [extraMinutes, setExtraMinutes] = useState(0)
+  useEffect(() => {
+    let cancelled = false
+    setExtraMinutes(0)
+    fetch(`/api/limits/status?date=${encodeURIComponent(progressDate)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (!cancelled) setExtraMinutes(Number(j?.extraMinutes) || 0)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [progressDate])
+
   const progressPayload = useMemo(() => {
     const items = computeWidgetDailyGoalItems({
+      date: progressDate,
       goals: displayGoals,
       sessions: daySessions,
       activeSessionId: null,
+      extraMinutes,
     })
     return { date: progressDate, items }
-  }, [displayGoals, daySessions, progressDate])
+  }, [displayGoals, daySessions, progressDate, extraMinutes])
 
   const doneByGoalId = useMemo(() => {
     const m: Record<string, number> = {}
@@ -220,7 +239,7 @@ export function GoalsTab({
   const progressReady = progressPayload != null
 
   const unproductiveTarget = progressReady
-    ? unproductiveBudgetLimitMinutesFromDones(displayGoals, doneByGoalId ?? {})
+    ? (unproductiveRow?.targetMinutes ?? 0)
     : 0
   const unproductive = progressReady ? (unproductiveRow?.doneMinutes ?? 0) : 0
   const unproductivePct =
@@ -417,7 +436,14 @@ export function GoalsTab({
                     <span className="block">Unproductive</span>
                     <span className="block text-[11px] text-white/45 font-normal mt-1 leading-snug">
                       Instagram + YouTube (phone, Chrome and laptop combined):
-                      {' '}{UNPRODUCTIVE_BUDGET_MAX_MIN} min per day. Blocked once used up.
+                      {' '}{UNPRODUCTIVE_BUDGET_MAX_MIN} min per day, unlocked as{' '}
+                      {UNPRODUCTIVE_BUDGET_UNLOCKS.map(
+                        (u) => `${u.minutes} min at ${String(u.hour).padStart(2, '0')}:00`
+                      ).join(', ')}
+                      . Blocked once used up; holding the button on the block screen
+                      for {UNPRODUCTIVE_EXTRA_HOLD_SECONDS / 60} min adds{' '}
+                      {UNPRODUCTIVE_EXTRA_GRANT_MIN} min.
+                      {extraMinutes > 0 && ` Extra taken this day: ${extraMinutes} min.`}
                     </span>
                   </div>
                 </div>

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Saemi Unproductive Limit",
-  "version": "0.7.0",
-  "description": "Blocks YouTube/Instagram once the 2h daily allowance (phone + laptop) is used up.",
+  "version": "0.8.0",
+  "description": "Blocks YouTube/Instagram once the unlocked part of the daily allowance (phone + laptop) is used up.",
   "permissions": [
     "tabs",
     "alarms",

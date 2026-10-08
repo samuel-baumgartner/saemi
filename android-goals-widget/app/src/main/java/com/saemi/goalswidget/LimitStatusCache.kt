@@ -77,6 +77,11 @@ object LimitStatusCache {
         }
     }
 
+    /** Adopts the status returned after claiming extra time, so the blocker lets you through at once. */
+    fun applyClaimedStatus(status: LimitStatus) {
+        applyFetchResult(Result.success(status))
+    }
+
     private fun applyFetchResult(result: Result<LimitStatus>) {
         val s = result.getOrNull()
         if (s != null) {

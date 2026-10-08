@@ -45,13 +45,62 @@
       a:hover {
         background: #6366f1;
       }
+      .extra {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #27272a;
+      }
+      #hold {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid #3f3f46;
+        border-radius: 0.5rem;
+        background: #18181b;
+        color: #e4e4e7;
+        font: inherit;
+        font-size: 0.875rem;
+        cursor: pointer;
+        user-select: none;
+        touch-action: none;
+      }
+      #hold:disabled {
+        cursor: default;
+        opacity: 0.6;
+      }
+      #holdFill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0;
+        background: #4f46e566;
+      }
+      #holdLabel {
+        position: relative;
+      }
+      #extraMsg {
+        min-height: 1.5em;
+        margin: 0.75rem 0 0;
+        font-size: 0.875rem;
+      }
     </style>
   </head>
   <body>
     <main>
-      <h1>Daily limit reached</h1>
-      <p>Your 2h YouTube + Instagram allowance for today is used up. It resets at midnight.</p>
+      <h1>Limit reached</h1>
+      <p>
+        Your YouTube + Instagram allowance is used up for now. You get 30 min in the morning,
+        45 more at 12:00 and another 45 at 19:00.
+      </p>
       <a href="https://www.samuelbaumgartner.ch/personal/dashboard">Open dashboard</a>
+      <div class="extra">
+        <button id="hold" type="button">
+          <span id="holdFill"></span>
+          <span id="holdLabel">Hold for 1 min to get 15 extra min</span>
+        </button>
+        <p id="extraMsg"></p>
+      </div>
     </main>
+    <script src="blocked.js"></script>
   </body>
 </html>

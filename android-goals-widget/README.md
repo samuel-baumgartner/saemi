@@ -2,7 +2,7 @@
 
 - **Goals widget**: read-only daily goals progress (server uses the same logic as the web app).
 - **Uni widget** (“Saemi Uni deadlines”): open exercises/quizzes from `/personal/uni`, plus notifications 24h and 3h before each deadline.
-- **Blocker** (accessibility service): Instagram + YouTube get 2h per day, phone and laptop combined. Covers the native apps and youtube.com / instagram.com in Chrome and other browsers. Phone usage is uploaded as “Not productive” / “Other” sessions.
+- **Blocker** (accessibility service): Instagram + YouTube get 2h per day (30 min from midnight, +45 at 12:00, +45 at 19:00), phone and laptop combined. Covers the native apps and youtube.com / instagram.com in Chrome and other browsers. Phone usage is uploaded as “Not productive” / “Other” sessions. On the block screen, holding the button for 1 minute adds 15 extra minutes for today.
 
 ## 1. Server configuration
 
@@ -69,6 +69,11 @@ To track YouTube / Instagram automatically, the app needs **Usage Access**.
 4. Tap **Open Accessibility settings** → **Saemi Goals** → turn it on (needed for blocking and for detecting YouTube / Instagram in browsers).
 5. Tap **Allow notifications** for Uni reminders.
 6. The official YouTube / Instagram apps are detected automatically; the optional package fields are only for clones.
+7. Optional: tap **Turn on protection** (do this last, after all permissions are granted). While it is on:
+   - any Settings, uninstall or permission screen that shows “Saemi Goals” is closed immediately (the accessibility toggle, App info / force stop / uninstall, usage access, settings search results, and also list pages such as Accessibility or All apps while Saemi Goals is visible);
+   - the server URL, token and package fields are locked.
+
+   To turn it off: **Request unlock** → wait 30 min → you get a 10-min window to change settings or tap **Turn off protection**. Restarting the phone cancels a pending request. Updating the app with `adb install -r` / Android Studio works without unlocking.
 
 Behavior:
 - The app rebuilds **today’s** phone sessions from Usage Events and uploads them right before each widget refresh.
