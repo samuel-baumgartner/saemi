@@ -22,7 +22,7 @@ export const educationItems: EducationItem[] = [
     title: 'ETH Electrical Engineering',
     subtitle: "Bachelor's Degree",
     description:
-      "Since 2023, I have been studying Electrical Engineering at ETH Zürich. With a current average of 5.7 (top 5% of the cohort), I focus on systems and control, embedded engineering, and robotics. My goal is to pursue a Master's in Robotics, where I can combine control theory, hardware design, and intelligent systems. Alongside my studies, I work on practical engineering projects, robotics prototypes, and competitive hackathons, aiming to build systems that move beyond theory into real-world impact.",
+      "I am in the 7th semester of Electrical Engineering at ETH Zürich, which I started in 2023. With a current average of 5.7 (top 5% of the cohort), I focus on systems and control, embedded engineering, and robotics. I plan to continue with a Master's in Robotics, combining control theory, hardware design, and intelligent systems. Alongside my studies, I work on practical engineering projects, robotics prototypes, and competitive hackathons, aiming to build systems that move beyond theory into real-world impact.",
     bgColor: 'light',
   },
 ];

@@ -9,6 +9,8 @@ import {
   createHighlightedSection,
   createProjectHeader,
 } from '@/lib/modalContent';
+import BallOnPlateViewer from '@/components/ball-on-plate/BallOnPlateViewer';
+import BallOnPlatePlayground from '@/components/ball-on-plate/BallOnPlatePlayground';
 
 // This file contains project data. For maintainability, project content is generated
 // using utility functions. To add a new project, add it to the projects array below.
@@ -103,10 +105,18 @@ export const projects: Project[] = [
       { label: 'Path Planning' },
     ],
     metadata: {},
-    backgroundImage: '/BoaP/BoaP_example_image.png',
+    backgroundImage: '/models/ball-on-plate/card.png',
     carouselItems: [
-      { type: 'image', src: '/BoaP/BoaP_example_image.png' },
-      { type: 'image', src: '/BoaP/rrt_image.png' },
+      {
+        type: 'custom',
+        content: <BallOnPlateViewer eager />,
+        caption: 'Interactive CAD · Soft Actor-Critic replay',
+      },
+      {
+        type: 'image',
+        src: '/BoaP/rrt_image.png',
+        caption: 'RRT* path tree with ball-radius clearance around the planned trajectory',
+      },
     ],
     headerContent: createProjectHeader(
       'Ball on a Plate',
@@ -119,43 +129,46 @@ export const projects: Project[] = [
     ),
     content: (
       <div className="space-y-8">
-        <div className="mt-20">
+        <div className="mt-4">
           {createHighlightedSection(
             'Overview',
             <p className="text-gray-700 leading-relaxed text-base">
-              Ball on a Plate is a control system project developed at ETH Zurich. The system consists of a ball that can be controlled by adjusting the angle of the plate it rests on. Multiple controllers are used to achieve precise ball positioning and trajectory control through plate angle manipulation.
+              Ball on a Plate is a control system project developed at ETH Zurich. A free ball rests on a tiltable plate; by commanding the plate angles you shape the ball&apos;s acceleration and steer it toward targets or through obstacle layouts. My focus was motion planning: RRT, RRT*, and RRT*-Smart paths that a lower-level controller can track on the real hardware.
             </p>,
             'from-blue-500 to-purple-500',
             'bg-blue-50',
             'border-blue-200'
           )}
         </div>
-        <div className="space-y-6 mt-16">
+
+        <div className="space-y-6 mt-12">
           {createSectionHeader('System Overview', 'from-purple-500 to-pink-500')}
           <div className="space-y-4">
-            <img
-              src="/BoaP/BoaP_example_image.png"
-              alt="Ball on a Plate example system"
-              className="w-full rounded-xl shadow-lg border border-gray-200"
-            />
-            <p className="text-gray-600 text-sm italic text-center">
-              Example image of the Ball on a Plate system
-            </p>
             <p className="text-gray-700 leading-relaxed text-base">
-              The system demonstrates a classic control problem where a ball must be maneuvered across a plate by tilting the plate in different directions. This requires sophisticated control algorithms to predict and execute the ball's path based on plate angle adjustments.
+              The plant is a two-axis gimballed plate. Two motors set the pitch and roll; an overhead camera measures the ball position; a real-time loop closes the gap between desired waypoints and the physical ball. Tilting the plate couples gravity into planar acceleration, so even small angle errors compound quickly — which is why planning must respect ball radius, clearance, and reachable tilt limits.
             </p>
+            {createFeatureList([
+              { title: 'Actuation', description: 'two-axis plate tilt (pitch / roll), typically within about ±10°', color: 'bg-blue-500' },
+              { title: 'Sensing', description: 'top-down vision for ball position on the plate plane', color: 'bg-green-500' },
+              { title: 'Planning layer', description: 'RRT-family paths that account for ball thickness and obstacles', color: 'bg-purple-500' },
+              { title: 'Tracking layer', description: 'low-level controller follows the planned waypoints on hardware', color: 'bg-orange-500' },
+            ])}
           </div>
         </div>
-        <div className="space-y-6">
+
+        <div className="space-y-4 mt-12">
+          {createSectionHeader('Test it yourself', 'from-amber-600 to-orange-500')}
+          <p className="text-gray-700 leading-relaxed text-base">
+            Move your mouse over the CAD machine to tilt the plate in X and Y — watch the ball accelerate downhill under the same gravity coupling a planner and controller have to fight on the real system.
+          </p>
+          <BallOnPlatePlayground />
+        </div>
+
+        <div className="space-y-6 mt-12">
           {createSectionHeader('Path Planning Implementation', 'from-indigo-500 to-blue-500')}
           <div className="space-y-4">
-            <img
-              src="/BoaP/rrt_image.png"
-              alt="RRT path planning visualization"
-              className="w-full rounded-xl shadow-lg border border-gray-200"
-            />
             <p className="text-gray-700 leading-relaxed text-base">
-              I implemented three path planning algorithms for this project: RRT (Rapidly-exploring Random Tree), RRT*, and RRT* Smart. The visualization shows the planned path with grey regions around the trajectory representing the thickness of the ball, accounting for the physical constraints and safety margins required for successful navigation.
+              I implemented three path planning algorithms for this project: RRT, RRT*, and RRT*-Smart. The carousel tree visualization shows the planned path with grey regions around the trajectory for the physical ball thickness and safety margin.
             </p>
             <div className="space-y-6">
               <h5 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -189,7 +202,7 @@ export const projects: Project[] = [
                         <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold">Optimized</span>
                       </h6>
                       <p className="text-sm leading-relaxed text-gray-700">
-                        To improve path quality, I implemented RRT*, which extends RRT with a cost-aware rewiring step. As the tree grows, each new node not only connects to the nearest state, but also chooses the parent that yields the lowest cost-to-come, and then "rewires" nearby nodes through this new state if it shortens their path. Over time, the tree converges to an asymptotically optimal solution: the path becomes shorter and smoother as more samples are added, at the cost of higher computation per iteration.
+                        To improve path quality, I implemented RRT*, which extends RRT with a cost-aware rewiring step. As the tree grows, each new node not only connects to the nearest state, but also chooses the parent that yields the lowest cost-to-come, and then &quot;rewires&quot; nearby nodes through this new state if it shortens their path. Over time, the tree converges to an asymptotically optimal solution: the path becomes shorter and smoother as more samples are added, at the cost of higher computation per iteration.
                       </p>
                     </div>
                   </div>
@@ -205,7 +218,7 @@ export const projects: Project[] = [
                         <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">Advanced</span>
                       </h6>
                       <p className="text-sm leading-relaxed text-gray-700">
-                        Finally, I implemented RRT*-Smart, which accelerates RRT*'s convergence by combining online path smoothing with intelligent sampling. Once a first path is found, the algorithm optimizes the path by removing redundant waypoints and straightening segments, extracts "beacon" nodes along this optimized path, and biases future samples to lie in a region around these beacons, while still mixing in uniform samples for global exploration. This focused sampling around a continually re-optimized path lets RRT*-Smart reach high-quality paths much faster than plain RRT*, especially in cluttered environments.
+                        Finally, I implemented RRT*-Smart, which accelerates RRT*&apos;s convergence by combining online path smoothing with intelligent sampling. Once a first path is found, the algorithm optimizes the path by removing redundant waypoints and straightening segments, extracts &quot;beacon&quot; nodes along this optimized path, and biases future samples to lie in a region around these beacons, while still mixing in uniform samples for global exploration. This focused sampling around a continually re-optimized path lets RRT*-Smart reach high-quality paths much faster than plain RRT*, especially in cluttered environments.
                       </p>
                     </div>
                   </div>

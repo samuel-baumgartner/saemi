@@ -32,7 +32,7 @@ object LimitStatusApi {
         )
     }
 
-    /** Adds 15 extra minutes for today; the server refuses (HTTP 409) unless currently blocked. */
+    /** Adds 15 extra minutes for today. The server always grants the request. */
     fun claimExtra(baseUrl: String, token: String): Result<LimitStatus> =
         request(
             URL("${baseUrl.trim().trimEnd('/')}/api/widget/limits-extra"),

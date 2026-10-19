@@ -1,0 +1,44 @@
+{
+  "plateSize": [
+    0.418,
+    0.607
+  ],
+  "plateCenter": [
+    0.650480811,
+    0.602,
+    0.279160089
+  ],
+  "outerPivot": [
+    0.650422173,
+    0.433944597,
+    0.27910401
+  ],
+  "innerPivot": [
+    0.650355811,
+    0.5398503,
+    0.279160089
+  ],
+  "target": [
+    0.6505,
+    0.55,
+    0.2792
+  ],
+  "camera": [
+    2.15,
+    1.55,
+    2.05
+  ],
+  "floor": -0.020514255,
+  "innerNames": [
+    "Inner Frame"
+  ],
+  "outerNames": [
+    "Middle Frame",
+    "Wellenlager innen",
+    "Motor innen",
+    "Wellen-Kupplung innen",
+    "Klemmring innen 1"
+  ],
+  "cadToWeb": "Metres; STEP X,Y,Z maps to Web X,Z,-Y",
+  "measurementNotes": "Inner opening between x=441.48..859.48 mm and y=-582.66..24.34 mm. Display plane is a visualization insert at z=602 mm; the STEP contains the frame but no complete monitor surface. Pivots follow circular bearing-mount centres; outer CAD X at z=433.9446 mm, inner CAD Y at x=650.3558 mm and z=539.8503 mm."
+}

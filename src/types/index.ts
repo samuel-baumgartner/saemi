@@ -1,8 +1,14 @@
-export type CarouselItemType = 'image' | 'video' | 'model';
+import type { ReactNode } from 'react';
+
+export type CarouselItemType = 'image' | 'video' | 'model' | 'custom';
 
 export interface CarouselItem {
   type: CarouselItemType;
-  src: string;
+  /** Required for image / video / model slides */
+  src?: string;
+  /** Used when type is 'custom' */
+  content?: ReactNode;
+  caption?: string;
 }
 
 export interface ProjectTag {

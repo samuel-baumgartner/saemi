@@ -15,17 +15,11 @@ export async function POST() {
   }
 
   try {
-    const result = await grantUnproductiveExtra(
+    const status = await grantUnproductiveExtra(
       resolveSessionsOwnerUserId(sessionUserId),
       'browser'
     )
-    if (!result.ok) {
-      return NextResponse.json(
-        { error: 'Not blocked right now', status: result.status },
-        { status: 409 }
-      )
-    }
-    return NextResponse.json(result.status)
+    return NextResponse.json(status)
   } catch (e) {
     console.error('POST /api/limits/extra', e)
     return NextResponse.json({ error: 'Failed to grant extra time' }, { status: 500 })

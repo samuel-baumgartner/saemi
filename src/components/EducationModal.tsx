@@ -2,11 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ModelViewer from "./ModelViewer";
-
-interface CarouselItem {
-  type: 'image' | 'video' | 'model';
-  src: string;
-}
+import type { CarouselItem } from "@/types";
 
 interface EducationModalProps {
   isOpen: boolean;
@@ -30,9 +26,10 @@ export default function EducationModal({
   headerContent,
 }: EducationModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-  // Convert images array to carouselItems if provided
-  const items: CarouselItem[] = carouselItems || (images ? images.map(img => ({ type: 'image' as const, src: img })) : []);
+
+  const items: CarouselItem[] =
+    carouselItems ||
+    (images ? images.map((img) => ({ type: "image" as const, src: img })) : []);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,9 +38,8 @@ export default function EducationModal({
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
-      // Reset to first item when modal opens
       setCurrentImageIndex(0);
-      
+
       return () => {
         document.body.style.position = "";
         document.body.style.top = "";
@@ -81,18 +77,16 @@ export default function EducationModal({
       setCurrentImageIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
     }
   };
-  
+
   const getYouTubeEmbedUrl = (url: string) => {
-    // Extract video ID from various YouTube URL formats
-    let videoId = '';
+    let videoId = "";
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
     if (match) {
       videoId = match[1];
     }
-    // Also check for start time parameter
     const startMatch = url.match(/[?&]t=(\d+)/);
-    const startTime = startMatch ? startMatch[1] : '25';
-    
+    const startTime = startMatch ? startMatch[1] : "25";
+
     if (!videoId) return url;
     return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&start=${startTime}&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0`;
   };
@@ -103,14 +97,13 @@ export default function EducationModal({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-2 sm:p-4"
       onClick={onClose}
-      style={{ overflow: 'hidden', overflowX: 'hidden' }}
+      style={{ overflow: "hidden", overflowX: "hidden" }}
     >
       <div
         className="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200/60 flex flex-col relative"
         onClick={(e) => e.stopPropagation()}
-        style={{ overflowX: 'hidden' }}
+        style={{ overflowX: "hidden" }}
       >
-        {/* Close button - fixed on mobile viewport, absolute on desktop */}
         <button
           onClick={onClose}
           className="fixed sm:absolute top-8 sm:top-6 right-6 sm:right-6 text-gray-500 hover:text-gray-700 hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 rounded-full p-1.5 sm:p-2 w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center transition-all shadow-lg sm:shadow-md hover:shadow-xl sm:hover:shadow-lg border border-gray-200/50 hover:border-red-200/50 bg-white/95 sm:bg-white backdrop-blur-sm sm:backdrop-blur-none z-[60] sm:z-20"
@@ -130,70 +123,112 @@ export default function EducationModal({
             />
           </svg>
         </button>
-        <div className="overflow-y-auto bg-white" style={{ maxHeight: '95vh', overflowX: 'hidden' }}>
-
-          {/* Header Content */}
+        <div
+          className="overflow-y-auto bg-white"
+          style={{ maxHeight: "95vh", overflowX: "hidden" }}
+        >
           {headerContent && (
             <div className="p-4 sm:p-6 md:p-10 pb-4 sm:pb-6 pl-4 sm:pl-8 md:pl-16 lg:pl-20 relative bg-white border-b border-gray-200/60">
               <div className="pr-12 sm:pr-12">{headerContent}</div>
             </div>
           )}
-          
-          {/* Image/Video Carousel */}
+
           {items.length > 0 && (
             <div className="relative w-full overflow-hidden bg-gradient-to-br from-blue-50/40 via-white to-purple-50/30 border-y border-blue-100/30">
-              <div className="relative w-full flex items-center" style={{ minHeight: '300px' }}>
+              <div
+                className="relative w-full flex items-center"
+                style={{ minHeight: "300px" }}
+              >
                 <div
                   className="flex transition-transform duration-500 ease-in-out w-full"
                   style={{
                     transform: `translateX(-${currentImageIndex * 100}%)`,
                   }}
                 >
-                  {items.map((item, index) => (
-                    <div
-                      key={index}
-                      className="min-w-full w-full flex items-center justify-center p-4 sm:p-6 md:p-4 lg:p-6"
-                    >
-                      {item.type === 'image' ? (
-                        <img
-                          src={item.src}
-                          alt={`${title} - Image ${index + 1}`}
-                          className="max-h-[400px] sm:max-h-[600px] md:max-h-[800px] max-w-full w-auto h-auto object-contain rounded-xl shadow-2xl"
-                        />
-                      ) : item.type === 'video' ? (
-                        <div className="w-full max-w-4xl aspect-video rounded-xl shadow-2xl overflow-hidden">
-                          <iframe
-                            src={getYouTubeEmbedUrl(item.src)}
-                            className="w-full h-full"
-                            allow="autoplay; encrypted-media"
-                            allowFullScreen
-                            title={`${title} - Video ${index + 1}`}
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-full max-w-6xl md:max-w-7xl lg:max-w-[90vw] flex flex-col items-center gap-3 sm:gap-4 py-2">
-                          <div className="text-center space-y-2 sm:space-y-3 w-full px-2">
-                            <h5 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-1 sm:mb-2 text-center">
-                              {title || "3D Model"}
-                            </h5>
+                  {items.map((item, index) => {
+                    const isActive = index === currentImageIndex;
+                    return (
+                      <div
+                        key={index}
+                        className="min-w-full w-full flex items-center justify-center p-4 sm:p-6 md:p-4 lg:p-6"
+                      >
+                        {item.type === "custom" ? (
+                          <div className="w-full max-w-4xl">
+                            {/* Keep WebGL mounts off-screen slides unmounted */}
+                            {isActive ? item.content : (
+                              <div className="bop-viewer">
+                                <div className="bop-stage" />
+                              </div>
+                            )}
+                            {item.caption && (
+                              <p className="mt-3 text-center text-sm text-gray-600 italic">
+                                {item.caption}
+                              </p>
+                            )}
                           </div>
-                          <div className="w-full max-w-2xl md:max-w-3xl lg:max-w-4xl aspect-square rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 border border-gray-200/60 ring-2 sm:ring-4 ring-gray-100/50">
-                            <ModelViewer modelPath={item.src} className="w-full h-full" />
+                        ) : item.type === "image" ? (
+                          <div className="w-full flex flex-col items-center gap-3">
+                            <img
+                              src={item.src}
+                              alt={`${title} - Image ${index + 1}`}
+                              className="max-h-[400px] sm:max-h-[600px] md:max-h-[800px] max-w-full w-auto h-auto object-contain rounded-xl shadow-2xl"
+                            />
+                            {item.caption && (
+                              <p className="text-sm text-gray-600 italic text-center">
+                                {item.caption}
+                              </p>
+                            )}
                           </div>
-                          <div className="w-full flex items-center justify-center pt-1 pb-2">
-                            <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 font-semibold px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
-                              <span className="flex items-center justify-center gap-2 mx-auto">
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                </svg>
-                                <span>Drag to rotate</span>
-                              </span>
-                            </p>
+                        ) : item.type === "video" ? (
+                          <div className="w-full max-w-4xl aspect-video rounded-xl shadow-2xl overflow-hidden">
+                            <iframe
+                              src={getYouTubeEmbedUrl(item.src || "")}
+                              className="w-full h-full"
+                              allow="autoplay; encrypted-media"
+                              allowFullScreen
+                              title={`${title} - Video ${index + 1}`}
+                            />
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        ) : (
+                          <div className="w-full max-w-6xl md:max-w-7xl lg:max-w-[90vw] flex flex-col items-center gap-3 sm:gap-4 py-2">
+                            <div className="text-center space-y-2 sm:space-y-3 w-full px-2">
+                              <h5 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-1 sm:mb-2 text-center">
+                                {title || "3D Model"}
+                              </h5>
+                            </div>
+                            <div className="w-full max-w-2xl md:max-w-3xl lg:max-w-4xl aspect-square rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 border border-gray-200/60 ring-2 sm:ring-4 ring-gray-100/50">
+                              {isActive && item.src && (
+                                <ModelViewer
+                                  modelPath={item.src}
+                                  className="w-full h-full"
+                                />
+                              )}
+                            </div>
+                            <div className="w-full flex items-center justify-center pt-1 pb-2">
+                              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 font-semibold px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
+                                <span className="flex items-center justify-center gap-2 mx-auto">
+                                  <svg
+                                    className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                    />
+                                  </svg>
+                                  <span>Drag to rotate</span>
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               {items.length > 1 && (
@@ -264,18 +299,23 @@ export default function EducationModal({
             </div>
           )}
 
-          {/* Rest of Content */}
           {(content || title || description) && (
             <div className="px-4 sm:px-8 md:px-16 lg:px-20 py-6 sm:py-8 relative bg-white">
               {title && !content && (
                 <div className="mb-4 sm:mb-6 pr-8 sm:pr-12">
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">{title}</h3>
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                    {title}
+                  </h3>
                 </div>
               )}
               {content ? (
-                <div className="text-sm sm:text-base text-gray-700 leading-relaxed pr-2 sm:pr-4 [&>*]:space-y-4 sm:[&>*]:space-y-6">{content}</div>
+                <div className="text-sm sm:text-base text-gray-700 leading-relaxed pr-2 sm:pr-4 [&>*]:space-y-4 sm:[&>*]:space-y-6">
+                  {content}
+                </div>
               ) : (
-                <p className="text-sm sm:text-base text-gray-700 leading-relaxed pr-2 sm:pr-4">{description}</p>
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed pr-2 sm:pr-4">
+                  {description}
+                </p>
               )}
             </div>
           )}
@@ -284,4 +324,3 @@ export default function EducationModal({
     </div>
   );
 }
-

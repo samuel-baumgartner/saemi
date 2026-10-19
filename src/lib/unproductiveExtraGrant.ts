@@ -7,29 +7,18 @@ import {
   loadWidgetDayBundleCached,
 } from '@/lib/widgetDayDataCache'
 
-export type ExtraGrantResult =
-  | { ok: true; status: LimitStatus }
-  | { ok: false; error: 'not_blocked'; status: LimitStatus }
-
 /**
- * Adds {@link UNPRODUCTIVE_EXTRA_GRANT_MIN} minutes to today's allowance, but only while
- * the user is actually over the limit (no stockpiling extras in advance).
+ * Adds {@link UNPRODUCTIVE_EXTRA_GRANT_MIN} minutes to today's allowance.
+ * Always grants: the phone and browser can already be blocking from local usage
+ * while the server still thinks the allowance is not used up, and refusing then
+ * leaves the apps blocked without adding any time.
  */
 export async function grantUnproductiveExtra(
   userId: string,
   source: string
-): Promise<ExtraGrantResult> {
+): Promise<LimitStatus> {
   const date = getServerCalendarDateString()
   const before = await loadWidgetDayBundleCached(userId, date, { bypassCache: true })
-  const statusBefore = buildLimitStatus(
-    date,
-    before.goals,
-    before.sessions,
-    before.extraMinutes
-  )
-  if (!statusBefore.isOverLimit) {
-    return { ok: false, error: 'not_blocked', status: statusBefore }
-  }
 
   await prisma.unproductiveExtraGrant.create({
     data: { userId, date, minutes: UNPRODUCTIVE_EXTRA_GRANT_MIN, source },
@@ -37,8 +26,5 @@ export async function grantUnproductiveExtra(
   invalidateWidgetDayCacheForUser(userId)
 
   const extraMinutes = before.extraMinutes + UNPRODUCTIVE_EXTRA_GRANT_MIN
-  return {
-    ok: true,
-    status: buildLimitStatus(date, before.goals, before.sessions, extraMinutes),
-  }
+  return buildLimitStatus(date, before.goals, before.sessions, extraMinutes)
 }
