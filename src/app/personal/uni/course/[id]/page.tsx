@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { ChevronLeft } from 'lucide-react'
 import { formatDue, itemStatus, relativeDue } from '@/lib/uni/dates'
+import { ethSemester } from '@/lib/uni/semester'
 import { KIND_NAME, KIND_SHORT, UNI_WEEKS, type UniCourse, type UniItem, type UniKind } from '@/lib/uni/types'
 import { useUni } from '@/components/uni/UniStore'
 import { useOpenItem } from '@/components/uni/UniShell'
@@ -66,6 +67,8 @@ function CourseView({ course }: { course: UniCourse }) {
   const [notes, setNotes] = useState(course.notes)
   const [showSettings, setShowSettings] = useState(false)
   const notesTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const semester = ethSemester(now)
+  const currentWeek = semester.phase === 'lecture' ? semester.week : null
 
   function saveNotes(value: string) {
     if (notesTimer.current) clearTimeout(notesTimer.current)
@@ -188,8 +191,8 @@ function CourseView({ course }: { course: UniCourse }) {
           </thead>
           <tbody>
             {weeks.map((w) => (
-              <tr key={w} className="border-b border-zinc-900 last:border-0">
-                <td className="px-3 py-2 font-medium text-zinc-400">{w}</td>
+              <tr key={w} className={`border-b border-zinc-900 last:border-0 ${w === currentWeek ? 'bg-indigo-500/[0.08]' : ''}`}>
+                <td className={`px-3 py-2 font-medium ${w === currentWeek ? 'text-indigo-200' : 'text-zinc-400'}`}>{w}</td>
                 <ItemCell item={getItem(course.id, w, 'lecture')} kind="lecture" now={now} onOpen={openItem} />
                 <ItemCell item={getItem(course.id, w, 'exercise')} kind="exercise" now={now} onOpen={openItem} />
                 {course.hasQuiz && <ItemCell item={getItem(course.id, w, 'quiz')} kind="quiz" now={now} onOpen={openItem} />}

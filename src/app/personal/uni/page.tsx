@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Check, Plus } from 'lucide-react'
 import { formatDue, itemStatus, kindLabel } from '@/lib/uni/dates'
+import { ethSemester, type EthSemester } from '@/lib/uni/semester'
 import { KIND_SHORT, UNI_WEEKS, type UniCourse, type UniItem, type UniKind } from '@/lib/uni/types'
 import { useUni } from '@/components/uni/UniStore'
 import { useOpenItem } from '@/components/uni/UniShell'
@@ -50,6 +51,21 @@ function Legend({ className, label }: { className: string; label: string }) {
   )
 }
 
+function SemesterLabel({ semester }: { semester: EthSemester }) {
+  if (semester.phase === 'finished') return <span className="text-zinc-300">Finished</span>
+  if (semester.phase === 'break') {
+    return <span className="text-zinc-300">Summer {semester.year} · Easter break</span>
+  }
+  const season = semester.season === 'winter' ? 'Winter' : 'Summer'
+  return (
+    <>
+      {season} {semester.year}
+      {' · Week '}
+      <span className="text-zinc-300">{semester.week}</span> of {semester.weeks}
+    </>
+  )
+}
+
 function Badge({ tone, children }: { tone: 'red' | 'amber'; children: React.ReactNode }) {
   const styles =
     tone === 'red' ? 'border-red-500/30 bg-red-500/10 text-red-300' : 'border-amber-400/30 bg-amber-400/10 text-amber-200'
@@ -67,11 +83,8 @@ export default function UniOverview() {
   const [adding, setAdding] = useState(false)
   const anyQuiz = courses.some((c) => c.hasQuiz)
 
-  const { overdue, soon, currentWeek, progress } = useMemo(() => {
+  const { overdue, soon, progress } = useMemo(() => {
     const visible = items.filter((i) => i.kind !== 'quiz' || courses.find((c) => c.id === i.courseId)?.hasQuiz)
-    const upcoming = visible
-      .filter((i) => i.dueAt && new Date(i.dueAt).getTime() >= now)
-      .sort((a, b) => a.dueAt!.localeCompare(b.dueAt!))
     const progress = new Map<string, { done: number; total: number }>()
     for (const i of visible) {
       if (i.skipped) continue
@@ -83,10 +96,12 @@ export default function UniOverview() {
     return {
       overdue: visible.filter((i) => itemStatus(i, now) === 'overdue').length,
       soon: visible.filter((i) => itemStatus(i, now) === 'soon').length,
-      currentWeek: upcoming[0]?.week ?? null,
       progress,
     }
   }, [items, courses, now])
+
+  const semester = useMemo(() => ethSemester(now), [now])
+  const currentWeek = semester.phase === 'lecture' ? semester.week : null
 
   if (!courses.length) {
     return (
@@ -115,11 +130,8 @@ export default function UniOverview() {
           <h2 className="text-2xl font-semibold tracking-tight">Overview</h2>
           <p className="mt-0.5 text-sm text-zinc-500">
             {courses.length} {courses.length === 1 ? 'course' : 'courses'}
-            {currentWeek && (
-              <>
-                {' \u00b7 '}Week <span className="text-zinc-300">{currentWeek}</span> of {UNI_WEEKS}
-              </>
-            )}
+            {' \u00b7 '}
+            <SemesterLabel semester={semester} />
           </p>
         </div>
         <div className="mb-0.5 flex flex-wrap gap-2">
