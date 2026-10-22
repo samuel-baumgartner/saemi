@@ -124,9 +124,10 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
   };
 
   return (
-    <section id="skills" className="relative min-h-[40vh] flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 z-10">
-      <div className="max-w-7xl w-full">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-8 sm:mb-12 text-center">Skills</h2>
+    <section id="skills" className="portfolio-section">
+      <div className="portfolio-container">
+        <p className="portfolio-eyebrow">04 / Toolkit</p>
+        <h2>Skills &amp; tools</h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {skills.map((skill) => {
@@ -136,6 +137,16 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
               <SpotlightCard
                 key={skill.id}
                 onClick={() => handleCardClick(skill.id)}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                aria-label={skill.category}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleCardClick(skill.id);
+                  }
+                }}
                 className="p-3 sm:p-4 h-full flex flex-col items-center text-center cursor-pointer group active:scale-95 transition-transform md:transition-none border-2 md:border border-neutral-700 md:border-neutral-800 hover:border-neutral-600 md:hover:border-neutral-700 relative"
                 spotlightColor={spotlightColors[skill.id] || "rgba(255, 255, 255, 0.15)"}
               >

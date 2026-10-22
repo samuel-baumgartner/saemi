@@ -452,7 +452,7 @@ export function GoalsTab({
                     Budget (min)
                   </span>
                   <div className="w-full rounded-lg bg-black/40 border border-white/15 px-3 py-2 text-white text-sm tabular-nums">
-                    {progressReady ? unproductiveTarget : '—'}
+                    {progressReady ? unproductiveTarget : 'N/A'}
                   </div>
                 </div>
               </div>
@@ -466,7 +466,7 @@ export function GoalsTab({
                     </>
                   ) : (
                     <span className="text-white/40">
-                      —
+                      N/A
                     </span>
                   )}
                   {progressReady && unproductiveOver && (
@@ -546,7 +546,7 @@ export function GoalsTab({
                     <span className="text-sm text-white/70 tabular-nums">
                       {done == null ? (
                         <span className="text-white/40">
-                          —
+                          N/A
                         </span>
                       ) : (
                         <>

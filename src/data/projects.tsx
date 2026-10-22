@@ -17,6 +17,36 @@ import BallOnPlatePlayground from '@/components/ball-on-plate/BallOnPlatePlaygro
 
 export const projects: Project[] = [
   {
+    id: 'provincia',
+    title: 'Provincia: Colony & Combat',
+    shortTitle: 'Provincia',
+    description: 'A Roman-inspired colony simulation with resource management, growing settlements, and tactical battles. A personal game project in active development.',
+    type: 'personal',
+    tags: [{ label: 'Game Development' }, { label: 'Godot 4' }, { label: 'Simulation' }],
+    metadata: { place: 'Colony building meets tactical combat', date: 'In development' },
+    backgroundImage: '/provincia/settlement-overview.webp',
+    carouselItems: [
+      { type: 'image', src: '/provincia/settlement-overview.webp', caption: 'A growing colony: homes, farms, and workshops' },
+      { type: 'image', src: '/provincia/water-aqueduct.webp', caption: 'Water infrastructure: an aqueduct through the settlement' },
+      { type: 'image', src: '/provincia/production.webp', caption: 'Inside the settlement: workshops and production buildings' },
+      { type: 'image', src: '/provincia/sandbox-infantry.webp', caption: 'Battle sandbox: legionaries meet barbarian infantry' },
+      { type: 'image', src: '/provincia/battle-close.webp', caption: 'Defending the settlement: combat on the front line' },
+      { type: 'image', src: '/provincia/sandbox-formations.webp', caption: 'Battle sandbox: opposing armies in formation' },
+    ],
+    headerContent: createProjectHeader('Provincia', [{ label: 'Godot 4' }, { label: 'Personal Project' }, { label: 'In development' }], 'Build a colony. Command its defense.'),
+    content: (
+      <div className="space-y-8 py-6">
+        {createHighlightedSection('A living settlement', <p className="leading-relaxed text-gray-700">Provincia is my Roman-inspired colony simulation, built with Godot. The project brings together settlement building, resource production, water infrastructure, and the people who keep a colony running.</p>)}
+        {createSectionHeader('From colony to battlefield')}
+        {createFeatureList([
+          { title: 'Tactical battles', description: 'Command formations of soldiers and defend the settlement against raids.', color: 'bg-sky-500' },
+          { title: 'A growing simulation', description: 'Connect housing, workplaces, resources, and water as the colony expands.', color: 'bg-blue-500' },
+          { title: 'An ongoing game project', description: 'In-engine captures show settlement building, water infrastructure, production, and the battle system during development.', color: 'bg-indigo-500' },
+        ])}
+      </div>
+    ),
+  },
+  {
     id: 'remote-ball',
     title: 'Remote Controlled Ball',
     shortTitle: 'Remote Controlled Ball',
@@ -29,7 +59,7 @@ export const projects: Project[] = [
       { label: 'Embedded Systems' },
     ],
     metadata: {},
-    backgroundImage: '/ball/image.png',
+    backgroundImage: '/ball/preview-transparent.png',
     carouselItems: [
       { type: 'model', src: '/Kugel_rerender6.glb' },
     ],
@@ -45,7 +75,7 @@ export const projects: Project[] = [
     ),
     content: (
       <div className="space-y-8">
-        <div className="mt-20">
+        <div>
           {createHighlightedSection(
             'Overview',
             <div>
@@ -105,7 +135,7 @@ export const projects: Project[] = [
       { label: 'Path Planning' },
     ],
     metadata: {},
-    backgroundImage: '/models/ball-on-plate/card.png',
+    backgroundImage: '/models/ball-on-plate/card-transparent.png',
     carouselItems: [
       {
         type: 'custom',
@@ -145,7 +175,7 @@ export const projects: Project[] = [
           {createSectionHeader('System Overview', 'from-purple-500 to-pink-500')}
           <div className="space-y-4">
             <p className="text-gray-700 leading-relaxed text-base">
-              The plant is a two-axis gimballed plate. Two motors set the pitch and roll; an overhead camera measures the ball position; a real-time loop closes the gap between desired waypoints and the physical ball. Tilting the plate couples gravity into planar acceleration, so even small angle errors compound quickly — which is why planning must respect ball radius, clearance, and reachable tilt limits.
+              The plant is a two-axis gimballed plate. Two motors set the pitch and roll; an overhead camera measures the ball position; a real-time loop closes the gap between desired waypoints and the physical ball. Tilting the plate couples gravity into planar acceleration, so even small angle errors compound quickly, which is why planning must respect ball radius, clearance, and reachable tilt limits.
             </p>
             {createFeatureList([
               { title: 'Actuation', description: 'two-axis plate tilt (pitch / roll), typically within about ±10°', color: 'bg-blue-500' },
@@ -159,7 +189,7 @@ export const projects: Project[] = [
         <div className="space-y-4 mt-12">
           {createSectionHeader('Test it yourself', 'from-amber-600 to-orange-500')}
           <p className="text-gray-700 leading-relaxed text-base">
-            Move your mouse over the CAD machine to tilt the plate in X and Y — watch the ball accelerate downhill under the same gravity coupling a planner and controller have to fight on the real system.
+            Move your mouse over the CAD machine to tilt the plate in X and Y and watch the ball accelerate downhill under the same gravity coupling a planner and controller have to fight on the real system.
           </p>
           <BallOnPlatePlayground />
         </div>
@@ -175,9 +205,9 @@ export const projects: Project[] = [
                 Implemented Algorithms
               </h5>
               <div className="space-y-6">
-                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 md:p-7 border border-indigo-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div className="bg-white/70 rounded-xl p-6 md:p-7 border border-indigo-100">
                   <div className="flex items-start gap-6 md:gap-8 pl-4 md:pl-6">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 border-2 border-blue-300 flex items-center justify-center shadow-sm mt-1">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 border-2 border-blue-300 flex items-center justify-center mt-1">
                       <span className="text-blue-900 font-bold text-sm leading-none">1</span>
                     </div>
                     <div className="flex-1">
@@ -191,9 +221,9 @@ export const projects: Project[] = [
                     </div>
                   </div>
                 </div>
-                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 md:p-7 border border-purple-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div className="bg-white/70 rounded-xl p-6 md:p-7 border border-purple-100">
                   <div className="flex items-start gap-6 md:gap-8 pl-4 md:pl-6">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-purple-100 border-2 border-purple-300 flex items-center justify-center shadow-sm mt-1">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-purple-100 border-2 border-purple-300 flex items-center justify-center mt-1">
                       <span className="text-purple-900 font-bold text-sm leading-none">2</span>
                     </div>
                     <div className="flex-1">
@@ -207,9 +237,9 @@ export const projects: Project[] = [
                     </div>
                   </div>
                 </div>
-                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 md:p-7 border border-purple-100 shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div className="bg-white/70 rounded-xl p-6 md:p-7 border border-purple-100">
                   <div className="flex items-start gap-6 md:gap-8 pl-4 md:pl-6">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-100 border-2 border-indigo-300 flex items-center justify-center shadow-sm mt-1">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-100 border-2 border-indigo-300 flex items-center justify-center mt-1">
                       <span className="text-purple-900 font-bold text-sm leading-none">3</span>
                     </div>
                     <div className="flex-1">
@@ -289,7 +319,7 @@ export const projects: Project[] = [
     ),
     content: (
       <div className="space-y-8">
-        <div className="mt-20">
+        <div>
           {createHighlightedSection(
             'Overview',
             <p className="text-gray-700 leading-relaxed text-base">
@@ -326,7 +356,7 @@ export const projects: Project[] = [
         )}
         <div className="space-y-3">
           {createSectionHeader('Project Video', 'from-red-500 to-pink-500')}
-          <div className="w-full aspect-video rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 overflow-hidden">
+          <div className="w-full aspect-video rounded-2xl border border-gray-200/60 overflow-hidden">
             <iframe
               src="https://www.youtube.com/embed/tGFbolKX4Ts"
               className="w-full h-full"
@@ -336,7 +366,7 @@ export const projects: Project[] = [
             />
           </div>
         </div>
-        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-orange-100/30 backdrop-blur-sm">
+        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 ">
           {createSectionHeader('Challenges Overcome', 'from-orange-500 to-red-500')}
           <ul className="space-y-3 pt-1">
             <li className="flex items-start gap-3">
@@ -403,7 +433,7 @@ export const projects: Project[] = [
     ),
     content: (
       <div className="space-y-8">
-        <div className="mt-20">
+        <div>
           {createHighlightedSection(
             'Overview',
           <p className="text-gray-700 leading-relaxed text-base">
@@ -416,7 +446,7 @@ export const projects: Project[] = [
         </div>
         <div className="space-y-8 mt-16">
           {createSectionHeader('Key Features', 'from-purple-500 to-pink-500')}
-          <div className="bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 ">
             <p className="text-gray-800 mb-6 font-semibold text-lg md:text-xl">Multi-layer environmental dashboard for Zurich, including:</p>
             {createFeatureList([
               { title: 'Surface Temperature', description: '(NASA/ESA Earthdata)', color: 'bg-blue-500' },
@@ -430,19 +460,19 @@ export const projects: Project[] = [
             <div className="mt-8 pt-6 border-t border-blue-200/60">
               <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Core Capabilities</h5>
               <div className="grid md:grid-cols-1 gap-4">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                <div className="bg-white/60 rounded-xl p-5 md:p-6 border border-blue-200/40 transition-all duration-300 ">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
                     <p className="text-gray-700 leading-relaxed text-base md:text-lg">Automated ingestion and alignment of satellite + city datasets into a unified grid</p>
                   </div>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                <div className="bg-white/60 rounded-xl p-5 md:p-6 border border-blue-200/40 transition-all duration-300 ">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
                     <p className="text-gray-700 leading-relaxed text-base md:text-lg">Unsupervised anomaly detection to identify unusual environmental patterns</p>
                   </div>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-blue-200/40 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                <div className="bg-white/60 rounded-xl p-5 md:p-6 border border-blue-200/40 transition-all duration-300 ">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2.5"></div>
                     <p className="text-gray-700 leading-relaxed text-base md:text-lg">Interactive web map to explore anomalies and underlying layers spatially</p>
@@ -466,12 +496,12 @@ export const projects: Project[] = [
           <img
             src="/Nasa Hack/3.png"
             alt="Public Transport"
-            className="w-full rounded-xl shadow-lg border border-gray-200"
+            className="w-full rounded-xl border border-gray-200"
           />
         </div>
         <div className="space-y-3">
           {createSectionHeader('Project Video', 'from-red-500 to-pink-500')}
-          <div className="w-full aspect-video rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 overflow-hidden">
+          <div className="w-full aspect-video rounded-2xl border border-gray-200/60 overflow-hidden">
             <iframe
               src="https://www.youtube.com/embed/XYicrR4ybDM?start=25"
               className="w-full h-full"
@@ -481,7 +511,7 @@ export const projects: Project[] = [
             />
           </div>
         </div>
-        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-orange-100/30 backdrop-blur-sm">
+        <div className="space-y-4 bg-gradient-to-br from-orange-50 to-red-50/30 rounded-2xl p-7 md:p-9 border border-gray-200/60 ">
           {createSectionHeader('Challenges Overcome', 'from-orange-500 to-red-500')}
           <ul className="space-y-3 pt-1">
             <li className="flex items-start gap-3">
@@ -508,7 +538,7 @@ export const projects: Project[] = [
             { category: 'Deployment', technology: 'Vercel', color: 'bg-orange-500' },
           ])}
         </div>
-        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
+        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-7 md:p-9 border border-gray-200/60 ">
           {createSectionHeader('Live Demo', 'from-blue-500 to-purple-500')}
           <div className="space-y-2 pt-1">
             <a
@@ -561,7 +591,7 @@ export const projects: Project[] = [
     ),
     content: (
       <div className="space-y-8">
-        <div className="mt-20">
+        <div>
           {createHighlightedSection(
             'Overview',
             <div>
@@ -596,7 +626,7 @@ export const projects: Project[] = [
               <img
                 src="/Start Hack/2.png"
                 alt="AI Coach Feature"
-                className="w-full rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 hover:ring-blue-200/50 transition-all duration-300"
+                className="w-full rounded-2xl border border-gray-200/60 transition-all duration-300"
               />
               <div>
                 <h5 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">AI Coach</h5>
@@ -609,7 +639,7 @@ export const projects: Project[] = [
               <img
                 src="/Start Hack/4.png"
                 alt="SMART Goals Feature"
-                className="w-full rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 hover:ring-blue-200/50 transition-all duration-300"
+                className="w-full rounded-2xl border border-gray-200/60 transition-all duration-300"
               />
               <div>
                 <h5 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Goals</h5>
@@ -618,7 +648,7 @@ export const projects: Project[] = [
           </p>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 ">
               <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Multilingual Chat</h5>
           <p className="text-gray-700 leading-relaxed text-base">
                 With automatic translation capabilities, our chat feature enables seamless interaction among employees, irrespective of their preferred language, breaking down communication barriers in diverse, global workplaces.
@@ -628,7 +658,7 @@ export const projects: Project[] = [
               <img
                 src="/Start Hack/3.png"
                 alt="Events System Feature"
-                className="w-full rounded-2xl shadow-2xl border border-gray-200/60 ring-4 ring-blue-100/30 hover:ring-blue-200/50 transition-all duration-300"
+                className="w-full rounded-2xl border border-gray-200/60 transition-all duration-300"
               />
               <div>
                 <h5 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Events</h5>
@@ -637,7 +667,7 @@ export const projects: Project[] = [
                 </p>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 shadow-lg shadow-purple-100/30 backdrop-blur-sm mt-8">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 mt-8">
               <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Feedback with an Avatar</h5>
               <p className="text-gray-700 leading-relaxed text-base">
                 Employing an animated avatar, our platform delivers instantaneous responses in the form of delayed rewards and consequences, aiding users in anticipating their emotional states based on their actions. This innovative approach to behavioral feedback enhances user engagement and promotes self-awareness.
@@ -657,10 +687,10 @@ export const projects: Project[] = [
             { category: 'AI Coach', technology: 'ChatGPT with user-context integration', color: 'bg-cyan-500' },
           ])}
         </div>
-        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-7 md:p-9 border border-gray-200/60 shadow-lg shadow-blue-100/30 backdrop-blur-sm">
+        <div className="space-y-3 bg-gradient-to-br from-blue-50 via-purple-50/50 to-blue-50 rounded-2xl p-7 md:p-9 border border-gray-200/60 ">
           {createSectionHeader('Result', 'from-blue-500 to-purple-500')}
           <p className="text-gray-700 leading-relaxed text-base pt-1">
-            In 36 hours, we delivered a fully functional prototype featuring real-time chat, goal tracking, event creation, AI coaching, and a 3D animated avatar—combining AI, gamification, and workplace psychology into one cohesive platform.
+            In 36 hours, we delivered a fully functional prototype featuring real-time chat, goal tracking, event creation, AI coaching, and a 3D animated avatar, combining AI, gamification, and workplace psychology into one cohesive platform.
           </p>
         </div>
       </div>
@@ -723,7 +753,7 @@ export const projects: Project[] = [
             <p className="text-gray-700 leading-relaxed text-base">
               A systemd unit manages the Docker stack lifecycle. The sharelatex container includes a full TeX Live distribution, with packages updated via tlmgr as needed.
             </p>
-            <div className="bg-gradient-to-br from-amber-50/60 via-orange-50/40 to-yellow-50/30 rounded-xl p-7 md:p-8 border border-gray-200/60 shadow-md">
+            <div className="bg-gradient-to-br from-amber-50/60 via-orange-50/40 to-yellow-50/30 rounded-xl p-7 md:p-8 border border-gray-200/60 ">
               <h5 className="text-xl font-semibold text-gray-900 mb-3">Storage and Backup Architecture</h5>
               <p className="text-gray-700 leading-relaxed mb-3">
                 A TrueNAS pool and dataset are configured as an SMB share, mounted at /backup on the Ubuntu VM. A nightly systemd timer triggers a backup script that runs mongodump and rsyncs Overleaf data, MongoDB, and Redis volumes into date-stamped folders on the TrueNAS share.

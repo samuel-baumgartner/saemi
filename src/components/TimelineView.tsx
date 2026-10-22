@@ -189,7 +189,7 @@ export function TimelineView({
     )
     const ok = await copyTextToClipboard(text)
     flashCopy(
-      ok ? 'Day copied — paste into ChatGPT (Cmd+V)' : 'Could not copy (clipboard denied)',
+      ok ? 'Day copied. Paste into ChatGPT (Cmd+V)' : 'Could not copy (clipboard denied)',
       ok
     )
   }
@@ -203,7 +203,7 @@ export function TimelineView({
     )
     const ok = await copyTextToClipboard(text)
     flashCopy(
-      ok ? 'Month copied — paste into ChatGPT (Cmd+V)' : 'Could not copy (clipboard denied)',
+      ok ? 'Month copied. Paste into ChatGPT (Cmd+V)' : 'Could not copy (clipboard denied)',
       ok
     )
   }
@@ -339,7 +339,7 @@ export function TimelineView({
             {sessions.length > 0 ? (
               <>
                 No entries on <span className="text-white/80">{selectedDate}</span>. The timeline
-                only shows rows for the day you select — sleep and Fit sync are stored on their
+                only shows rows for the day you select; sleep and Fit sync are stored on their
                 calendar dates (often not &quot;today&quot;).
                 {sessionDateRangeHint ? (
                   <>

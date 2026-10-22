@@ -236,7 +236,7 @@ function World({
             statusRef.current("Ball rolling…");
           }
         } else {
-          statusRef.current("Tilting — ball keeps moving freely.");
+          statusRef.current("Tilting. The ball keeps moving freely.");
         }
       }
     } else {

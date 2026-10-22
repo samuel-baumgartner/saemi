@@ -35,7 +35,7 @@ export default function BallOnPlatePlayground() {
   const [tiltX, setTiltX] = useState(0);
   const [tiltY, setTiltY] = useState(0);
   const [resetKey, setResetKey] = useState(0);
-  const [status, setStatus] = useState("Move the mouse over the machine — no goal, just tilt and watch the ball.");
+  const [status, setStatus] = useState("Move the mouse over the machine. Tilt it and watch the ball move freely.");
 
   useEffect(() => {
     const observer = new IntersectionObserver(

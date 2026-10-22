@@ -40,27 +40,6 @@ function ModelPreloader() {
 export default function Home() {
   const { modalState, openModal, closeModal } = useModal();
 
-  // Prevent scrolling past ContactSection
-  useEffect(() => {
-    const handleScroll = () => {
-      const contactSection = document.querySelector('#contact');
-      if (!contactSection) return;
-
-      const contactRect = contactSection.getBoundingClientRect();
-      const contactBottom = contactRect.bottom + window.scrollY;
-      const currentScroll = window.scrollY + window.innerHeight;
-
-      // If we've scrolled past the contact section, prevent further scrolling
-      if (currentScroll > contactBottom) {
-        const maxScroll = contactBottom - window.innerHeight;
-        window.scrollTo(0, maxScroll);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: false });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const handleOpenProject = (project: Project) => {
     openModal(
       project.title,
@@ -108,7 +87,7 @@ export default function Home() {
     <>
       <ModelPreloader />
       <ScrollBackground />
-      <main className="relative min-h-screen">
+      <main className="portfolio relative min-h-screen">
         <HeroSection personalInfo={personalInfo} onOpenRemoteBallProject={handleOpenRemoteBallProject} />
         <AboutSection personalInfo={personalInfo} />
         <EducationSection

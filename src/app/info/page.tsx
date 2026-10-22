@@ -84,7 +84,7 @@ export default async function InfoPage() {
           <code className="text-cyan-200/90">sync.json</code> →{' '}
           <code className="text-cyan-200/90">startup_rule_ids</code> marks whole rules
           (e.g. Cursor). Generic browser rules use title matching on the computer so
-          not every Chrome minute counts — see the TimeChecker README. Sessions whose
+          not every Chrome minute counts; see the TimeChecker README. Sessions whose
           text still matches “Cursor” also count (e.g. rule label Cursor).
         </p>
         <p className="text-white/55 text-sm leading-relaxed mb-2">
@@ -149,7 +149,7 @@ export default async function InfoPage() {
           <ul className="text-sm space-y-2 font-mono text-white/70">
             {logs.map((l) => (
               <li key={l.id} className="border-b border-white/5 py-2">
-                {l.createdAt.toISOString()} — sessions: {l.sessionCount}{' '}
+                {l.createdAt.toISOString()} | sessions: {l.sessionCount}{' '}
                 {l.message ? `(${l.message})` : ''}
               </li>
             ))}

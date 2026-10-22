@@ -53,7 +53,7 @@ export const createFeatureList = (features: FeatureItem[]): React.ReactNode => {
         return (
           <div 
             key={index} 
-            className={`group bg-gradient-to-br ${gradient} rounded-xl p-4 md:p-5 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border ${borderColor} shadow-md text-center backdrop-blur-sm`}
+            className={`group bg-gradient-to-br ${gradient} rounded-xl p-4 md:p-5 transition-all duration-300 border ${borderColor} text-center`}
           >
             <div className="flex flex-col items-center">
               <strong className="text-gray-900 font-bold text-lg md:text-xl block mb-2">{feature.title}</strong>
@@ -125,13 +125,13 @@ export const createTechStack = (techItems: TechStackItem[]): React.ReactNode => 
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-4">
+    <div className="grid md:grid-cols-2 gap-x-4 gap-y-3">
       {techItems.map((item, index) => {
         const colors = getColorStyles(item.color);
         return (
           <div 
             key={index} 
-            className="rounded-2xl p-4 md:p-5 border border-gray-200/60 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group mb-4"
+            className="modal-tech-card rounded-2xl p-4 md:p-5 border border-gray-200/60 transition-all duration-300 group"
             style={{
               background: `linear-gradient(135deg, ${colors.bgFrom}, ${colors.bgTo})`,
             }}
@@ -175,7 +175,7 @@ export const createProjectHeader = (
       {tags.map((tag, index) => (
         <span
           key={index}
-          className={`${tag.color || 'bg-blue-100 text-blue-800'} px-4 py-2 rounded-full font-bold shadow-lg border border-gray-200/60 backdrop-blur-md hover:scale-105 transition-transform duration-200`}
+          className={`${tag.color || 'bg-blue-100 text-blue-800'} px-4 py-2 rounded-full font-bold border border-gray-200/60 transition-transform duration-200`}
         >
           {tag.label}
         </span>

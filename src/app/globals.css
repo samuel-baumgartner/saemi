@@ -386,3 +386,74 @@
   color: var(--accent);
 }
 
+
+/* Portfolio styles are scoped to the public home page. */
+.portfolio { color: #e2e8f0; font-family: Arial, Helvetica, sans-serif; }
+.portfolio :is(a, button, summary):focus-visible { outline: 2px solid #7dd3fc; outline-offset: 5px; }
+.portfolio a, .portfolio button { -webkit-tap-highlight-color: transparent; }
+.portfolio-nav a:hover, .portfolio-hero-footer :is(a, button):hover { color: white; }
+.portfolio-hero { position: relative; min-height: calc(100svh + 100px); display: flex; flex-direction: column; background: linear-gradient(90deg, rgba(5, 12, 22, .55), rgba(5, 12, 22, .15)); }
+.portfolio-nav, .portfolio-hero-content, .portfolio-hero-footer { width: min(100% - 48px, 1080px); margin-inline: auto; }
+.portfolio-nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 28px; }
+.portfolio-hero-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-block: 48px clamp(180px, 32svh, 340px); }
+.portfolio-hero h1 { max-width: 780px; font-size: clamp(3.25rem, 7.4vw, 6.5rem); font-weight: 600; line-height: 1.04; letter-spacing: -.055em; color: #fff; text-wrap: balance; }
+.portfolio-eyebrow { margin-bottom: 22px; color: #7dd3fc; font-size: 11px; line-height: 1.6; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
+.portfolio-hero-footer { min-height: 76px; flex-shrink: 0; display: flex; justify-content: space-between; gap: 20px; padding-block: 24px; border-top: 1px solid #ffffff20; color: #cbd5e1; font-size: 13px; }
+.portfolio-section { position: relative; padding: 88px 24px; background: rgba(11, 16, 24, .35); scroll-margin-top: 20px; }
+.portfolio-section + .portfolio-section { border-top: 1px solid #ffffff0e; }
+.portfolio-container { max-width: 1080px; margin-inline: auto; }
+.portfolio-section h2 { margin-bottom: 40px; color: #f8fafc; font-size: clamp(1.9rem, 4vw, 2.75rem); font-weight: 500; letter-spacing: -.035em; line-height: 1.15; }
+.portfolio-panel, .portfolio-project { border: 1px solid #ffffff14; border-radius: 12px; background: #121a26; transition: border-color .2s, background .2s; }
+.portfolio-panel:hover, .portfolio-project:hover { border-color: #7dd3fc70; background: #162130; }
+.portfolio-project { display: flex; flex-direction: column; overflow: hidden; text-align: left; width: 100%; }
+.portfolio-project-image { height: 200px; width: 100%; background-color: #0c131e; background-position: center; background-size: cover; border-bottom: 1px solid #ffffff14; }
+.portfolio-skill { border-top: 1px solid #ffffff20; }
+.portfolio-skill summary::marker { color: #7dd3fc; font-size: 12px; }
+.portfolio-button { display: inline-flex; justify-content: center; align-items: center; gap: 10px; min-height: 48px; border: 1px solid #ffffff30; border-radius: 7px; padding: 12px 20px; color: #f8fafc; font-size: 14px; font-weight: 500; transition: background .2s; }
+.portfolio-button:hover { background: #ffffff10; }
+.portfolio-button-primary { background: #e0f2fe; color: #0c2334; border-color: #e0f2fe; }
+.portfolio-button-primary:hover { background: #bae6fd; }
+@media (max-width: 640px) {
+  .portfolio-nav { flex-wrap: wrap; gap: 18px; }
+  .portfolio-hero-content { justify-content: flex-start; padding-block: 24px 64px; }
+  .portfolio-section { padding-block: 60px; }
+  .portfolio-section h2 { margin-bottom: 30px; }
+  .portfolio-project-image { height: 180px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio *, .portfolio *::before, .portfolio *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Provincia uses the portfolio palette; screenshots retain their in-engine color. */
+.provincia-showcase { position: relative; display: grid; grid-template-columns: .85fr 1.3fr; overflow: hidden; border: 1px solid #7dd3fc26; border-radius: 12px; background: linear-gradient(135deg, #152233, #101722); }
+.provincia-copy { align-self: center; padding: 32px; }
+.provincia-gallery { min-width: 0; background: #0c131e; border-left: 1px solid #ffffff0e; }
+.provincia-hero-shot { display: block; position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+.provincia-thumbnail { overflow: hidden; border: 2px solid transparent; border-radius: 5px; opacity: .65; transition: opacity .2s, border-color .2s; }
+.provincia-thumbnail:hover, .provincia-thumbnail.is-active { opacity: 1; }
+.provincia-thumbnail.is-active { border-color: #7dd3fc; }
+@media (max-width: 767px) {
+  .provincia-showcase { grid-template-columns: 1fr; }
+  .provincia-copy { padding: 28px 24px; }
+  .provincia-gallery { border-left: 0; border-top: 1px solid #ffffff0e; }
+  .provincia-hero-shot { aspect-ratio: 16 / 9; }
+}
+
+/* Match portfolio dialogs and their generated project content to the dark palette. */
+.portfolio-modal { color-scheme: dark; }
+.portfolio-modal-prose :is(.text-gray-900, .text-gray-800, .text-gray-950) { color: #f1f5f9; }
+.portfolio-modal-prose :is(.text-gray-700, .text-gray-600) { color: #cbd5e1; }
+.portfolio-modal-prose .bg-clip-text { background: none; color: #f1f5f9; }
+.portfolio-modal-prose :is([class*="bg-gradient-to-"], [class*="bg-white"], .modal-tech-card):not(.bg-clip-text) { background: #192536 !important; }
+.portfolio-modal-prose [class*="border-"] { border-color: #ffffff1a; }
+.portfolio-modal-prose :is([class*="bg-blue-100"], [class*="bg-green-100"], [class*="bg-purple-100"], [class*="bg-indigo-100"]) { background-color: #24364c; color: #bae6fd; }
+.portfolio-modal-prose a { color: #7dd3fc; }
+.portfolio-modal-prose a:hover { color: #bae6fd; }
+
+.portfolio-modal-prose .group:hover .group-hover\:text-gray-950 { color: #f1f5f9; }
+
+/* The explore button covers the card; gallery controls remain independently clickable. */
+.provincia-open::after { content: ""; position: absolute; inset: 0; z-index: 1; cursor: pointer; }
+.provincia-showcase:hover { border-color: #7dd3fc70; }
+.provincia-showcase:has(.provincia-open:focus-visible) { outline: 2px solid #7dd3fc; outline-offset: 5px; }
+.provincia-hero-shot, .provincia-thumbnail { position: relative; z-index: 2; }

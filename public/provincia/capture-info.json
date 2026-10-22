@@ -1,0 +1,22 @@
+{
+  "captured": "2026-10-22",
+  "game": "Provincia",
+  "engine": "Godot 4.6.2",
+  "renderer": "Forward+ / Vulkan (llvmpipe software rendering)",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "source_scene": "tools/sandbox/battle_sandbox.tscn",
+  "notes": "Actual in-engine captures. Settlement, water, and production screenshots from the September 29, 2026 screenshot set. Battle sandbox captures from October 22, 2026: full army deployment, infantry duel, and cavalry versus spears, with UI hidden and portfolio camera positions. WebP encoding only; no generated or retouched content.",
+  "images": {
+    "settlement-overview": "01_settlement_overview",
+    "water-aqueduct": "04_water_aqueduct",
+    "production": "05_production",
+    "sandbox-formations": "sandbox-formations",
+    "sandbox-infantry": "sandbox-infantry",
+    "sandbox-cavalry": "sandbox-cavalry",
+    "battle-close": "09_battle_melee_close (tools/portfolio_capture/portfolio_battle.tscn)"
+  },
+  "capture_script": "tools/portfolio_capture/portfolio_sandbox_capture.gd"
+}

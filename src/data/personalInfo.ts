@@ -7,31 +7,8 @@ export const personalInfo: PersonalInfo = {
   universityUrl: 'https://ethz.ch/',
   interests: 'Interested in robotics, control, and embedded systems.',
   about: [
-    "I am in the 7th semester of my Bachelor's in Electrical Engineering at ETH Zurich, planning a Master's in Robotics, with a strong interest in software development and control systems.",
+    "I am in the 7th semester of my Bachelor's in Electrical Engineering at ETH Zurich, planning a Master's in Robotics, with a strong interest in software development and control systems. During my degree, I also completed an exchange in Japan.",
     'I work as a teaching assistant at ETH and am actively pursuing projects in SaaS development to gain practical entrepreneurial experience.',
     'Outside of academics, I study Japanese, take care of my bees, and go to the gym, combining curiosity and creativity in both personal and professional pursuits.',
   ],
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
