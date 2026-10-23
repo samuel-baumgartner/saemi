@@ -4,15 +4,6 @@ import { useState, useEffect, useRef } from "react";
 
 const TOTAL_IMAGES = 100;
 
-// ============================================
-// SCROLL SPEED CONTROLS - Adjust these values
-// ============================================
-// Higher value = faster scrolling (more images per pixel scrolled)
-// Lower value = slower scrolling (fewer images per pixel scrolled)
-const SCROLL_MULTIPLIER_DESKTOP = 0.039;  // Desktop scroll speed
-const SCROLL_MULTIPLIER_MOBILE = 0.025;   // Mobile scroll speed
-// ============================================
-
 function getPreloadRange(isMobile: boolean) {
   // Increase preload range for mobile to prevent flickering
   return isMobile ? 10 : 5;
@@ -307,6 +298,7 @@ export default function ScrollBackground() {
   }, [currentImageIndex, isMobile]);
 
   useEffect(() => {
+    let animationEnd = 1;
     const handleScroll = () => {
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
@@ -314,10 +306,9 @@ export default function ScrollBackground() {
 
       rafRef.current = requestAnimationFrame(() => {
         const scrollTop = window.scrollY;
-        // Use different multiplier for desktop vs mobile
-        const scrollMultiplier = isMobile ? SCROLL_MULTIPLIER_MOBILE : SCROLL_MULTIPLIER_DESKTOP;
-        // Simple calculation: scrollTop * multiplier determines image index
-        const imageIndex = Math.min(Math.floor(scrollTop * scrollMultiplier), TOTAL_IMAGES - 1);
+        // Finish assembly when the projects section reaches the ball at screen center.
+        const progress = Math.max(0, Math.min(1, scrollTop / animationEnd));
+        const imageIndex = Math.floor(progress * (TOTAL_IMAGES - 1));
         
         if (imageIndex !== lastIndexRef.current && !isUpdatingRef.current) {
           // Check if image is fully ready (loaded and decoded)
@@ -328,9 +319,7 @@ export default function ScrollBackground() {
             // On mobile, use double buffering for smoother transitions
             if (isMobile) {
               // Mobile: use double buffering with transition
-              if (nextImageIndex !== imageIndex) {
-                setNextImageIndex(imageIndex);
-              }
+              setNextImageIndex(imageIndex);
               requestAnimationFrame(() => {
                 setCurrentImageIndex(imageIndex);
                 lastIndexRef.current = imageIndex;
@@ -466,6 +455,18 @@ export default function ScrollBackground() {
       });
     };
 
+    const updateAnimationEnd = () => {
+      const projects = document.getElementById("projects");
+      animationEnd = projects
+        ? Math.max(1, projects.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.5)
+        : Math.max(1, window.innerHeight);
+      handleScroll();
+    };
+    const resizeObserver = new ResizeObserver(updateAnimationEnd);
+    resizeObserver.observe(document.querySelector("main") || document.body);
+    window.addEventListener("resize", updateAnimationEnd);
+    updateAnimationEnd();
+
     // Use passive listener for better mobile performance
     window.addEventListener("scroll", handleScroll, { passive: true });
     // Also listen to touchmove for mobile momentum scrolling
@@ -473,6 +474,8 @@ export default function ScrollBackground() {
     handleScroll(); // Initial call
 
     return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateAnimationEnd);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("touchmove", handleScroll);
       if (rafRef.current) {
