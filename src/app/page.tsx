@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useGLTF } from "@react-three/drei";
 import ScrollBackground from "@/components/ScrollBackground";
 import EducationModal from "@/components/EducationModal";
 import HeroSection from "@/components/sections/HeroSection";
@@ -22,14 +21,10 @@ function ModelPreloader() {
   useEffect(() => {
     // Wait a bit after page load, then preload the model in the background
     const timer = setTimeout(() => {
-      try {
-        // Preload the GLB model
-        useGLTF.preload('/Kugel_rerender6.glb');
-      } catch {
-        // Silently fail if preload doesn't work
-        console.debug('Model preload initiated');
-      }
-    }, 2000); // Start preloading 2 seconds after page load
+      // Warm the HTTP cache. Parsing happens in the viewer, which can fail
+      // on its own without taking down the page.
+      fetch("/Kugel_rerender6.glb").catch(() => {});
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
