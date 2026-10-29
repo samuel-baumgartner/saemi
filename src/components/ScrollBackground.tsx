@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
+import frameNames from "@/data/ball-sequence.json";
 
-const TOTAL_IMAGES = 100;
-const PRELOAD_RADIUS = 2;
-const MAX_LOADS = 2;
-
-function getImagePath(index: number): string {
-  return `/data/${String(index + 1).padStart(4, "0")}.png`;
-}
+const LOAD_CONCURRENCY = 4;
 
 export default function ScrollBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,78 +13,87 @@ export default function ScrollBackground() {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d", { alpha: false });
     if (!canvas || !context) return;
-
-    // One persistent bitmap: never clear the displayed frame while another loads.
-    // Its native resolution stays fixed, including during viewport resizing.
-    context.globalCompositeOperation = "copy";
-    const images = new Map<number, HTMLImageElement>();
-    const loading = new Map<number, HTMLImageElement>();
-    const failed = new Set<number>();
+    const surface = canvas;
+    const ctx = context;
+    // Keep every decoded frame. Resolution bounds the whole sequence to about
+    // 121 MiB on desktop or 54 MiB on mobile, rather than 791 MiB of source PNGs.
+    const width = window.innerWidth <= 768 ? 640 : 960;
+    surface.width = width;
+    surface.height = width * 9 / 16;
+    const frames: ImageBitmap[] = [];
+    const abort = new AbortController();
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let disposed = false;
-    let requestedIndex = 0;
-    let displayedIndex = -1;
+    let ready = false;
+    let started = false;
     let animationEnd = 1;
+    let displayedPosition = -1;
     let raf: number | undefined;
 
-    function desiredFrames() {
-      const indices = [requestedIndex];
-      for (let distance = 1; distance <= PRELOAD_RADIUS; distance++) {
-        if (requestedIndex + distance < TOTAL_IMAGES) indices.push(requestedIndex + distance);
-        if (requestedIndex - distance >= 0) indices.push(requestedIndex - distance);
-      }
-      return indices;
-    }
-
     function paint() {
-      const image = images.get(requestedIndex);
-      if (!image || requestedIndex === displayedIndex) return;
-      try {
-        // Draw the actual decoded element, not a second CSS image resource.
-        // Copy replaces transparent pixels too, without an intermediate blank frame.
-        context!.drawImage(image, 0, 0, canvas!.width, canvas!.height);
-        displayedIndex = requestedIndex;
-      } catch {
-        // Keep the last good pixels if a browser cannot draw this frame.
-        images.delete(requestedIndex);
-        failed.add(requestedIndex);
+      const progress = Math.max(0, Math.min(1, window.scrollY / animationEnd));
+      const position = ready && !reducedMotion.matches ? progress * (frameNames.length - 1) : 0;
+      if (!frames[0] || position === displayedPosition) return;
+      const lower = Math.floor(position);
+      const upper = Math.ceil(position);
+      // Both draws complete in one animation callback. No clears, canvas
+      // resizing, fetches, decoding, or spring/catch-up motion while scrolling.
+      ctx.globalAlpha = 1;
+      ctx.drawImage(frames[lower], 0, 0);
+      if (upper !== lower) {
+        ctx.globalAlpha = position - lower;
+        ctx.drawImage(frames[upper], 0, 0);
       }
-    }
-
-    function prepareFrames() {
-      const wanted = desiredFrames();
-      for (const index of images.keys()) {
-        if (!wanted.includes(index)) images.delete(index);
-      }
-      for (const index of wanted) {
-        if (loading.size >= MAX_LOADS) break;
-        if (images.has(index) || loading.has(index) || failed.has(index)) continue;
-        const image = new Image();
-        loading.set(index, image);
-        image.decoding = "async";
-        image.src = getImagePath(index);
-        void image.decode().then(() => {
-          if (disposed) return;
-          if (image.naturalWidth === 0 || image.naturalHeight === 0) throw new Error("Empty frame");
-          // A late completion must never replace a newer scroll target.
-          if (desiredFrames().includes(index)) images.set(index, image);
-        }).catch(() => {
-          if (!disposed) failed.add(index);
-        }).finally(() => {
-          loading.delete(index);
-          if (!disposed) scheduleUpdate();
-        });
-      }
+      ctx.globalAlpha = 1;
+      displayedPosition = position;
+      surface.style.visibility = "visible";
     }
 
     function scheduleUpdate() {
       if (disposed || raf !== undefined) return;
       raf = requestAnimationFrame(() => {
         raf = undefined;
-        const progress = Math.max(0, Math.min(1, window.scrollY / animationEnd));
-        requestedIndex = Math.floor(progress * (TOTAL_IMAGES - 1));
         paint();
-        prepareFrames();
       });
+    }
+
+    async function loadFrame(index: number) {
+      const response = await fetch(`/ball-sequence/${frameNames[index]}-${width}.webp`, {
+        signal: abort.signal,
+      });
+      if (!response.ok) throw new Error(`Background frame: ${response.status}`);
+      const bitmap = await createImageBitmap(await response.blob());
+      if (disposed || abort.signal.aborted) {
+        bitmap.close();
+        return;
+      }
+      frames[index] = bitmap;
+    }
+
+    async function loadSequence() {
+      if (started || disposed || reducedMotion.matches) return;
+      started = true;
+      let nextIndex = 1;
+      try {
+        await Promise.all(Array.from({ length: LOAD_CONCURRENCY }, async () => {
+          while (!disposed && !abort.signal.aborted && nextIndex < frameNames.length) {
+            await loadFrame(nextIndex++);
+          }
+        }));
+        if (disposed || abort.signal.aborted) return;
+        ready = true;
+        scheduleUpdate();
+      } catch {
+        // A failed sequence stays on its poster, never a partial animation.
+        abort.abort();
+        for (let index = 1; index < frames.length; index++) frames[index]?.close();
+        frames.length = 1;
+      }
+    }
+
+    function onMotionChange() {
+      scheduleUpdate();
+      void loadSequence();
     }
 
     function updateAnimationEnd() {
@@ -99,34 +104,41 @@ export default function ScrollBackground() {
       scheduleUpdate();
     }
 
-    const resizeObserver = new ResizeObserver(updateAnimationEnd);
-    resizeObserver.observe(document.querySelector("main") || document.body);
-    window.addEventListener("resize", updateAnimationEnd);
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    canvas.addEventListener("contextrestored", restoreFrame);
     function restoreFrame() {
-      context!.globalCompositeOperation = "copy";
-      displayedIndex = -1;
+      displayedPosition = -1;
       scheduleUpdate();
     }
+
+    const resizeObserver = new ResizeObserver(updateAnimationEnd);
+    resizeObserver.observe(document.querySelector("main") || document.body);
+    reducedMotion.addEventListener("change", onMotionChange);
+    window.addEventListener("resize", updateAnimationEnd);
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    surface.addEventListener("contextrestored", restoreFrame);
     updateAnimationEnd();
+    void loadFrame(0).then(() => {
+      scheduleUpdate();
+      return loadSequence();
+    }).catch(() => { /* Leave the static CSS poster visible if loading fails. */ });
 
     return () => {
       disposed = true;
+      abort.abort();
       if (raf !== undefined) cancelAnimationFrame(raf);
       resizeObserver.disconnect();
+      reducedMotion.removeEventListener("change", onMotionChange);
       window.removeEventListener("resize", updateAnimationEnd);
       window.removeEventListener("scroll", scheduleUpdate);
-      canvas.removeEventListener("contextrestored", restoreFrame);
-      for (const image of loading.values()) image.src = "";
-      loading.clear();
-      images.clear();
+      surface.removeEventListener("contextrestored", restoreFrame);
+      for (const frame of frames) frame?.close();
     };
   }, []);
 
   return (
     <div className="scroll-background" aria-hidden="true">
-      <canvas ref={canvasRef} width={1920} height={1080} />
+      <Image className="scroll-background-poster" src="/ball-sequence/0001-960.webp"
+        alt="" width={960} height={540} unoptimized />
+      <canvas ref={canvasRef} width={960} height={540} style={{ visibility: "hidden" }} />
     </div>
   );
 }

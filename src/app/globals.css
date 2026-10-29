@@ -474,8 +474,9 @@
 
 /* Keep a single persistent background surface across frame changes and resizes. */
 .scroll-background { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #000; }
-.scroll-background canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+.scroll-background-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.scroll-background canvas { position: relative; display: block; width: 100%; height: 100%; object-fit: contain; }
 .scroll-background::after { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .4); }
 @media (max-width: 767px) {
-  .scroll-background canvas { position: absolute; width: 130%; height: auto; max-width: none; left: -15%; top: 50%; transform: translateY(-50%); }
+  .scroll-background canvas, .scroll-background-poster { position: absolute; width: 130%; height: auto; max-width: none; left: -15%; top: 50%; transform: translateY(-50%); }
 }
