@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import ModelViewer from "./ModelViewer";
+import dynamic from "next/dynamic";
 import type { CarouselItem } from "@/types";
+
+const ModelViewer = dynamic(() => import('./ModelViewer'), { ssr: false });
 
 interface EducationModalProps {
   isOpen: boolean;
@@ -192,9 +194,9 @@ export default function EducationModal({
                         ) : (
                           <div className="w-full max-w-6xl md:max-w-7xl lg:max-w-[90vw] flex flex-col items-center gap-3 sm:gap-4 py-2">
                             <div className="text-center space-y-2 sm:space-y-3 w-full px-2">
-                              <h5 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-100 mb-1 sm:mb-2 text-center">
+                              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-100 mb-1 sm:mb-2 text-center">
                                 {title || "3D Model"}
-                              </h5>
+                              </h3>
                             </div>
                             <div className="w-full max-w-2xl md:max-w-3xl lg:max-w-4xl aspect-square rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden bg-slate-900 border border-white/10 ring-2 sm:ring-4 ring-white/5">
                               {isActive && item.src && (

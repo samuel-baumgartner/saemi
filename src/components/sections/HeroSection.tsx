@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowUpRight, Download } from 'lucide-react';
+import Image from 'next/image';
 import { PersonalInfo } from '@/types';
 
 interface HeroSectionProps {
@@ -30,7 +31,7 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
                 <a href="/CV/Samuel_Baumgartner.pdf" download="Samuel_Baumgartner_CV.pdf" className="portfolio-cv-link">Download CV <Download size={16} /></a>
               </div>
             </div>
-          <img src="/Portrait.png" alt={personalInfo.name} width={260} height={300} className="portfolio-hero-portrait" fetchPriority="high" />
+          <Image src="/Portrait.png" alt={`${personalInfo.name}, electrical engineering student at ETH Zürich`} width={260} height={300} sizes="(max-width: 640px) 112px, (max-width: 1263px) 19vw, 240px" className="portfolio-hero-portrait" priority />
           </div>
         </div>
         <a href="#about" className="portfolio-scroll-cue" aria-label="Scroll to About me">

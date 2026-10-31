@@ -6,11 +6,11 @@ export const createSectionHeader = (
   _gradient: string = 'from-blue-500 to-purple-500'
 ): React.ReactNode => {
   return (
-    <h4 className="text-3xl md:text-4xl font-extrabold mb-3">
+    <h2 className="text-3xl md:text-4xl font-extrabold mb-3">
       <span className="text-gray-900">
         {title}
       </span>
-    </h4>
+    </h2>
   );
 };
 
@@ -168,9 +168,9 @@ export const createProjectHeader = (
   description: string
 ): React.ReactNode => (
   <div className="pb-8 pt-4 pr-4">
-    <h4 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
+    <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
       {title}
-    </h4>
+    </h2>
     <div className="flex flex-wrap gap-4 text-sm mb-6">
       {tags.map((tag, index) => (
         <span

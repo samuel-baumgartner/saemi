@@ -9,6 +9,7 @@ export default function ContactSection() {
         <div className="flex flex-wrap gap-3">
           <a href="mailto:sbaumgartn@ethz.ch" className="portfolio-button portfolio-button-primary"><Mail size={17} /> sbaumgartn@ethz.ch</a>
           <a href="https://www.linkedin.com/in/samuel-baumgartner-441a1a24b/" target="_blank" rel="noopener noreferrer" className="portfolio-button">LinkedIn <ArrowUpRight size={17} /></a>
+          <a href="https://github.com/samuel-baumgartner" target="_blank" rel="noopener noreferrer" className="portfolio-button">GitHub <ArrowUpRight size={17} /></a>
         </div>
         <footer className="mt-16 flex flex-wrap justify-between gap-4 border-t border-white/10 pt-6 text-sm text-slate-500"><span>Samuel Baumgartner</span><a href="#" className="text-slate-400">Back to top ↑</a></footer>
       </div>

@@ -8,6 +8,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
+    "test:seo": "python3 tests/seo-smoke.py",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:setup-new": "bash scripts/setup-new-db.sh",

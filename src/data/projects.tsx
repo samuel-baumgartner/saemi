@@ -1,7 +1,9 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { Project } from '@/types';
+import { projectSummaries } from '@/data/projectSummaries';
 import {
   createSectionHeader,
   createFeatureList,
@@ -17,14 +19,10 @@ import BallOnPlatePlayground from '@/components/ball-on-plate/BallOnPlatePlaygro
 
 export const projects: Project[] = [
   {
-    id: 'provincia',
-    title: 'Provincia: Colony & Combat',
-    shortTitle: 'Provincia',
-    description: 'A Roman-inspired colony simulation with resource management, growing settlements, and tactical battles. A personal game project in active development.',
+    ...projectSummaries['provincia'],
     type: 'personal',
     tags: [{ label: 'Game Development' }, { label: 'Godot 4' }, { label: 'Simulation' }],
     metadata: { place: 'Colony building meets tactical combat', date: 'In development' },
-    backgroundImage: '/provincia/settlement-overview.webp',
     carouselItems: [
       { type: 'image', src: '/provincia/settlement-overview.webp', caption: 'A growing colony: homes, farms, and workshops' },
       { type: 'image', src: '/provincia/water-aqueduct.webp', caption: 'Water infrastructure: an aqueduct through the settlement' },
@@ -47,10 +45,7 @@ export const projects: Project[] = [
     ),
   },
   {
-    id: 'remote-ball',
-    title: 'Remote Controlled Ball',
-    shortTitle: 'Remote Controlled Ball',
-    description: 'A spherical robot controlled via smartphone through a web interface. The ball moves forward by spinning its inner mechanism and sideways by shifting an internal mass.',
+    ...projectSummaries['remote-ball'],
     type: 'personal',
     tags: [
       { label: 'Personal Project', color: 'bg-green-100 text-green-800' },
@@ -59,7 +54,6 @@ export const projects: Project[] = [
       { label: 'Embedded Systems' },
     ],
     metadata: {},
-    backgroundImage: '/ball/preview-transparent.png',
     carouselItems: [
       { type: 'model', src: '/Kugel_rerender6.glb' },
     ],
@@ -124,10 +118,7 @@ export const projects: Project[] = [
     ),
   },
   {
-    id: 'ball-on-plate',
-    title: 'Ball on a Plate',
-    shortTitle: 'Ball on a Plate',
-    description: 'A control system project from ETH implementing RRT, RRT*, and RRT* smart path planning algorithms for ball control via plate angle manipulation.',
+    ...projectSummaries['ball-on-plate'],
     type: 'personal',
     tags: [
       { label: 'ETH Project', color: 'bg-purple-100 text-purple-800' },
@@ -135,7 +126,6 @@ export const projects: Project[] = [
       { label: 'Path Planning' },
     ],
     metadata: {},
-    backgroundImage: '/models/ball-on-plate/card-transparent.png',
     carouselItems: [
       {
         type: 'custom',
@@ -201,9 +191,9 @@ export const projects: Project[] = [
               I implemented three path planning algorithms for this project: RRT, RRT*, and RRT*-Smart. The carousel tree visualization shows the planned path with grey regions around the trajectory for the physical ball thickness and safety margin.
             </p>
             <div className="space-y-6">
-              <h5 className="text-2xl md:text-3xl font-bold text-gray-900">
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
                 Implemented Algorithms
-              </h5>
+              </h3>
               <div className="space-y-6">
                 <div className="bg-white/70 rounded-xl p-6 md:p-7 border border-indigo-100">
                   <div className="flex items-start gap-6 md:gap-8 pl-4 md:pl-6">
@@ -211,10 +201,10 @@ export const projects: Project[] = [
                       <span className="text-blue-900 font-bold text-sm leading-none">1</span>
                     </div>
                     <div className="flex-1">
-                      <h6 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
+                      <h4 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
                         Rapidly-Exploring Random Tree (RRT)
                         <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-semibold">Classic</span>
-                      </h6>
+                      </h4>
                       <p className="text-sm leading-relaxed text-gray-700">
                         I implemented the classic RRT algorithm for motion planning in cluttered environments. RRT incrementally grows a tree of collision-free states by sampling random points in the configuration space and connecting them to the nearest node if the straight-line path is obstacle-free. Because it aggressively explores large, unknown regions, it is very good at quickly finding a feasible path from start to goal – but that first path is usually quite suboptimal and jagged.
                       </p>
@@ -227,10 +217,10 @@ export const projects: Project[] = [
                       <span className="text-purple-900 font-bold text-sm leading-none">2</span>
                     </div>
                     <div className="flex-1">
-                      <h6 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
+                      <h4 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
                         RRT*: Asymptotically Optimal RRT
                         <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold">Optimized</span>
-                      </h6>
+                      </h4>
                       <p className="text-sm leading-relaxed text-gray-700">
                         To improve path quality, I implemented RRT*, which extends RRT with a cost-aware rewiring step. As the tree grows, each new node not only connects to the nearest state, but also chooses the parent that yields the lowest cost-to-come, and then &quot;rewires&quot; nearby nodes through this new state if it shortens their path. Over time, the tree converges to an asymptotically optimal solution: the path becomes shorter and smoother as more samples are added, at the cost of higher computation per iteration.
                       </p>
@@ -243,10 +233,10 @@ export const projects: Project[] = [
                       <span className="text-purple-900 font-bold text-sm leading-none">3</span>
                     </div>
                     <div className="flex-1">
-                      <h6 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
+                      <h4 className="font-bold text-lg text-gray-900 mb-2 flex items-center gap-2">
                         RRT*-Smart: Biased, Beacon-Guided Optimization
                         <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">Advanced</span>
-                      </h6>
+                      </h4>
                       <p className="text-sm leading-relaxed text-gray-700">
                         Finally, I implemented RRT*-Smart, which accelerates RRT*&apos;s convergence by combining online path smoothing with intelligent sampling. Once a first path is found, the algorithm optimizes the path by removing redundant waypoints and straightening segments, extracts &quot;beacon&quot; nodes along this optimized path, and biases future samples to lie in a region around these beacons, while still mixing in uniform samples for global exploration. This focused sampling around a continually re-optimized path lets RRT*-Smart reach high-quality paths much faster than plain RRT*, especially in cluttered environments.
                       </p>
@@ -281,10 +271,7 @@ export const projects: Project[] = [
     ),
   },
   {
-    id: 'zurich-hack',
-    title: 'Swiss AI hack 2025 – "Guidely: AI Desktop Guidance Assistant"',
-    shortTitle: 'Swiss AI hack',
-    description: 'Guidely is a desktop application built for Swiss AI hack 2025. It helps users complete tasks on their computer by generating interactive, step-by-step tutorials.',
+    ...projectSummaries['zurich-hack'],
     type: 'hackathon',
     tags: [
       { label: 'Hackathon', color: 'bg-blue-100 text-blue-800' },
@@ -299,7 +286,6 @@ export const projects: Project[] = [
       place: '🥈 2nd Place (out of 40 teams)',
       earnings: '💰 3k earnings',
     },
-    backgroundImage: '/Zuerich Hack/1.png',
     carouselItems: [
       { type: 'image', src: '/Zuerich Hack/1.png' },
       { type: 'image', src: '/Zuerich Hack/2.png' },
@@ -358,6 +344,7 @@ export const projects: Project[] = [
           {createSectionHeader('Project Video', 'from-red-500 to-pink-500')}
           <div className="w-full aspect-video rounded-2xl border border-gray-200/60 overflow-hidden">
             <iframe
+              loading="lazy"
               src="https://www.youtube.com/embed/tGFbolKX4Ts"
               className="w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -397,10 +384,7 @@ export const projects: Project[] = [
     ),
   },
   {
-    id: 'nasa-hack',
-    title: 'NASA Space Apps Challenge 2025 – "Data Pathways to Healthy Cities" | UrbanLens',
-    shortTitle: 'City Planner',
-    description: 'UrbanLens is a web platform built during the NASA Space Apps Challenge in Lucerne. We tackled the theme Data Pathways to Healthy Cities and Human Settlements by creating an interactive map of Zurich that overlays diverse environmental datasets.',
+    ...projectSummaries['nasa-hack'],
     type: 'hackathon',
     tags: [
       { label: 'Hackathon', color: 'bg-blue-100 text-blue-800' },
@@ -414,7 +398,6 @@ export const projects: Project[] = [
       teamSize: 'Team of 5',
       place: '🥉 3rd Place',
     },
-    backgroundImage: '/Nasa Hack/1.png',
     carouselItems: [
       { type: 'image', src: '/Nasa Hack/1.png' },
       { type: 'image', src: '/Nasa Hack/2.png' },
@@ -458,7 +441,7 @@ export const projects: Project[] = [
               { title: 'Transportation Reachability Layer', description: '(travel range within 10 minutes)', color: 'bg-cyan-500' },
             ])}
             <div className="mt-8 pt-6 border-t border-blue-200/60">
-              <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Core Capabilities</h5>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Core Capabilities</h3>
               <div className="grid md:grid-cols-1 gap-4">
                 <div className="bg-white/60 rounded-xl p-5 md:p-6 border border-blue-200/40 transition-all duration-300 ">
                   <div className="flex items-start gap-3">
@@ -493,8 +476,11 @@ export const projects: Project[] = [
           <p className="text-gray-700 leading-relaxed text-base mb-4">
             I retrieved public transport data from an external API and used it to compute the area that can be reached within 10 minutes from any given point. Based on this reachable region, I then calculated a transport-accessibility score for every location on the map, reflecting how well each area is served by public transport.
           </p>
-          <img
+          <Image
             src="/Nasa Hack/3.png"
+            width={816}
+            height={649}
+            sizes="(max-width: 1128px) calc(100vw - 48px), 1080px"
             alt="Public Transport"
             className="w-full rounded-xl border border-gray-200"
           />
@@ -503,6 +489,7 @@ export const projects: Project[] = [
           {createSectionHeader('Project Video', 'from-red-500 to-pink-500')}
           <div className="w-full aspect-video rounded-2xl border border-gray-200/60 overflow-hidden">
             <iframe
+              loading="lazy"
               src="https://www.youtube.com/embed/XYicrR4ybDM?start=25"
               className="w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -556,10 +543,7 @@ export const projects: Project[] = [
     ),
   },
   {
-    id: 'start-hack',
-    title: 'StartHack 2024 | Progress Pact',
-    shortTitle: 'Start Hack 24 - Progress Pact',
-    description: 'A web app to improve workplace well-being through AI coaching, gamified goal tracking, and social engagement.',
+    ...projectSummaries['start-hack'],
     type: 'hackathon',
     tags: [
       { label: 'Hackathon', color: 'bg-blue-100 text-blue-800' },
@@ -572,7 +556,6 @@ export const projects: Project[] = [
       date: 'March 2025',
       teamSize: 'Team of 4',
     },
-    backgroundImage: "/Start Hack/1.png",
     carouselItems: [
       { type: 'image', src: '/Start Hack/1.png' },
       { type: 'image', src: '/Start Hack/2.png' },
@@ -623,52 +606,61 @@ export const projects: Project[] = [
           {createSectionHeader('Key Features', 'from-purple-500 to-pink-500')}
           <div className="space-y-8">
             <div className="space-y-3">
-              <img
+              <Image
                 src="/Start Hack/2.png"
+                width={1914}
+                height={1079}
+                sizes="(max-width: 1128px) calc(100vw - 48px), 1080px"
                 alt="AI Coach Feature"
                 className="w-full rounded-2xl border border-gray-200/60 transition-all duration-300"
               />
               <div>
-                <h5 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">AI Coach</h5>
+                <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">AI Coach</h3>
                 <p className="text-gray-700 leading-relaxed">
                   Powered by artificial intelligence, our coaching feature provides personalized training regimens and guidance tailored to individual goals. The AI coach adapts to each user's unique needs, offering real-time support and motivation to help employees achieve their wellness objectives.
                 </p>
               </div>
             </div>
             <div className="space-y-3">
-              <img
+              <Image
                 src="/Start Hack/4.png"
+                width={1916}
+                height={1078}
+                sizes="(max-width: 1128px) calc(100vw - 48px), 1080px"
                 alt="SMART Goals Feature"
                 className="w-full rounded-2xl border border-gray-200/60 transition-all duration-300"
               />
               <div>
-                <h5 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Goals</h5>
+                <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Goals</h3>
                 <p className="text-gray-700 leading-relaxed">
                   Users can establish objectives across various facets of life, accompanied by incentives to foster goal attainment. The system provides comprehensive tracking and gamified rewards that motivate continuous progress and achievement.
           </p>
               </div>
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-cyan-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 ">
-              <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Multilingual Chat</h5>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Multilingual Chat</h3>
           <p className="text-gray-700 leading-relaxed text-base">
                 With automatic translation capabilities, our chat feature enables seamless interaction among employees, irrespective of their preferred language, breaking down communication barriers in diverse, global workplaces.
           </p>
         </div>
         <div className="space-y-3">
-              <img
+              <Image
                 src="/Start Hack/3.png"
+                width={1913}
+                height={1089}
+                sizes="(max-width: 1128px) calc(100vw - 48px), 1080px"
                 alt="Events System Feature"
                 className="w-full rounded-2xl border border-gray-200/60 transition-all duration-300"
               />
               <div>
-                <h5 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Events</h5>
+                <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Events</h3>
                 <p className="text-gray-700 leading-relaxed">
                   Discover and engage in events aligned with personal interests, facilitating connections with like-minded individuals and offering rewards for participation, either from the company or through the avatar. This feature promotes social interaction and helps build a stronger, more connected workplace community.
                 </p>
               </div>
             </div>
             <div className="bg-gradient-to-br from-purple-50 to-pink-50/50 rounded-2xl p-7 md:p-8 border border-gray-200/60 mt-8">
-              <h5 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Feedback with an Avatar</h5>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Feedback with an Avatar</h3>
               <p className="text-gray-700 leading-relaxed text-base">
                 Employing an animated avatar, our platform delivers instantaneous responses in the form of delayed rewards and consequences, aiding users in anticipating their emotional states based on their actions. This innovative approach to behavioral feedback enhances user engagement and promotes self-awareness.
               </p>
@@ -697,10 +689,7 @@ export const projects: Project[] = [
     ),
   },
   {
-    id: 'overleaf-selfhosted',
-    title: 'Self-Hosted Overleaf with Automated TrueNAS Backups',
-    shortTitle: 'Self-Hosted Overleaf',
-    description: 'A self-hosted Overleaf deployment running on ETH servers for internal ETH use, with comprehensive documentation, automated setup scripts, Docker Compose, nginx reverse proxy, and automated TrueNAS backups.',
+    ...projectSummaries['overleaf-selfhosted'],
     type: 'personal',
     tags: [
       { label: 'ETH Project', color: 'bg-purple-100 text-purple-800' },
@@ -709,7 +698,6 @@ export const projects: Project[] = [
       { label: 'Self-Hosting' },
     ],
     metadata: {},
-    backgroundImage: '/overleaf/image.png',
     carouselItems: [
       { type: 'image', src: '/overleaf/image.png' },
     ],
@@ -754,7 +742,7 @@ export const projects: Project[] = [
               A systemd unit manages the Docker stack lifecycle. The sharelatex container includes a full TeX Live distribution, with packages updated via tlmgr as needed.
             </p>
             <div className="bg-gradient-to-br from-amber-50/60 via-orange-50/40 to-yellow-50/30 rounded-xl p-7 md:p-8 border border-gray-200/60 ">
-              <h5 className="text-xl font-semibold text-gray-900 mb-3">Storage and Backup Architecture</h5>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Storage and Backup Architecture</h3>
               <p className="text-gray-700 leading-relaxed mb-3">
                 A TrueNAS pool and dataset are configured as an SMB share, mounted at /backup on the Ubuntu VM. A nightly systemd timer triggers a backup script that runs mongodump and rsyncs Overleaf data, MongoDB, and Redis volumes into date-stamped folders on the TrueNAS share.
               </p>

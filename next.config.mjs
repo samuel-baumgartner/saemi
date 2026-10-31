@@ -3,6 +3,12 @@ const GAMES_ORIGIN = "https://ralf-game.vercel.app";
 
 const nextConfig = {
   output: "standalone",
+  async headers() {
+    return ["/personal/:path*", "/info/:path*", "/widget-preview/:path*", "/api/:path*"].map(source => ({
+      source,
+      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+    }));
+  },
   async redirects() {
     return [
       {

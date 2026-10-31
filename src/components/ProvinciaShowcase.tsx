@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowUpRight, Expand } from 'lucide-react';
 import type { Project } from '@/types';
 
@@ -24,6 +25,7 @@ export default function ProvinciaShowcase({ project, onOpen }: { project: Projec
           {['Godot 4', 'Colony simulation', 'Tactical combat'].map(tag => <span key={tag} className="rounded-full border border-sky-200/15 px-3 py-1 text-xs text-slate-300">{tag}</span>)}
         </div>
         <button className="portfolio-button provincia-open mt-7" onClick={openProject}>Explore the project <ArrowUpRight size={16} /></button>
+        <Link href={`/projects/${project.id}`} prefetch={false} className="relative z-[2] mt-5 block w-fit text-sm text-sky-200 underline-offset-4 hover:underline">Read the Provincia case study ↗</Link>
       </div>
       <div className="provincia-gallery">
         <button className="provincia-hero-shot group" onClick={openProject} aria-label={`Enlarge screenshot: ${shot.caption}`}>

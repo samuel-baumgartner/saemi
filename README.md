@@ -40,6 +40,14 @@ scripts/                 maintenance / reclassification jobs
 
 Personal project, actively used daily. Not packaged for others to self-host — the code is here as a reference for how the pieces fit together.
 
+## Public portfolio SEO
+
+The public portfolio and `/projects/[slug]` pages include canonical URLs, unique search metadata, Open Graph/Twitter previews, and JSON-LD. Project summaries live in `src/data/projectSummaries.ts`; the homepage, case studies, preview images, and sitemap share that catalog. Private dashboard, sync, and widget pages use `noindex` metadata and response headers. Indexing directives do not change the existing authentication behavior.
+
+After starting a production build with `pnpm build` and `pnpm start`, run `pnpm test:seo` (or `python3 tests/seo-smoke.py http://127.0.0.1:3001`) to check the actual HTML, sitemap, crawler directives, and preview PNGs. The check requires Python 3 and no extra packages.
+
+The canonical production origin is configured in `src/lib/seo.ts`. Once deployed, submit `https://www.samuelbaumgartner.ch/sitemap.xml` in Google Search Console to request discovery and monitor indexing.
+
 ## Author
 
 [Samuel Baumgartner](https://www.samuelbaumgartner.ch) — BSc Electrical Engineering, ETH Zürich.

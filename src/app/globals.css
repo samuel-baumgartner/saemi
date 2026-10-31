@@ -389,6 +389,8 @@
 
 /* Portfolio styles are scoped to the public home page. */
 .portfolio { color: #e2e8f0; font-family: Arial, Helvetica, sans-serif; }
+.portfolio-skip-link { position: fixed; top: 12px; left: 12px; z-index: 100; transform: translateY(-200%); border-radius: 6px; padding: 12px 20px; background: #e0f2fe; color: #0c2334; }
+.portfolio-skip-link:focus { transform: translateY(0); }
 .portfolio :is(a, button, summary):focus-visible { outline: 2px solid #7dd3fc; outline-offset: 5px; }
 .portfolio a, .portfolio button { -webkit-tap-highlight-color: transparent; }
 .portfolio-nav a:hover, .portfolio-hero-footer :is(a, button):hover { color: white; }
