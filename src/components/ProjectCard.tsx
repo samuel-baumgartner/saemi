@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Project } from '@/types';
 
-export default function ProjectCard({ project, onOpen }: { project: Project; onOpen: (project: Project) => void }) {
+export default function ProjectCard({ project }: { project: Project }) {
   const label = project.type === 'hackathon' ? 'Hackathon' : project.tags?.some(tag => tag.label === 'ETH Project') ? 'ETH Project' : 'Personal Project';
   return (
     <article className="portfolio-project group" data-project-id={project.id}>
@@ -24,7 +24,6 @@ export default function ProjectCard({ project, onOpen }: { project: Project; onO
           <span className="mt-auto pt-6 text-sm text-sky-200">Read case study <span aria-hidden="true">↗</span></span>
         </div>
       </Link>
-      <button onClick={() => onOpen(project)} className="border-t border-white/10 px-6 py-4 text-left text-sm text-slate-400 hover:text-white sm:px-7" aria-label={`Quick preview: ${project.shortTitle}`}>Quick preview</button>
     </article>
   );
 }

@@ -5,10 +5,9 @@ import ProvinciaShowcase from '@/components/ProvinciaShowcase';
 
 interface ProjectsSectionProps {
   projects: Project[];
-  onOpenProject: (project: Project) => void;
 }
 
-export default function ProjectsSection({ projects, onOpenProject }: ProjectsSectionProps) {
+export default function ProjectsSection({ projects }: ProjectsSectionProps) {
   const provincia = projects.find(project => project.id === 'provincia');
   const ballProjects = projects.filter(project => ['remote-ball', 'ball-on-plate'].includes(project.id));
   const remainingProjects = projects.filter(project => !['provincia', 'remote-ball', 'ball-on-plate'].includes(project.id));
@@ -21,17 +20,17 @@ export default function ProjectsSection({ projects, onOpenProject }: ProjectsSec
 
         <div className="mb-6 sm:mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 auto-rows-fr">
           {ballProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} onOpen={onOpenProject} />
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
 
         {provincia && (
-          <ProvinciaShowcase project={provincia} onOpen={onOpenProject} />
+          <ProvinciaShowcase project={provincia} />
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 auto-rows-fr">
           {remainingProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} onOpen={onOpenProject} />
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
 

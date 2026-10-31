@@ -455,7 +455,7 @@
 
 .portfolio-modal-prose .group:hover .group-hover\:text-gray-950 { color: #f1f5f9; }
 
-/* The explore button covers the card; gallery controls remain independently clickable. */
+/* The project link covers the card; gallery controls remain independently clickable. */
 .provincia-open::after { content: ""; position: absolute; inset: 0; z-index: 1; cursor: pointer; }
 .provincia-showcase:hover { border-color: #7dd3fc70; }
 .provincia-showcase:has(.provincia-open:focus-visible) { outline: 2px solid #7dd3fc; outline-offset: 5px; }

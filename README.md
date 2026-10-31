@@ -48,6 +48,8 @@ After starting a production build with `pnpm build` and `pnpm start`, run `pnpm 
 
 The canonical production origin is configured in `src/lib/seo.ts`. Once deployed, submit `https://www.samuelbaumgartner.ch/sitemap.xml` in Google Search Console to request discovery and monitor indexing.
 
+Projects open on their dedicated pages, with images, videos, and 3D demos embedded in the page. Run `pnpm exec playwright install chromium`, `pnpm build`, and `pnpm test:browser` to check desktop and mobile navigation, gallery controls, 3D rotation, replay, zoom/reset, and plate tilt/recentering. Tests compare rendered canvas images to verify that interaction changes the scene and reset restores it. Set `PLAYWRIGHT_BASE_URL` to test an already-running server. Software rendering verifies behavior and appearance, not GPU performance.
+
 ## Author
 
 [Samuel Baumgartner](https://www.samuelbaumgartner.ch) — BSc Electrical Engineering, ETH Zürich.

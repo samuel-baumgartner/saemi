@@ -2,14 +2,14 @@
 
 import { ArrowDown, ArrowUpRight, Download } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { PersonalInfo } from '@/types';
 
 interface HeroSectionProps {
   personalInfo: PersonalInfo;
-  onOpenRemoteBallProject?: () => void;
 }
 
-export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: HeroSectionProps) {
+export default function HeroSection({ personalInfo }: HeroSectionProps) {
   return (
     <header className="portfolio-hero">
       <div className="portfolio-hero-screen">
@@ -40,7 +40,7 @@ export default function HeroSection({ personalInfo, onOpenRemoteBallProject }: H
       </div>
       <div className="portfolio-hero-footer">
         <a href="#about" className="inline-flex items-center gap-2">About me <ArrowDown size={15} /></a>
-        <button onClick={onOpenRemoteBallProject} className="hidden items-center gap-2 sm:inline-flex">Behind the animation <ArrowUpRight size={15} /></button>
+        <Link href="/projects/remote-ball" prefetch={false} className="hidden items-center gap-2 sm:inline-flex">Behind the animation <ArrowUpRight size={15} /></Link>
       </div>
     </header>
   );

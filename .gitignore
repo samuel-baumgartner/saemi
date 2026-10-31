@@ -35,3 +35,5 @@ out
 
 /src/generated/prisma
 .vercel
+test-results/
+playwright-report/

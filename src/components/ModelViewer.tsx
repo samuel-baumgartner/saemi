@@ -62,8 +62,11 @@ export default function ModelViewer({ modelPath, className }: ModelViewerProps) 
 
   return (
     <div className={`relative h-full w-full ${className || ""}`}>
+      {!scene && <p role="status" className="flex h-full items-center justify-center text-sm text-slate-300">Loading the 3D model…</p>}
       {scene && (
         <Canvas
+          frameloop="demand"
+          dpr={[1, 1.5]}
           camera={{ position: [0, 0, 8], fov: 50 }}
           gl={{ antialias: true, alpha: true }}
           onCreated={({ gl, scene: threeScene }) => {

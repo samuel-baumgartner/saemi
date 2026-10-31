@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test:seo": "python3 tests/seo-smoke.py",
+    "test:browser": "playwright test",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:setup-new": "bash scripts/setup-new-db.sh",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "1.56.1",
     "@types/node": "^24.10.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ProjectDetails from '@/components/ProjectDetails';
@@ -50,15 +49,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">{project.title}</h1>
           <p className="mt-6 text-lg leading-8 text-slate-300">{project.description}</p>
         </header>
-        <Image
-          src={project.backgroundImage}
-          alt={`${project.shortTitle} project overview`}
-          width={1200}
-          height={675}
-          sizes="(max-width: 1128px) calc(100vw - 48px), 1080px"
-          priority
-          className="mb-10 aspect-video w-full rounded-xl border border-white/10 bg-[#0c131e] object-contain"
-        />
         <div id="project-content" className="scroll-mt-6">
           <ProjectDetails projectId={project.id} />
         </div>

@@ -3,16 +3,12 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, Expand } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import type { Project } from '@/types';
 
-export default function ProvinciaShowcase({ project, onOpen }: { project: Project; onOpen: (project: Project) => void }) {
+export default function ProvinciaShowcase({ project }: { project: Project }) {
   const [active, setActive] = useState(0);
   const shot = project.carouselItems[active];
-  const openProject = () => onOpen({
-    ...project,
-    carouselItems: [...project.carouselItems.slice(active), ...project.carouselItems.slice(0, active)],
-  });
 
   return (
     <article className="provincia-showcase mb-6 sm:mb-8" aria-labelledby="provincia-title" data-project-id={project.id}>
@@ -24,14 +20,12 @@ export default function ProvinciaShowcase({ project, onOpen }: { project: Projec
         <div className="mt-6 flex flex-wrap gap-2" aria-label="Project topics">
           {['Godot 4', 'Colony simulation', 'Tactical combat'].map(tag => <span key={tag} className="rounded-full border border-sky-200/15 px-3 py-1 text-xs text-slate-300">{tag}</span>)}
         </div>
-        <button className="portfolio-button provincia-open mt-7" onClick={openProject}>Explore the project <ArrowUpRight size={16} /></button>
-        <Link href={`/projects/${project.id}`} prefetch={false} className="relative z-[2] mt-5 block w-fit text-sm text-sky-200 underline-offset-4 hover:underline">Read the Provincia case study ↗</Link>
+        <Link href={`/projects/${project.id}`} prefetch={false} className="portfolio-button provincia-open mt-7">Explore the project <ArrowUpRight size={16} /></Link>
       </div>
       <div className="provincia-gallery">
-        <button className="provincia-hero-shot group" onClick={openProject} aria-label={`Enlarge screenshot: ${shot.caption}`}>
+        <Link href={`/projects/${project.id}#project-gallery`} prefetch={false} className="provincia-hero-shot group" aria-label="Explore Provincia screenshots on the project page">
           <Image src={shot.src!} alt={shot.caption!} width={1920} height={1080} sizes="(max-width: 767px) 100vw, 660px" className="h-full w-full object-cover" />
-          <span className="absolute right-4 top-4 rounded-full border border-white/20 bg-slate-950/60 p-2 text-white"><Expand size={16} /></span>
-        </button>
+        </Link>
         <div className="flex items-center justify-between gap-3 px-4 pt-4 text-xs text-slate-300" aria-live="polite">
           <span>{shot.caption}</span><span className="shrink-0 text-slate-500">0{active + 1} / 0{project.carouselItems.length}</span>
         </div>
