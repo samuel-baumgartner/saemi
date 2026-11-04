@@ -36,7 +36,8 @@ object PhoneSync {
         val token = WidgetPrefs.getToken(context)
         if (baseUrl.isBlank() || token.isBlank()) return
 
-        val sessions = PhoneUsageTracker.buildTodaySessions(context)
+        val built = PhoneUsageTracker.buildTodaySessions(context) ?: return
+        val sessions = built + TargetUseLog.extraSessions(context, built)
         val date = dayFmt.format(Date())
         val payload = PhoneUsageTracker.toJsonPayload(date, sessions)
         PhoneSyncApi.postPhoneSessions(baseUrl, token, payload)

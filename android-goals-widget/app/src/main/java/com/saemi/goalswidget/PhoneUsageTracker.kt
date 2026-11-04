@@ -1,8 +1,10 @@
 package com.saemi.goalswidget
 
 import android.app.usage.UsageEvents
+import android.app.usage.UsageEventsQuery
 import android.app.usage.UsageStatsManager
 import android.content.Context
+import android.os.Build
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -34,17 +36,23 @@ object PhoneUsageTracker {
         return cal.timeInMillis
     }
 
-    fun buildTodaySessions(context: Context): List<PhoneSession> {
+    /**
+     * Today's sessions, or null when usage events could not be read. Null must not be
+     * uploaded: the server replaces the day's phone sessions, so an empty failed read
+     * would delete the time and turn the blocker off.
+     */
+    fun buildTodaySessions(context: Context): List<PhoneSession>? {
         if (!UsageAccess.hasUsageAccess(context)) return emptyList()
         val usm = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val start = startOfTodayMs()
         val end = System.currentTimeMillis()
 
-        val events = usm.queryEvents(start, end) ?: return emptyList()
+        val events = readEvents(usm, start, end) ?: return null
         val e = UsageEvents.Event()
 
         var curPkg: String? = null
         var curStart: Long? = null
+        var sawTransition = false
 
         val raw = ArrayList<PhoneSession>(256)
 
@@ -86,14 +94,20 @@ object PhoneUsageTracker {
         while (events.hasNextEvent()) {
             events.getNextEvent(e)
             val pkg = e.packageName ?: continue
-            when (e.eventType) {
-                UsageEvents.Event.MOVE_TO_FOREGROUND -> {
-                    // Close previous app session at this timestamp.
+            val foreground = e.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND ||
+                e.eventType == UsageEvents.Event.ACTIVITY_RESUMED
+            val background = e.eventType == UsageEvents.Event.MOVE_TO_BACKGROUND ||
+                e.eventType == UsageEvents.Event.ACTIVITY_PAUSED
+            when {
+                foreground -> {
+                    sawTransition = true
+                    if (curPkg == pkg) continue
                     if (curPkg != null && curStart != null) closeAt(e.timeStamp)
                     curPkg = pkg
                     curStart = e.timeStamp
                 }
-                UsageEvents.Event.MOVE_TO_BACKGROUND -> {
+                background -> {
+                    sawTransition = true
                     if (curPkg == pkg && curStart != null) {
                         closeAt(e.timeStamp)
                         curPkg = null
@@ -102,6 +116,7 @@ object PhoneUsageTracker {
                 }
             }
         }
+        if (!sawTransition) return null
 
         // If something is still in foreground, close at "now".
         if (curPkg != null && curStart != null) closeAt(end)
@@ -128,13 +143,37 @@ object PhoneUsageTracker {
         return merged
     }
 
+    /**
+     * Android 15's old query often comes back with no activity events for apps
+     * that target the current SDK. Ask for resumed/paused explicitly, and keep
+     * the old query when that returns nothing.
+     */
+    private fun readEvents(usm: UsageStatsManager, start: Long, end: Long): UsageEvents? {
+        if (Build.VERSION.SDK_INT >= 35) {
+            try {
+                val query = UsageEventsQuery.Builder(start, end)
+                    .setEventTypes(
+                        UsageEvents.Event.ACTIVITY_RESUMED,
+                        UsageEvents.Event.ACTIVITY_PAUSED,
+                    )
+                    .build()
+                val filtered = usm.queryEvents(query)
+                if (filtered != null && filtered.hasNextEvent()) return filtered
+            } catch (_: Throwable) {
+            }
+        }
+        return usm.queryEvents(start, end)
+    }
+
     /** Phone-only YouTube + Instagram minutes today (offline fallback for the blocker). */
     fun unproductiveMinutesToday(context: Context): Int {
         val label = PhoneCategory.Unproductive.activityLabel
-        val ms = buildTodaySessions(context)
-            .filter { it.activity == label }
-            .sumOf { it.endMs - it.startMs }
-        return (ms / 60_000L).toInt()
+        val fromUsage = buildTodaySessions(context)
+            ?.filter { it.activity == label }
+            ?.sumOf { it.endMs - it.startMs }
+            ?.let { (it / 60_000L).toInt() }
+            ?: 0
+        return maxOf(fromUsage, TargetUseLog.minutesToday(context))
     }
 
     fun toJsonPayload(date: String, sessions: List<PhoneSession>): JSONObject {

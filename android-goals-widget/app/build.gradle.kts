@@ -9,8 +9,8 @@ android {
         applicationId = "com.saemi.goalswidget"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "2.1"
+        versionCode = 4
+        versionName = "2.2"
     }
     signingConfigs {
         // Same key on every machine/CI run so updates install over the previous APK.
@@ -46,4 +46,5 @@ android {
 }
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
+    testImplementation("junit:junit:4.13.2")
 }
